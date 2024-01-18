@@ -1,0 +1,22 @@
+{
+  "name": "pay-adyen-connect-client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3000",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "serve": "npm run build && npx http-server dist --port=3000  --cors"
+  },
+  "dependencies": {
+    "@adyen/adyen-web": "5.51.0"
+  },
+  "devDependencies": {
+    "@adyen/adyen-web": "5.51.0",
+    "@types/node": "^20.11.0",
+    "typescript": "5.2.2",
+    "vite": "4.4.9",
+    "vite-plugin-css-injected-by-js": "3.3.0"
+  }
+}

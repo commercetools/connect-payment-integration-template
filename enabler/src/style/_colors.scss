@@ -1,0 +1,74 @@
+/**
+* From https://www.figma.com/file/B3AuN5HVBARkLRXuYUWVY0/CA_UI-library?node-id=10-17139&t=HIYfSjMPWF7Q8zEX-0
+*/
+
+$color-style-black: #000;
+$color-style-white: #fff;
+
+// Primary
+$color-style-primary-active: #115190;
+$color-style-primary-disabled-background: #e0e0e0;
+$color-style-primary-disabled-stroke: #9d9d9d;
+$color-style-primary-hover-background: #edf4fc;
+$color-style-primary-hover: #115fac;
+$color-style-primary-low-capacity: #5b9ede;
+$color-style-primary-main: #186ec3;
+
+// Secondary
+$color-style-secondary-card-background: #f2f2f2;
+$color-style-secondary-disabled-background: #fcfcfc;
+$color-style-secondary-disabled-stroke: #e0e0e0;
+$color-style-secondary-main: #555557;
+
+// Error
+$color-style-error-active: #ffc5c5;
+$color-style-error-background: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.9),
+    rgba(255, 255, 255, 0.9)
+  ),
+  #d32f2f;
+$color-style-error-dark: #b52323;
+$color-style-error-hover: #fbdada;
+$color-style-error-main: #d32f2f;
+
+// Warning
+$color-style-warning-active: #ffd0a9;
+$color-style-warning-background: #ffebdb;
+$color-style-warning-dark: #e16600;
+$color-style-warning-hover: #ffd6b5;
+$color-style-warning-main: #ed6c02;
+
+// Success
+$color-style-success-active: #c8e4ca;
+$color-style-success-background: #e8f5e9;
+$color-style-success-dark: #2e7d32;
+$color-style-success-hover: #dcecdd;
+$color-style-success-main: #4caf50;
+
+// Info
+$color-style-info-active: #cce0eb;
+$color-style-info-background: #e8f3fa;
+$color-style-info-dark: #006fac;
+$color-style-info-hover: #d6e9f3;
+$color-style-info-main: #0288d1;
+
+// Other
+$color-style-other-border-dark: #4f4f4f;
+$color-style-other-border-default: #949494;
+$color-style-other-border-divider: #dee2e6;
+$color-style-other-card-background: #f7f7f7;
+$color-style-other-divider: rgba(0, 0, 0, 0.12);
+$color-style-other-tag-background: #ededed;
+$color-style-other-tag-background-discount: #ddf7de;
+$color-style-other-tag-text-discount: #105e14;
+$color-style-other-tooltip-background: rgba(97, 97, 97, 0.9);
+
+// Text
+$color-style-text-black: #333333;
+$color-style-text-disabled: #a2a3a4;
+$color-style-text-helper: #5e6368;
+$color-style-text-label: #4f4f4f;
+
+// Layout
+$color-style-side-background: #f8f8f8;

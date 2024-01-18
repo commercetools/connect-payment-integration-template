@@ -1,0 +1,24 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "files": [
+    "src/main.ts",
+    "src/global.d.ts"
+  ],
+  "compilerOptions": {
+    "target": "es2022",
+    "module": "Node16",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+  },
+  "include": [
+    "src/**/*",
+  ],
+  "exclude": ["src/**/*.[test|spec].ts"]
+}

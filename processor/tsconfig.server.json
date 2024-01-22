@@ -1,0 +1,25 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "files": [
+    "src/server/main.ts",
+    "src/server/global.d.ts"
+  ],
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+  },
+  "include": [
+    "src/server/**/*",
+  ],
+  "exclude": ["src/client/**/*", "src/server/**/*.[test|spec].ts", "src/mocks/**/*"]
+}

@@ -1,11 +1,9 @@
 {
-  "name": "pay-adyen-connect",
+  "name": "payment-integration-template",
   "version": "0.0.1",
-  "description": "Adyen Connector within Connect",
+  "description": "Payment provider integration template",
   "main": "dist/server/server.js",
   "scripts": {
-    "build:client": "vite build",
-    "build:client:dev": "vite build --mode dev && vite build",
     "build:server": "tsc -p tsconfig.server.json",
     "build": "npm run build:server && npm run build:client",
     "build:dev": "npm run build:server && npm run build:client:dev",
@@ -22,7 +20,6 @@
   "dependencies": {
     "@adyen/api-library": "14.2.0",
     "@commercetools/connect-payments-sdk": "0.0.1",
-    "@commercetools/payments-sdk": "file:../payments-sdk",
     "@commercetools/platform-sdk": "6.0.0",
     "@commercetools/sdk-client-v2": "2.2.0",
     "@fastify/cors": "8.4.0",

@@ -1,6 +1,5 @@
 import {healthCheckCoCoPermissions,statusHandler } from '@commercetools/connect-payments-sdk'
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { AdyenAPI } from '../clients/adyen/adyen.client';
 import { config } from '../config/config';
 import { paymentSDK } from '../payment-sdk';
 const packageJSON = require('../../../package.json');
@@ -22,11 +21,9 @@ export const statusRoutes = async (fastify: FastifyInstance, opts: FastifyPlugin
       }),
       async () => {
         try {
-          const paymentMethods = await AdyenAPI().PaymentsApi.paymentMethods({
-            merchantAccount: config.adyenMerchantAccount,
-          });
+          const paymentMethods = 'card';
           return {
-            name: 'Adyen API',
+            name: 'Mock Payment API',
             status: 'UP',
             data: {
               paymentMethods,
@@ -34,7 +31,7 @@ export const statusRoutes = async (fastify: FastifyInstance, opts: FastifyPlugin
           };
         } catch (e) {
           return {
-            name: 'Adyen API',
+            name: 'Mock Payment API',
             status: 'DOWN',
             data: {
               // TODO do not expose the error
@@ -47,7 +44,6 @@ export const statusRoutes = async (fastify: FastifyInstance, opts: FastifyPlugin
     metadataFn: async () => ({
       name: packageJSON.name,
       description: packageJSON.description,
-      '@adyen/api-library': packageJSON.dependencies['@adyen/api-library'],
       '@commercetools/sdk-client-v2': packageJSON.dependencies['@commercetools/sdk-client-v2'],
     }),
   });

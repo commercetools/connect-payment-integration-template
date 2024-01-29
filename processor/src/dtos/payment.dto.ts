@@ -1,26 +1,6 @@
 import {Static, Type} from '@sinclair/typebox';
 
-// TODO: Identify the SessionRequest Type for mock payment
-
-// export type CreateSessionData = Omit<
-//     CreateCheckoutSessionRequest,
-//     | 'amount'
-//     | 'merchantAccount'
-//     | 'countryCode'
-//     | 'returnUrl'
-//     | 'reference'
-//     | 'storePaymentMethod'
-//     | 'shopperReference'
-//     | 'recurringProcessingModel'
-//     | 'storePaymentMethodMode'
-// >;
-//
-// export type SessionData = {
-//   sessionData: CreateCheckoutSessionResponse;
-//   paymentReference: string;
-// };
-
-export const cartPaymentMethod = Type.Object({
+export const CardPaymentMethod = Type.Object({
   type: Type.Literal('card'),
   number: Type.String(),
   expiryMonth: Type.Number(),
@@ -30,19 +10,19 @@ export const cartPaymentMethod = Type.Object({
 });
 
 export const PaymentRequestSchema = Type.Object({
-  paymentMethod: Type.Composite([cartPaymentMethod]),
+  paymentMethod: Type.Composite([CardPaymentMethod]),
   paymentReference: Type.String(),
 });
 
-export enum paymentOutcome {
+export enum PaymentOutcome {
   AUTHORIZED = 'Authorized',
   REJECTED = 'Rejected',
 }
 
-export const paymentOutcomeSchema = Type.Enum(paymentOutcome);
+export const PaymentOutcomeSchema = Type.Enum(PaymentOutcome);
 
 export const PaymentResponseSchema = Type.Object({
-  outcome: paymentOutcomeSchema,
+  outcome: PaymentOutcomeSchema,
   paymentReference: Type.String(),
 });
 

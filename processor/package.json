@@ -18,7 +18,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@adyen/api-library": "14.2.0",
     "@commercetools/connect-payments-sdk": "0.0.1",
     "@commercetools/platform-sdk": "6.0.0",
     "@commercetools/sdk-client-v2": "2.2.0",
@@ -36,7 +35,6 @@
     "pino-std-serializers": "6.2.2"
   },
   "devDependencies": {
-    "@adyen/adyen-web": "5.51.0",
     "@jest/globals": "29.7.0",
     "@types/jest": "29.5.6",
     "@types/node": "20.6.3",

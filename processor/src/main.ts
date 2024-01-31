@@ -6,11 +6,12 @@ import { setupFastify } from "./server";
 
 (async () => {
     const server = await setupFastify();
-  
+
+    const HOST = '0.0.0.0';
     try {
       await server.listen({
-        port: config.serverPort,
-        host: config.serverHost,
+        port: 8080,
+        host: HOST,
       });
     } catch (err) {
       server.log.error(err);

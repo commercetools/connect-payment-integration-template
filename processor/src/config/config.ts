@@ -17,11 +17,6 @@ export const config = {
   // Payment Providers config
   returnUrl: process.env.RETURN_URL,
 
-  // Remove it after testing TODO: cleanup
-  // Required to setup fastify server
-  serverPort: process.env.SERVER_PORT ? parseInt(process.env.SERVER_PORT) : 8080,
-  serverHost: process.env.SERVER_HOST || '0.0.0.0',
-
   // TODO review these configurations
   // supportedUIElements: convertStringCommaSeparatedValuesToArray(process.env.SUPPORTED_UI_ELEMENTS),
   // enableStoreDetails: process.env.ENABLE_STORE_DETAILS === 'true' ? true : false,

@@ -1,10 +1,6 @@
 import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
 import { paymentProviderApi } from '../clients/mockPaymentAPI';
-import {
-  CreatePayment,
-  PaymentService,
-  PaymentServiceOptions
-} from './types/payment.type';
+import { CreatePayment, PaymentService, PaymentServiceOptions } from './types/payment.type';
 import { getSessionContext } from '../libs/fastify/context/context';
 import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/payment.dto';
 
@@ -18,12 +14,12 @@ export class DefaultPaymentService implements PaymentService {
   }
 
   public async createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO> {
-    let ctCart, ctPayment;
+    let ctCart;
     ctCart = await this.ctCartService.getCart({
       id: getSessionContext().cartId,
     });
 
-    ctPayment = await this.ctPaymentService.createPayment({
+    const ctPayment = await this.ctPaymentService.createPayment({
       amountPlanned: this.ctCartService.getPaymentAmount({
         cart: ctCart,
       }),

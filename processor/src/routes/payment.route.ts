@@ -4,8 +4,8 @@ import {
   PaymentRequestSchema,
   PaymentRequestSchemaDTO,
   PaymentResponseSchema,
-  PaymentResponseSchemaDTO
-} from "../dtos/payment.dto";
+  PaymentResponseSchemaDTO,
+} from '../dtos/payment.dto';
 
 type PaymentRoutesOptions = {
   paymentService: PaymentService;
@@ -13,7 +13,6 @@ type PaymentRoutesOptions = {
 };
 
 export const paymentRoutes = async (fastify: FastifyInstance, opts: FastifyPluginOptions & PaymentRoutesOptions) => {
-
   fastify.post<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
     '/payments',
     {

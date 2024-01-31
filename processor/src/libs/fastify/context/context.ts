@@ -51,7 +51,6 @@ export const updateSessionContext = (ctx: Partial<SessionContextData>) => {
   });
 };
 
-
 export const requestContextPlugin = fp(async (fastify: FastifyInstance) => {
   // Enance the request object with a correlationId property
   fastify.decorateRequest('correlationId', '');

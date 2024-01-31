@@ -3,8 +3,8 @@
     "files": true
   },
   "files": [
-    "src/server/main.ts",
-    "src/server/global.d.ts"
+    "src/main.ts",
+    "src/global.d.ts"
   ],
   "compilerOptions": {
     "target": "es2017",
@@ -19,7 +19,7 @@
     "outDir": "./dist",
   },
   "include": [
-    "src/server/**/*",
+    "src/**/*",
   ],
-  "exclude": ["src/client/**/*", "src/server/**/*.[test|spec].ts", "src/mocks/**/*"]
+  "exclude": ["src/**/*.[test|spec].ts"]
 }

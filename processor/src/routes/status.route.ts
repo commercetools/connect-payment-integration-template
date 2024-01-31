@@ -1,8 +1,8 @@
-import {healthCheckCoCoPermissions,statusHandler } from '@commercetools/connect-payments-sdk'
+import { healthCheckCoCoPermissions, statusHandler } from '@commercetools/connect-payments-sdk';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { config } from '../config/config';
 import { paymentSDK } from '../payment-sdk';
-const packageJSON = require('../../../package.json');
+const packageJSON = require('../../package.json');
 
 export const statusRoutes = async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
   fastify.get('/ping', async (request, reply) => {

@@ -6,12 +6,12 @@ export const configRoutes = async (fastify: FastifyInstance, options: FastifyPlu
   const handler = configHandler({
     configuration: () => ({
       clientKey: config.mockClientKey,
-      environment: config.mockEnvironment
-    })
-  })
+      environment: config.mockEnvironment,
+    }),
+  });
 
-  fastify.get('/config', async(request, reply) => {
-    const result = await handler()
+  fastify.get('/config', async (request, reply) => {
+    const result = await handler();
     reply.code(result.status).send(result.body);
   });
 };

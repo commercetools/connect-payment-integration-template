@@ -1,4 +1,4 @@
-import {Static, Type} from '@sinclair/typebox';
+import { Static, Type } from '@sinclair/typebox';
 
 export const CardPaymentMethod = Type.Object({
   // TODO: Remove the fields according to the payment provider solution,
@@ -8,7 +8,7 @@ export const CardPaymentMethod = Type.Object({
   expiryMonth: Type.Number(),
   expiryYear: Type.Number(),
   cvc: Type.Number(),
-  holderName: Type.Optional(Type.String())
+  holderName: Type.Optional(Type.String()),
 });
 
 export const PaymentRequestSchema = Type.Object({
@@ -30,4 +30,3 @@ export const PaymentResponseSchema = Type.Object({
 
 export type PaymentRequestSchemaDTO = Static<typeof PaymentRequestSchema>;
 export type PaymentResponseSchemaDTO = Static<typeof PaymentResponseSchema>;
-

@@ -1,7 +1,7 @@
 import { type FastifyReply, type FastifyRequest } from 'fastify';
 
 import { ErrorInvalidField, ErrorRequiredField, Errorx, MultiErrorx } from '@commercetools/connect-payments-sdk';
-import { log } from '../logger/pino';
+import { log } from '../logger';
 
 const getKeys = (path: string) => path.replace(/^\//, '').split('/');
 
@@ -18,12 +18,12 @@ type ValidationObject = {
   validation: object;
 };
 
-type TError=  {
+type TError = {
   statusCode: number;
   code: string;
   message: string;
   errors?: object[];
-}
+};
 
 export const errorHandler = (error: Error, req: FastifyRequest, reply: FastifyReply) => {
   if (error instanceof Object && (error as unknown as ValidationObject).validation) {
@@ -56,7 +56,7 @@ export const errorHandler = (error: Error, req: FastifyRequest, reply: FastifyRe
   if (error instanceof Errorx) {
     return handleErrorx(error, reply);
   } else {
-    log.error({ err: error }, error.message);
+    log.error(error.message);
     return reply.code(500).send({
       code: 'General',
       message: 'Internal server error.',
@@ -66,12 +66,7 @@ export const errorHandler = (error: Error, req: FastifyRequest, reply: FastifyRe
 };
 
 const handleErrorx = (error: Errorx, reply: FastifyReply) => {
-  const { cause, ...errorWithoutCause } = error;
-  if (error.skipLog) {
-    log.debug({ err: errorWithoutCause, cause }, error.message);
-  } else {
-    log.error({ err: errorWithoutCause, cause }, error.message);
-  }
+  log.error(error.message);
   const errorBuilder: TError = {
     statusCode: error.httpErrorStatus,
     code: error.code,

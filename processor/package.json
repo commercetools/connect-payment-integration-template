@@ -20,6 +20,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@commercetools-backend/loggers": "^22.16.0",
     "@commercetools/connect-payments-sdk": "0.0.1",
     "@commercetools/platform-sdk": "6.0.0",
     "@commercetools/sdk-client-v2": "2.2.0",

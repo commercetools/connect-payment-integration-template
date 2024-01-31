@@ -1,3 +1,3 @@
-import { log } from './pino';
+import { createApplicationLogger } from '@commercetools-backend/loggers';
 
-export { log };
+export const log = createApplicationLogger();

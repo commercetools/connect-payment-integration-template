@@ -2,6 +2,7 @@ import { v4 as uuid } from 'uuid';
 import {CreatePaymentRequest, MockPaymentProviderResponse} from '../services/types/payment.type';
 import {PaymentOutcome} from "../dtos/payment.dto";
 
+// TODO: Make it class , add interface and provide implementation
 export const paymentProviderApi = (): any => {
 
     const allowedCreditCards = ['4111111111111111', '5555555555554444', '341925950237632'];

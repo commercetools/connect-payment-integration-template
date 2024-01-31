@@ -17,7 +17,8 @@ export const paymentRoutes = async (fastify: FastifyInstance, opts: FastifyPlugi
   fastify.post<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
     '/payments',
     {
-      onRequest: opts.sessionAuthHook,
+      // TODO: implement session
+      // onRequest: opts.sessionAuthHook,
       schema: {
         body: PaymentRequestSchema,
         response: {

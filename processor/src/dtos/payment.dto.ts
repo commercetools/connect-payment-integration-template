@@ -2,7 +2,7 @@ import {Static, Type} from '@sinclair/typebox';
 
 export const CardPaymentMethod = Type.Object({
   type: Type.Literal('card'),
-  number: Type.String(),
+  cardNumber: Type.String(),
   expiryMonth: Type.Number(),
   expiryYear: Type.Number(),
   cvc: Type.Number(),

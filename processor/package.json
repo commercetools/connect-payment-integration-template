@@ -32,7 +32,8 @@
     "fastify": "4.25.1",
     "fastify-plugin": "4.5.1",
     "pino": "8.16.2",
-    "pino-std-serializers": "6.2.2"
+    "pino-std-serializers": "6.2.2",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@jest/globals": "29.7.0",

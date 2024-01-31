@@ -1,20 +1,25 @@
 import { Cart, Payment } from '@commercetools/platform-sdk';
 import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
-import {PaymentRequestSchemaDTO, PaymentResponseSchemaDTO} from '../../dtos/payment.dto';
-import { PaymentMethodsResponse } from '@adyen/api-library/lib/src/typings/checkout/paymentMethodsResponse';
+import {
+  PaymentOutcome,
+  PaymentRequestSchemaDTO,
+  PaymentResponseSchemaDTO
+} from '../../dtos/payment.dto';
 
 export type CreatePayment = {
   data: PaymentRequestSchemaDTO;
 };
 
-export type ConvertCreatePayment = {
+export type CreatePaymentRequest = {
   data: PaymentRequestSchemaDTO;
   cart: Cart;
   payment: Payment;
 };
 
-export type ConvertPaymentMethodsResponse = {
-  data: PaymentMethodsResponse;
+export type MockPaymentProviderResponse = {
+  resultCode: PaymentOutcome,
+  pspReference: string,
+  paymentMethodType: string,
 };
 
 export interface PaymentService {

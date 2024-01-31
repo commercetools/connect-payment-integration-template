@@ -1,5 +1,5 @@
 import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
-import { paymentProviderApi } from '../clients/client';
+import { paymentProviderApi } from '../clients/mockPaymentAPI';
 import {
   CreatePayment,
   PaymentService,
@@ -28,8 +28,7 @@ export class DefaultPaymentService implements PaymentService {
         cart: ctCart,
       }),
       paymentMethodInfo: {
-        // TODO: Fetch payment method from PSP
-        paymentInterface: 'mock-payment',
+        paymentInterface: 'mock-connect',
       },
       ...(ctCart.customerId && {
         customer: {
@@ -47,19 +46,19 @@ export class DefaultPaymentService implements PaymentService {
       paymentId: ctPayment.id,
     });
 
-    //TODO: consolidate payment amount if needed
+    // TODO: consolidate payment amount if needed
     const data = {
       data: opts.data,
       cart: ctCart,
       payment: ctPayment,
     };
 
-    const res = await paymentProviderApi().PaymentsApi.payments(data);
+    const res = await paymentProviderApi().processPayment(data);
 
     const updatedPayment = await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       pspReference: res.pspReference,
-      paymentMethod: res.paymentMethod?.type,
+      paymentMethod: res.paymentMethodType,
       transaction: {
         type: 'Authorization',
         amount: ctPayment.amountPlanned,

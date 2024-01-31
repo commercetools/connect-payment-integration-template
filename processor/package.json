@@ -4,15 +4,17 @@
   "description": "Payment provider integration template",
   "main": "dist/server/server.js",
   "scripts": {
+    "start": "node dist/server/main.js",
+    "start:dev": "node_modules/.bin/nodemon -q dist/server/main.js",
+    "lint": "prettier --check \"src/**/*.{ts,js,json}\" && eslint --ext .ts src",
+    "lint:fix": "prettier --write \"src/**/*.{ts,js,json}\" && eslint --fix --ext .ts src",
     "build:server": "tsc -p tsconfig.server.json",
     "build": "npm run build:server && npm run build:client",
     "build:dev": "npm run build:server && npm run build:client:dev",
     "dev": "ts-node --project tsconfig.server.json src/server/main.ts | pino-pretty",
-    "start": "SERVER_PORT=8080 node dist/server/main.js",
-    "watch": "nodemon --watch \"src/**\" --ext \"ts,json,js,html,css\" --ignore \"src/**/*.spec.ts\" --exec \"npm run dev\"",
-    "lint": "prettier --check \"src/**/*.{ts,js,json}\" && eslint --ext .ts src",
-    "lint:fix": "prettier --write \"src/**/*.{ts,js,json}\" && eslint --fix --ext .ts src",
-    "test": "jest --detectOpenHandles"
+    "test": "jest --detectOpenHandles",
+    "connector:post-deploy": "node src/connectors/post-deploy.ts",
+    "connector:pre-undeploy": "node src/connectors/pre-undeploy.ts"
   },
   "keywords": [],
   "author": "",

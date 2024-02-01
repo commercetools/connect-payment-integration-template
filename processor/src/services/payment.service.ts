@@ -16,7 +16,9 @@ export class DefaultPaymentService implements PaymentService {
   public async createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO> {
     let ctCart;
     ctCart = await this.ctCartService.getCart({
-      id: getSessionContext().cartId,
+      //id: getSessionContext().cartId,
+      // TODO: Implement Session API , For testing purpose using hardcoded cart value.
+      id: "861502ae-c719-4762-a262-d04f68063d4b"
     });
 
     const ctPayment = await this.ctPaymentService.createPayment({

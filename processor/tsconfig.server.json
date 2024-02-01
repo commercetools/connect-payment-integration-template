@@ -1,0 +1,25 @@
+{
+  "ts-node": {
+    "files": true
+  },
+  "files": [
+    "src/main.ts",
+    "src/global.d.ts"
+  ],
+  "compilerOptions": {
+    "target": "es2017",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true,
+    "rootDir": "./src",
+    "outDir": "./dist",
+  },
+  "include": [
+    "src/**/*",
+  ],
+  "exclude": ["src/**/*.[test|spec].ts"]
+}

@@ -20,5 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["lib", "decs.d.ts"]
+  "include": [
+    "src", "decs.d.ts"]
 }

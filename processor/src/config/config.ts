@@ -3,9 +3,9 @@ export const config = {
   projectKey: process.env.CTP_PROJECT_KEY || 'test',
   clientId: process.env.CTP_CLIENT_ID || 'clientId',
   clientSecret: process.env.CTP_CLIENT_SECRET || 'clientSecret',
-  authUrl: process.env.CTP_AUTH_URL || 'http://auth.test.com',
-  apiUrl: process.env.CTP_API_URL || 'http://api.test.com',
-  sessionUrl: process.env.CTP_SESSION_URL || 'http://session.test.com',
+  authUrl: process.env.CTP_AUTH_URL || 'https://auth.europe-west1.gcp.commercetools.com',
+  apiUrl: process.env.CTP_API_URL || 'https://api.europe-west1.gcp.commercetools.com',
+  sessionUrl: process.env.CTP_SESSION_URL || 'https://session-dev.europe-west1.gcp.commercetools.com/',
 
   // Required by logger
   loggerLevel: process.env.LOGGER_LEVEL || 'info',

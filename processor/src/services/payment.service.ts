@@ -24,7 +24,7 @@ export class DefaultPaymentService implements PaymentService {
         cart: ctCart,
       }),
       paymentMethodInfo: {
-        paymentInterface: 'mock-connect',
+        paymentInterface: 'mock',
       },
       ...(ctCart.customerId && {
         customer: {

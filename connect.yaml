@@ -1,7 +1,4 @@
 deployAs:
-  - name: enabler
-    applicationType: service
-    endpoint: /enabler
   - name: processor
     applicationType: service
     endpoint: /processor

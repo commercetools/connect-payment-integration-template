@@ -13,7 +13,6 @@ export const CardPaymentMethod = Type.Object({
 
 export const PaymentRequestSchema = Type.Object({
   paymentMethod: Type.Composite([CardPaymentMethod]),
-  paymentReference: Type.String(),
 });
 
 export enum PaymentOutcome {

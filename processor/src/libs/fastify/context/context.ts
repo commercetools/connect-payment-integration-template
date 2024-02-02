@@ -1,3 +1,4 @@
+import { Authentication, SessionAuthentication } from '@commercetools/connect-payments-sdk';
 import { fastifyRequestContext, requestContext } from '@fastify/request-context';
 import { randomUUID } from 'crypto';
 import { FastifyInstance, FastifyRequest } from 'fastify';
@@ -12,15 +13,11 @@ export type ContextData = {
   query?: any;
   correlationId: string;
   requestId: string;
+  authentication?: Authentication;
 };
 
-export type SessionContextData = {
-  cartId: string;
-  allowedPaymentMethods: string[];
-};
-
-export const getRequestContext = (): ContextData => {
-  return requestContext.get('request') || ({} as ContextData);
+export const getRequestContext = (): Partial<ContextData> => {
+  return requestContext.get('request') ?? {};
 };
 
 export const setRequestContext = (ctx: ContextData) => {
@@ -30,25 +27,19 @@ export const setRequestContext = (ctx: ContextData) => {
 export const updateRequestContext = (ctx: Partial<ContextData>) => {
   const currentContext = getRequestContext();
   setRequestContext({
-    ...currentContext,
+    ...(currentContext as ContextData),
     ...ctx,
   });
 };
 
-export const getSessionContext = (): SessionContextData => {
-  return requestContext.get('session') || ({} as SessionContextData);
+export const getCartIdFromContext = (): string => {
+  const authentication = getRequestContext().authentication as SessionAuthentication;
+  return authentication?.getPrincipal().cartId;
 };
 
-export const setSessionContext = (ctx: SessionContextData) => {
-  requestContext.set('session', ctx);
-};
-
-export const updateSessionContext = (ctx: Partial<SessionContextData>) => {
-  const currentContext = getSessionContext();
-  setSessionContext({
-    ...currentContext,
-    ...ctx,
-  });
+export const getAllowedPaymentMethodsFromContext = (): string[] => {
+  const authentication = getRequestContext().authentication as SessionAuthentication;
+  return authentication?.getPrincipal().allowedPaymentMethods;
 };
 
 export const requestContextPlugin = fp(async (fastify: FastifyInstance) => {

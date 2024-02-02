@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+    <script>
+      var __VITE_ADMIN_CLIENT_ID__ = !'%VITE_ADMIN_CLIENT_ID%'.startsWith('%') && '%VITE_ADMIN_CLIENT_ID%';
+      var __VITE_ADMIN_CLIENT_SECRET__ = !'%VITE_ADMIN_CLIENT_SECRET%'.startsWith('%') && '%VITE_ADMIN_CLIENT_SECRET%';
+      var __VITE_ADMIN_SCOPE__ = !'%VITE_ADMIN_SCOPE%'.startsWith('%') && '%VITE_ADMIN_SCOPE%';
+      var __VITE_REGION__ = !'%VITE_REGION%'.startsWith('%') && '%VITE_REGION%';
+      var __VITE_CART_ID__ = !'%VITE_CART_ID%'.startsWith('%') && '%VITE_CART_ID%';
+    </script>
+    <script src="./session.js"></script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module">
+      import { Connector } from '/enabler/src/main.ts';
+
+      const sessionId = await getSessionId();
+
+      const connector = new Connector({
+          connectorUrl: "http://0.0.0.0:5000",
+          sessionId: sessionId,
+          config: {
+            
+          },
+          onComplete: ({ isSuccess, paymentReference }) => {
+            console.log('onComplete', { isSuccess, paymentReference });
+          },
+      });
+
+      connector.createComponent('dropin', {
+        config: {},
+      })
+      .then(e => e.mount('#adyen-dropin-component'));
+
+      connector.createComponent('card', {
+        config: {},
+      })
+      .then(e => e.mount('#adyen-card-component'));
+
+      connector.createComponent('ideal', {
+        config: {showPayButton: false},
+      })
+      .then(e => e.mount('#adyen-ideal-component'));
+
+      connector.createComponent('googlepay', {})
+      .then(e => e.mount('#adyen-googlepay-component'));
+    </script>
+
+    <div class="container-md p-3 border m-3">
+      <div class="container-md p-3 border m-3">
+        <h5>Adyen dropin component:</h5>
+        <div id="adyen-dropin-component"></div>
+      </div>
+      <div class="container-md p-3 border m-3">
+        <h5>Adyen card component:</h5>
+        <div id="adyen-card-component"></div>
+      </div>
+      <div class="container-md p-3 border m-3">
+        <h5>Ideal component:</h5>
+        <div id="adyen-ideal-component"></div>
+      </div>
+      <div class="container-md p-3 border m-3">
+        <h5>Googlepay component:</h5>
+        <div id="adyen-googlepay-component"></div>
+      </div>
+    </div>
+  </body>
+</html>

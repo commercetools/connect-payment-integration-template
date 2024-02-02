@@ -3,6 +3,25 @@ name: CI
 on: [push]
 
 jobs:
+  build-enabler:
+    name: Build the application for enabler
+    runs-on: ubuntu-latest
+    env:
+      CTP_REGION: ${{ secrets.CTP_REGION }}
+    defaults:
+      run:
+        working-directory: enabler
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16.x'
+
+      - name: Install modules
+        run: npm ci
 
   build-processor:
     name: Build the application for processor

@@ -1,5 +1,5 @@
 {
-  "name": "pay-adyen-connect-client",
+  "name": "enabler",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -18,7 +18,7 @@
     "@adyen/adyen-web": "5.51.0",
     "@types/node": "^20.11.0",
     "typescript": "5.2.2",
-    "vite": "4.4.9",
+    "vite": "5.0.12",
     "vite-plugin-css-injected-by-js": "3.3.0"
   }
 }

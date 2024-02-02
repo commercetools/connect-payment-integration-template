@@ -41,13 +41,6 @@ export const setupFastify = async () => {
   // Register context plugin
   await server.register(requestContextPlugin);
 
-  // Configure session auth hook for Authorizing requests based on the `X-Session-ID` header
-  const sessionAuthHookOnRequest = async (req: FastifyRequest) => {
-    return paymentSDK.sessionAuthHookFn({
-      headers: req.headers,
-    });
-  };
-
   // Register default routes
   await server.register(statusRoutes);
   await server.register(configRoutes);
@@ -59,7 +52,7 @@ export const setupFastify = async () => {
 
   await server.register(paymentRoutes, {
     paymentService,
-    sessionAuthHook: sessionAuthHookOnRequest,
+    sessionAuthHook: paymentSDK.sessionAuthHookFn,
   });
 
   return server;

@@ -1,8 +1,8 @@
 import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
 import { paymentProviderApi } from '../clients/mockPaymentAPI';
 import { CreatePayment, PaymentService, PaymentServiceOptions } from './types/payment.type';
-import { getSessionContext } from '../libs/fastify/context/context';
 import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/payment.dto';
+import { getCartIdFromContext } from '../libs/fastify/context/context';
 
 export class DefaultPaymentService implements PaymentService {
   private ctCartService: CommercetoolsCartService;
@@ -16,9 +16,7 @@ export class DefaultPaymentService implements PaymentService {
   public async createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO> {
     let ctCart;
     ctCart = await this.ctCartService.getCart({
-      //id: getSessionContext().cartId,
-      // TODO: Implement Session API , For testing purpose using hardcoded cart value.
-      id: "861502ae-c719-4762-a262-d04f68063d4b"
+      id: getCartIdFromContext(),
     });
 
     const ctPayment = await this.ctPaymentService.createPayment({

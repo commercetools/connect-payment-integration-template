@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000",
-    "start": "http-server dist --port=8082 --cors",
+    "start": "http-server dist --cors",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "serve": "npm run build && npx http-server dist --port=3000  --cors"

@@ -23,3 +23,7 @@ deployAs:
   - name: enabler
     applicationType: service
     endpoint: /enabler
+    configuration:
+      securedConfiguration:
+        - key: CTP_REGION
+          description: Region of Commercetools project

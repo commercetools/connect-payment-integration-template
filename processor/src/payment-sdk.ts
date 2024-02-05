@@ -1,11 +1,6 @@
 import { setupPaymentSDK, Logger, RequestContextData } from '@commercetools/connect-payments-sdk';
 import { config } from './config/config';
-import {
-  getRequestContext,
-  getSessionContext,
-  updateRequestContext,
-  updateSessionContext,
-} from './libs/fastify/context/context';
+import { getRequestContext, updateRequestContext } from './libs/fastify/context/context';
 
 export class AppLogger implements Logger {
   public debug = (obj: object, message: string) => {
@@ -32,15 +27,11 @@ export const paymentSDK = setupPaymentSDK({
   projectKey: config.projectKey,
   sessionUrl: config.sessionUrl,
   getContextFn: (): RequestContextData => {
-    const { correlationId, requestId } = getRequestContext();
-    const { cartId, allowedPaymentMethods } = getSessionContext();
+    const { correlationId, requestId, authentication } = getRequestContext();
     return {
-      correlationId,
-      requestId,
-      sessionData: {
-        allowedPaymentMethods,
-        cartId,
-      },
+      correlationId: correlationId || '',
+      requestId: requestId || '',
+      authentication,
     };
   },
   updateContextFn: (context: Partial<RequestContextData>) => {
@@ -48,17 +39,9 @@ export const paymentSDK = setupPaymentSDK({
       {},
       context.correlationId ? { correlationId: context.correlationId } : {},
       context.requestId ? { requestId: context.requestId } : {},
+      context.authentication ? { authentication: context.authentication } : {},
     );
     updateRequestContext(requestContext);
-
-    const sessionContext = Object.assign(
-      {},
-      context.sessionData?.cartId ? { cartId: context.sessionData.cartId } : {},
-      context.sessionData?.allowedPaymentMethods
-        ? { allowedPaymentMethods: context.sessionData.allowedPaymentMethods }
-        : {},
-    );
-    updateSessionContext(sessionContext);
   },
   logger: appLogger,
 });

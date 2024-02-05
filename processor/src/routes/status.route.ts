@@ -1,4 +1,4 @@
-import { healthCheckCoCoPermissions, statusHandler } from '@commercetools/connect-payments-sdk';
+import { healthCheckCommercetoolsPermissions, statusHandler } from '@commercetools/connect-payments-sdk';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { config } from '../config/config';
 import { paymentSDK } from '../payment-sdk';
@@ -12,11 +12,9 @@ export const statusRoutes = async (fastify: FastifyInstance, opts: FastifyPlugin
   const handler = statusHandler({
     timeout: 3000,
     checks: [
-      healthCheckCoCoPermissions({
+      healthCheckCommercetoolsPermissions({
         requiredPermissions: ['manage_project'],
-        oauth2Service: paymentSDK.oauth2Service,
-        clientId: config.clientId,
-        clientSecret: config.clientSecret,
+        ctAuthorizationService: paymentSDK.ctAuthorizationService,
         projectKey: config.projectKey,
       }),
       async () => {

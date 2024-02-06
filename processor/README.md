@@ -33,9 +33,9 @@ Some of the services have authentication mechanism.
 * `session`: Relies on commercetools session service
 * `oauth2`: Relies on commercetools oauth2 server
 
-While `session` and `oauth2` authentication mechanisms are easy to work locally, `jwt` will 
+While `session` and `oauth2` authentication mechanisms are easy to work locally, `jwt` will need some workaround to be able to test locally as depends on the merchant center forward-to proxy.
 
-In order to make easy running the application locally, the code comes with a jwt mock server
+In order to make easy running the application locally, the code comes with a jwt mock server:
 
 ```
 # Set environment variable to point to the jwksUrl
@@ -59,4 +59,4 @@ curl --location 'http://localhost:9000/jwt/token' \
 {"token":"<token>"}
 ```
 
-Use the token to authenticate your requests.
+Use the token to authenticate requests protected by JWT: `Authorization: Bearer <token>`. 

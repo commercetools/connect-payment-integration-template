@@ -1,7 +1,11 @@
 import { Static, Type } from '@sinclair/typebox';
 
-export const SupportedPaymentMethodData = Type.String();
+export const SupportedPaymentComponentsData = Type.Object({
+  type: Type.String(),
+});
 
-export const SupportedPaymentMethodsSchema = Type.Array(SupportedPaymentMethodData);
+export const SupportedPaymentComponentsSchema = Type.Object({
+  components: Type.Array(SupportedPaymentComponentsData),
+});
 
-export type SupportedPaymentMethodsDTO = Static<typeof SupportedPaymentMethodsSchema>;
+export type SupportedPaymentComponentsSchemaDTO = Static<typeof SupportedPaymentComponentsSchema>;

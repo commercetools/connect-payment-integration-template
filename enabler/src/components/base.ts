@@ -1,75 +1,54 @@
-import Core from '@adyen/adyen-web/dist/types/core/core';
-import { ComponentOptions, PaymentResult } from '../payment-connector/paymentConnector';
-import ApplePay from '@adyen/adyen-web/dist/types/components/ApplePay';
-import GooglePay from '@adyen/adyen-web/dist/types/components/GooglePay';
-import RedirectElement from '@adyen/adyen-web/dist/types/components/Redirect/Redirect';
+import { FakeSdk } from '../FakeSdk';
+import { ComponentOptions, PaymentMethod, PaymentResult } from '../payment-connector/paymentConnector';
+
 
 export type ElementOptions = {
-  adyenPaymentMethod: 'card' | 'ideal' | 'googlepay' | 'dropin' | 'applepay' | string;
+  paymentMethod: PaymentMethod;
   isOffsite?: boolean;
-};                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+};
+
+export type BaseOptions = {
+  sdk: FakeSdk;
+  connectorUrl: string;
+  sessionId: string;
+  environment: string;
+  config: any;
+  onComplete: (result: PaymentResult) => void;
+  onError: (error?: any) => void;
+}
 
 /**
- * Base Component
+ * Base Web Component
  */
-export class BaseComponent {
-  protected _paymentMethod: string;
-  protected _offsite: boolean = false;
-  protected _adyenCheckout: typeof Core;
-  protected _config: any;
+export abstract class BaseComponent {
+  protected paymentMethod: ElementOptions['paymentMethod'];
+  protected sdk: FakeSdk;
+  protected connectorUrl: BaseOptions['connectorUrl'];
+  protected sessionId: BaseOptions['sessionId'];
+  protected environment: BaseOptions['environment'];
+  protected config: BaseOptions['config'];
+  protected showPayButton: boolean;
 
-  public component: typeof ApplePay | typeof GooglePay | typeof RedirectElement;
-
-  constructor(opts: ElementOptions, componentOptions: ComponentOptions, adyenCheckout: typeof Core) {
-    this._paymentMethod = opts.adyenPaymentMethod;
-    this._offsite = !!opts.isOffsite;
-    this._adyenCheckout = adyenCheckout;
-    this.beforePay = componentOptions.beforePay || (() => Promise.resolve());
-    this.onError = componentOptions.onError;
-    this.onComplete = componentOptions.onComplete;
-    this.component = this._create();
+  constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
+    this.sdk = baseOptions.sdk;
+    this.connectorUrl = baseOptions.connectorUrl;
+    this.sessionId = baseOptions.sessionId;
+    this.environment = baseOptions.environment;
+    this.config = baseOptions.config;
+    this.onComplete = baseOptions.onComplete;
+    this.onError = baseOptions.onError;
+    this.showPayButton = 
+      'showPayButton' in componentOptions.config ? !!componentOptions.config.showPayButton :
+        'showPayButton' in baseOptions.config ? !!baseOptions.config.showPayButton :
+          true;
   }
 
-  beforePay: () => Promise<void>;
+  async updated() {}
 
-  protected _create(): typeof ApplePay | typeof GooglePay | typeof RedirectElement {
-    return this._adyenCheckout.create(this._paymentMethod, this._config);
-  }
+  abstract submit(): void;
 
-  submit() {
-    this.beforePay().then(() => {
-      this.component.submit();
-    });
-  }
+  abstract mount(selector: string): void ;
 
-  hasSubmit() {
-    return true;
-  }
-
-  isOffsite() {
-    return this._offsite;
-  }
-
-  isAvailable() {
-    return 'isAvailable' in this.component ? this.component.isAvailable() : Promise.resolve();
-  }
-
-  isValid() {
-    return this.component.isValid;
-  }
-
-  mount(selector: string) {
-    this
-      .isAvailable()
-      .then(() => {
-        this.component.mount(selector);
-      })
-      .catch((e: unknown) => {
-        console.log(`${this._paymentMethod } is not available`, e);
-      });
-  }
-
-  onComplete: ((result: PaymentResult) => Promise<void>) | undefined;
-
-  onError: ((error: any) => Promise<void>) | undefined;
+  onComplete: (result: PaymentResult) => void;
+  onError: (error?: any) => void;
 }

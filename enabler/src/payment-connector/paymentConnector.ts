@@ -1,26 +1,21 @@
 import { BaseComponent } from '../components/base';
 
-export type PaymentResult = {
-  isSuccess: boolean;
-  paymentReference: string;
-};
+export type PaymentMethod = 'card';
 
-export type PaymentError = {
-  error: string;
-  paymentReference?: string;
-};
+export type PaymentResult = {
+  isSuccess: true;
+  paymentReference: string;
+} | { isSuccess: false };
 
 export type ComponentOptions = {
-  id: string;
-  config: any;
-  beforePay?: () => Promise<void>;
-  onComplete: (result: PaymentResult) => Promise<void>;
-  onError?: (error: PaymentError) => Promise<void>;
+  config: {
+    showPayButton?: boolean;
+  };
 };
 
 export interface PaymentConnector {
   /** 
    * @throws {Error}
    */
-  createComponent: (type: string, opts: ComponentOptions) => Promise<BaseComponent | never>
+  createComponent: (type: string, opts: ComponentOptions, sessionId?: string) => Promise<BaseComponent | never>
 }

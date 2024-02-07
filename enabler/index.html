@@ -17,12 +17,13 @@
   <body>
     <div id="app"></div>
     <script type="module">
-      import { Connector } from '/enabler/src/main.ts';
+      import { Connector } from '/src/main.ts';
 
       const sessionId = await getSessionId();
+      const connectorUrl = "https://service-ce9d8088-b10c-42df-8eb1-63f1fde80093.europe-west1.gcp.preview.commercetools.app";
 
       const connector = new Connector({
-          connectorUrl: "http://0.0.0.0:5000",
+          connectorUrl: connectorUrl,
           sessionId: sessionId,
           config: {
             
@@ -32,42 +33,13 @@
           },
       });
 
-      connector.createComponent('dropin', {
-        config: {},
-      })
-      .then(e => e.mount('#adyen-dropin-component'));
-
       connector.createComponent('card', {
         config: {},
       })
-      .then(e => e.mount('#adyen-card-component'));
+      .then(e => e.mount('#card-component'));
 
-      connector.createComponent('ideal', {
-        config: {showPayButton: false},
-      })
-      .then(e => e.mount('#adyen-ideal-component'));
-
-      connector.createComponent('googlepay', {})
-      .then(e => e.mount('#adyen-googlepay-component'));
     </script>
 
-    <div class="container-md p-3 border m-3">
-      <div class="container-md p-3 border m-3">
-        <h5>Adyen dropin component:</h5>
-        <div id="adyen-dropin-component"></div>
-      </div>
-      <div class="container-md p-3 border m-3">
-        <h5>Adyen card component:</h5>
-        <div id="adyen-card-component"></div>
-      </div>
-      <div class="container-md p-3 border m-3">
-        <h5>Ideal component:</h5>
-        <div id="adyen-ideal-component"></div>
-      </div>
-      <div class="container-md p-3 border m-3">
-        <h5>Googlepay component:</h5>
-        <div id="adyen-googlepay-component"></div>
-      </div>
-    </div>
+    <div id="card-component"></div>
   </body>
 </html>

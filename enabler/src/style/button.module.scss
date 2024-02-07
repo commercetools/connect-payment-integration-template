@@ -1,0 +1,157 @@
+@use './vx' as *;
+
+// legacy browser fallback
+@supports not (background: color-mix(in srgb, red 50%, blue)) {
+  :root {
+    --ctc-button-hover: var(--ctc-button);
+  }
+}
+
+.button {
+  color: var(--ctc-button-text);
+  padding: 0.5rem 1.375rem;
+  background-color: var(--ctc-button);
+  border: 0 none;
+  border-radius: $border-radius;
+  font-size: 0.9375rem;
+  font-weight: $font-weight-regular;
+  font-family: $font-family;
+  text-transform: uppercase;
+  line-height: 1.5rem;
+  letter-spacing: 0.43px;
+  box-shadow: $box-shadow;
+  background-position: center;
+  transition: background-color 0.8s;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ctc-button-hover)
+      radial-gradient(circle, transparent 1%, var(--ctc-button-hover) 1%) center/15000%;
+  }
+
+  &:active {
+    background-color: var(--ctc-button-hover);
+    background-size: 100%;
+    transition: background-color 0s;
+  }
+
+  &:disabled {
+    color: var(--ctc-button-disabled-text);
+    background-color: var(--ctc-button-disabled);
+    pointer-events: none;
+    box-shadow: none;
+
+    &:hover,
+    &:active {
+      background-color: var(--ctc-button-disabled);
+      cursor: not-allowed;
+    }
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.linkButton {
+  text-decoration: none;
+  text-transform: unset;
+  background: none;
+  border-bottom: 1.5px solid transparent;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+  font-weight: $font-weight-light;
+  color: var(--ctc-button);
+
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.188rem;
+  letter-spacing: 0.009rem;
+
+  &:hover,
+  &:active {
+    cursor: pointer;
+    border-bottom: 1.5px solid var(--ctc-button);
+    background: none;
+  }
+
+  &.disabled {
+    color: $color-style-text-disabled;
+    text-decoration: none;
+    cursor: not-allowed;
+    pointer-events: none;
+    background-color: transparent;
+    box-shadow: none;
+
+    &:hover,
+    &:active {
+      border-bottom: none;
+    }
+  }
+}
+
+// variants
+.lowOpacityButton {
+  background-color: color-mix(in srgb, var(--ctc-button), transparent 30%);
+
+  // legacy browser fallback
+  @supports not (background: color-mix(in srgb, red 50%, blue)) {
+    background-color: var(--ctc-button);
+    opacity: 60%;
+  }
+}
+
+.textButton {
+  background-color: transparent;
+  color: var(--ctc-button);
+  box-shadow: none;
+  padding: 0.5rem 0.6875rem;
+
+  $color-style-primary-hover-background: color-mix(in srgb, var(--ctc-button), transparent 90%);
+
+  &:hover {
+    background: $color-style-primary-hover-background
+      radial-gradient(circle, transparent 1%, $color-style-primary-hover-background 1%)
+      center/15000%;
+  }
+
+  &:active {
+    background-color: $color-style-primary-hover-background;
+    background-size: 100%;
+    transition: background-color 0s;
+  }
+
+  &:focus {
+    background-color: $color-style-primary-hover-background;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    color: $color-button-disabled;
+  }
+}
+
+.errorButton {
+  color: $color-status-error-dark;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: none;
+  box-shadow: none;
+  outline: none;
+  transition: none;
+
+  &:hover {
+    background: $color-status-error-hover;
+  }
+
+  &:active {
+    border: 1px solid $color-status-error-dark;
+    background: $color-status-error-active;
+  }
+
+  &:disabled {
+    background-color: transparent;
+    color: $color-button-disabled;
+  }
+}

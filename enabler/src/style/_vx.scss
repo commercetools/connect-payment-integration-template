@@ -1,0 +1,36 @@
+// BUTTONS
+:root,
+:host {
+  --ctc-button: #186ec3;
+  --ctc-button-hover: color-mix(in srgb, var(--ctc-button), black 15%);
+  --ctc-button-disabled: #e0e0e0;
+  --ctc-button-text: #fff;
+  --ctc-button-disabled-text: #a2a3a4;
+}
+
+// RADIO
+:root,
+:host {
+  --ctc-radio: #186ec3;
+}
+
+// CHECKBOX
+:root,
+:host {
+  --ctc-checkbox: #186ec3;
+}
+
+// INPUT FIELDS
+:root,
+:host {
+  --ctc-input-field-focus: #186ec3;
+}
+
+// FONTS
+:root,
+:host {
+  --ctc-font-family: 'Roboto', sans-serif;
+}
+
+@import './colors';
+@import './variables';

@@ -15,8 +15,8 @@
     "http-server": "^14.1.1"
   },
   "devDependencies": {
-    "@adyen/adyen-web": "5.51.0",
     "@types/node": "^20.11.0",
+    "sass": "^1.70.0",
     "typescript": "5.2.2",
     "vite": "5.0.12",
     "vite-plugin-css-injected-by-js": "3.3.0"

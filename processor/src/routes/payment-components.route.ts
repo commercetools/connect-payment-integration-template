@@ -11,7 +11,7 @@ export const paymentComponentsRoute = async (
   options: FastifyPluginOptions & PaymentComponentsRoutesOptions,
 ) => {
   fastify.get('/payment-components', async (request, reply) => {
-    const result = await options.paymentService.getSupponpmrtedPaymentComponents();
+    const result = await options.paymentService.getSupportedPaymentComponents();
     reply.code(200).send(result);
   });
 };

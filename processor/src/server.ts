@@ -43,8 +43,12 @@ export const setupFastify = async () => {
   await server.register(requestContextPlugin);
 
   // Register default routes
-  await server.register(statusRoutes);
-  await server.register(configRoutes);
+  await server.register(statusRoutes, {
+    jwtAuthHook: paymentSDK.jwtAuthHookFn,
+  });
+  await server.register(configRoutes, {
+    sessionAuthHook: paymentSDK.sessionAuthHookFn,
+  });
 
   const paymentService = new DefaultPaymentService({
     ctCartService: paymentSDK.ctCartService,

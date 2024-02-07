@@ -1,16 +1,25 @@
-import { healthCheckCommercetoolsPermissions, statusHandler } from '@commercetools/connect-payments-sdk';
+import {
+  JWTAuthenticationHook,
+  healthCheckCommercetoolsPermissions,
+  statusHandler,
+} from '@commercetools/connect-payments-sdk';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { config } from '../config/config';
+import { StatusResponseSchema, StatusResponseSchemaDTO } from '../dtos/status.dto';
 import { paymentSDK } from '../payment-sdk';
 const packageJSON = require('../../package.json');
 
-export const statusRoutes = async (fastify: FastifyInstance, opts: FastifyPluginOptions) => {
+type StatusRoutesOptions = {
+  jwtAuthHook: JWTAuthenticationHook;
+};
+
+export const statusRoutes = async (fastify: FastifyInstance, opts: FastifyPluginOptions & StatusRoutesOptions) => {
   fastify.get('/ping', async (request, reply) => {
     reply.code(200).send('pong');
   });
 
   const handler = statusHandler({
-    timeout: 3000,
+    timeout: config.healthCheckTimeout,
     checks: [
       healthCheckCommercetoolsPermissions({
         requiredPermissions: ['manage_project'],
@@ -45,8 +54,21 @@ export const statusRoutes = async (fastify: FastifyInstance, opts: FastifyPlugin
       '@commercetools/sdk-client-v2': packageJSON.dependencies['@commercetools/sdk-client-v2'],
     }),
   });
-  fastify.get('/status', async (request, reply) => {
-    const handle = await handler();
-    reply.code(handle.status).send(handle.body);
-  });
+
+  fastify.get<{ Reply: StatusResponseSchemaDTO }>(
+    '/status',
+    {
+      preHandler: [opts.jwtAuthHook.authenticate()],
+      schema: {
+        response: {
+          200: StatusResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      const handle = await handler();
+      const body = await handle.body;
+      reply.code(handle.status).send(body);
+    },
+  );
 };

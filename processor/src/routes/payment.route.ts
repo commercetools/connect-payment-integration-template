@@ -1,12 +1,13 @@
+
+import { SessionAuthenticationHook } from '@commercetools/connect-payments-sdk';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { PaymentService } from '../services/types/payment.type';
 import {
   PaymentRequestSchema,
   PaymentRequestSchemaDTO,
   PaymentResponseSchema,
   PaymentResponseSchemaDTO,
 } from '../dtos/payment.dto';
-import { SessionAuthenticationHook } from '@commercetools/connect-payments-sdk';
+import { PaymentService } from '../services/types/payment.type';
 
 type PaymentRoutesOptions = {
   paymentService: PaymentService;
@@ -17,7 +18,7 @@ export const paymentRoutes = async (fastify: FastifyInstance, opts: FastifyPlugi
   fastify.post<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
     '/payments',
     {
-      onRequest: [opts.sessionAuthHook.authenticate()],
+      preHandler: [opts.sessionAuthHook.authenticate()],
       schema: {
         body: PaymentRequestSchema,
         response: {

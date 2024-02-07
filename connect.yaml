@@ -1,7 +1,7 @@
 deployAs:
   - name: processor
     applicationType: service
-    endpoint: /processor
+    endpoint: /operations
     configuration:
       securedConfiguration:
         - key: CTP_PROJECT_KEY

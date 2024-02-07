@@ -62,6 +62,7 @@ export const setupFastify = async () => {
 
   await server.register(paymentComponentsRoute, {
     paymentService,
+    jwtAuthHook: paymentSDK.jwtAuthHookFn,
   });
 
   return server;

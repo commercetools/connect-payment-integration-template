@@ -1,6 +1,10 @@
 import { v4 as uuid } from 'uuid';
-import { CreatePaymentRequest, MockPaymentProviderResponse } from '../services/types/payment.type';
-import { PaymentOutcome } from '../dtos/payment.dto';
+import {
+  CreatePaymentRequest, MockPaymentProviderModificationResponse,
+  MockPaymentProviderResponse
+} from '../services/types/payment.type';
+import { PaymentModificationStatus, PaymentOutcome } from '../dtos/payment.dto';
+import { Payment } from '@commercetools/platform-sdk';
 
 // TODO: Make it class , add interface and provide implementation
 export const paymentProviderApi = (): any => {
@@ -20,9 +24,30 @@ export const paymentProviderApi = (): any => {
     };
   };
 
+  const cancelAuthorisedPaymentByPspReference =
+      async (pspReference: string, payment: Payment): Promise<MockPaymentProviderModificationResponse> => {
+
+    return { outcome: PaymentModificationStatus.RECEIVED, pspReference: pspReference }
+  }
+
+  const captureAuthorisedPayment =
+      async (pspReference: string, payment: Payment): Promise<MockPaymentProviderModificationResponse> => {
+
+    return { outcome: PaymentModificationStatus.RECEIVED, pspReference: pspReference }
+  }
+
+  const refundCapturedPayment =
+      async (pspReference: string, payment: Payment): Promise<MockPaymentProviderModificationResponse> => {
+
+    return { outcome: PaymentModificationStatus.RECEIVED, pspReference: pspReference }
+  }
+
   const isCreditCardAllowed = (cardNumber: string) => allowedCreditCards.includes(cardNumber);
 
   return {
     processPayment,
+    cancelAuthorisedPaymentByPspReference,
+    captureAuthorisedPayment,
+    refundCapturedPayment,
   };
 };

@@ -27,5 +27,31 @@ export const PaymentResponseSchema = Type.Object({
   paymentReference: Type.String(),
 });
 
+export const CapturePaymentRequestSchema = Type.Object({
+  amount: Type.Object({
+    centAmount: Type.Number(),
+    currencyCode: Type.String(),
+  }),
+});
+
+export const RefundPaymentRequestSchema = Type.Object({
+  amount: Type.Object({
+    centAmount: Type.Number(),
+    currencyCode: Type.String(),
+  }),
+});
+
+export enum PaymentModificationStatus {
+  RECEIVED = 'received',
+}
+const PaymentModificationSchema = Type.Enum(PaymentModificationStatus);
+
+export const PaymentModificationResponseSchema = Type.Object({
+  status: PaymentModificationSchema,
+});
+
 export type PaymentRequestSchemaDTO = Static<typeof PaymentRequestSchema>;
 export type PaymentResponseSchemaDTO = Static<typeof PaymentResponseSchema>;
+export type CapturePaymentRequestDTO = Static<typeof CapturePaymentRequestSchema>;
+export type RefundPaymentRequestDTO = Static<typeof RefundPaymentRequestSchema>;
+export type PaymentModificationResponseDTO = Static<typeof PaymentModificationResponseSchema>;

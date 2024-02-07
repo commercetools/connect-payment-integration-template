@@ -1,7 +1,18 @@
 import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
 import { paymentProviderApi } from '../clients/mockPaymentAPI';
-import { CreatePayment, PaymentService, PaymentServiceOptions } from './types/payment.type';
-import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/payment.dto';
+import {
+  CancelPayment,
+  CapturePayment,
+  CreatePayment,
+  PaymentService,
+  PaymentServiceOptions, RefundPayment
+} from './types/payment.type';
+import {
+  PaymentModificationResponseDTO,
+  PaymentModificationStatus,
+  PaymentOutcome,
+  PaymentResponseSchemaDTO
+} from '../dtos/payment.dto';
 import { getCartIdFromContext } from '../libs/fastify/context/context';
 
 export class DefaultPaymentService implements PaymentService {
@@ -68,6 +79,119 @@ export class DefaultPaymentService implements PaymentService {
       paymentReference: updatedPayment.id,
     };
   }
+
+  public async cancelPayment(opts: CancelPayment): Promise<PaymentModificationResponseDTO> {
+    const ctPayment = await this.ctPaymentService.getPayment({
+      id: opts.paymentId,
+    });
+
+    await this.ctPaymentService.updatePayment({
+      id: ctPayment.id,
+      transaction: {
+        type: 'CancelAuthorization',
+        amount: ctPayment.amountPlanned,
+        state: 'Initial',
+      },
+    });
+
+    const res = await paymentProviderApi().cancelAuthorisedPaymentByPspReference(
+        ctPayment.interfaceId as string,
+        ctPayment,
+    );
+
+    await this.ctPaymentService.updatePayment({
+      id: ctPayment.id,
+      transaction: {
+        type: 'CancelAuthorization',
+        amount: ctPayment.amountPlanned,
+        interactionId: res.pspReference,
+        state: 'Pending',
+      },
+    });
+
+    return {
+      status: PaymentModificationStatus.RECEIVED,
+    };
+  }
+
+  public async capturePayment(opts: CapturePayment): Promise<PaymentModificationResponseDTO> {
+    const ctPayment = await this.ctPaymentService.getPayment({
+      id: opts.paymentId,
+    });
+
+    const data = { payment: ctPayment, data: opts.data };
+
+    await this.ctPaymentService.updatePayment({
+      id: ctPayment.id,
+      transaction: {
+        type: 'Charge',
+        amount: {
+          currencyCode: opts.data.amount.currencyCode,
+          centAmount: opts.data.amount.centAmount,
+        },
+        state: 'Initial',
+      },
+    });
+
+    const res = await paymentProviderApi().captureAuthorisedPayment(ctPayment.interfaceId as string, ctPayment);
+
+    await this.ctPaymentService.updatePayment({
+      id: ctPayment.id,
+      transaction: {
+        type: 'Charge',
+        amount: {
+          currencyCode: opts.data.amount.currencyCode,
+          centAmount: opts.data.amount.centAmount,
+        },
+        interactionId: res.pspReference,
+        state: 'Pending',
+      },
+    });
+
+    return {
+      status: PaymentModificationStatus.RECEIVED,
+    };
+  }
+
+  public async refundPayment(opts: RefundPayment): Promise<PaymentModificationResponseDTO> {
+    const ctPayment = await this.ctPaymentService.getPayment({
+      id: opts.paymentId,
+    });
+
+    const data = { payment: ctPayment, data: opts.data };
+
+    await this.ctPaymentService.updatePayment({
+      id: ctPayment.id,
+      transaction: {
+        type: 'Refund',
+        amount: {
+          currencyCode: opts.data.amount.currencyCode,
+          centAmount: opts.data.amount.centAmount,
+        },
+        state: 'Initial',
+      },
+    });
+
+    const res = await paymentProviderApi().refundCapturedPayment(ctPayment.interfaceId as string, ctPayment);
+
+    await this.ctPaymentService.updatePayment({
+      id: ctPayment.id,
+      transaction: {
+        type: 'Refund',
+        amount: {
+          currencyCode: opts.data.amount.currencyCode,
+          centAmount: opts.data.amount.centAmount,
+        },
+        interactionId: res.pspReference,
+        state: 'Pending',
+      },
+    });
+
+    return {
+      status: PaymentModificationStatus.RECEIVED,
+    };
+  }
+
 
   private convertPaymentResultCode(resultCode: PaymentOutcome): string {
     switch (resultCode) {

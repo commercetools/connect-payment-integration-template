@@ -1,4 +1,4 @@
-import { FastifyInstance, FastifyPluginOptions, onRequestHookHandler } from 'fastify';
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { PaymentService } from '../services/types/payment.type';
 import {
   PaymentRequestSchema,

@@ -1,6 +1,6 @@
 import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
 import { paymentProviderApi } from '../clients/mockPaymentAPI';
-import { CreatePayment, PaymentService, PaymentServiceOptions } from './types/payment.type';
+import { CreatePayment, PaymentService, PaymentServiceOptions, SupportedPaymentComponents } from './types/payment.type';
 import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/payment.dto';
 import { getCartIdFromContext } from '../libs/fastify/context/context';
 
@@ -11,6 +11,13 @@ export class DefaultPaymentService implements PaymentService {
   constructor(opts: PaymentServiceOptions) {
     this.ctCartService = opts.ctCartService;
     this.ctPaymentService = opts.ctPaymentService;
+  }
+
+  public async getSupportedPaymentComponents(): Promise<SupportedPaymentComponents> {
+    // TODO : Implement actual API call to payment service provider
+    return {
+      supportedPaymentComponents: ['dropin', 'card', 'applepay'],
+    };
   }
 
   public async createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO> {

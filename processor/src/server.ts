@@ -1,6 +1,6 @@
 import cors from '@fastify/cors';
 import fastifyFormBody from '@fastify/formbody';
-import Fastify, { FastifyRequest } from 'fastify';
+import Fastify from 'fastify';
 import { randomUUID } from 'node:crypto';
 import { config } from './config/config';
 import { requestContextPlugin } from './libs/fastify/context/context';
@@ -9,6 +9,7 @@ import { paymentSDK } from './payment-sdk';
 import { configRoutes } from './routes/config.route';
 import { paymentRoutes } from './routes/payment.route';
 import { statusRoutes } from './routes/status.route';
+import { paymentComponentsRoute } from './routes/payment-components.route';
 import { DefaultPaymentService } from './services/payment.service';
 
 /**
@@ -53,6 +54,10 @@ export const setupFastify = async () => {
   await server.register(paymentRoutes, {
     paymentService,
     sessionAuthHook: paymentSDK.sessionAuthHookFn,
+  });
+
+  await server.register(paymentComponentsRoute, {
+    paymentService,
   });
 
   return server;

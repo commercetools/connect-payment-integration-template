@@ -8,5 +8,7 @@ import { Payment } from '@commercetools/platform-sdk';
 export interface PaymentConnector {
 
   processPayment: (request: CreatePaymentRequest) => Promise<MockPaymentProviderResponse>
-  modifyPaymentByPspReference: (pspReference: string, payment: Payment) => Promise<MockPaymentProviderModificationResponse>
+  capturePayment: (pspReference: string, payment: Payment) => Promise<MockPaymentProviderModificationResponse>
+  cancelPayment: (pspReference: string, payment: Payment) => Promise<MockPaymentProviderModificationResponse>
+  refundPayment: (pspReference: string, payment: Payment) => Promise<MockPaymentProviderModificationResponse>
 }

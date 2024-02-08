@@ -11,7 +11,6 @@ import { paymentRoutes } from './routes/payment.route';
 import { statusRoutes } from './routes/status.route';
 import { DefaultPaymentService } from './services/payment.service';
 import {paymentModificationRoutes} from "./routes/payment-modification.route";
-import {MockPaymentConnector} from "./clients/mockPaymentConnector";
 
 /**
  * Setup Fastify server instance

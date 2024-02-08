@@ -26,7 +26,17 @@ export class MockPaymentConnector implements PaymentConnector {
     };
   }
 
-  async modifyPaymentByPspReference(pspReference: string, payment: Payment): Promise<MockPaymentProviderModificationResponse> {
+  async capturePayment(pspReference: string, payment: Payment): Promise<MockPaymentProviderModificationResponse> {
+
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: pspReference }
+  }
+
+  async cancelPayment(pspReference: string, payment: Payment): Promise<MockPaymentProviderModificationResponse> {
+
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: pspReference }
+  }
+
+  async refundPayment(pspReference: string, payment: Payment): Promise<MockPaymentProviderModificationResponse> {
 
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: pspReference }
   }

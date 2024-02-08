@@ -8,7 +8,6 @@ import {
   PaymentRequestSchemaDTO,
   PaymentResponseSchemaDTO,
 } from '../../dtos/payment.dto';
-import {MockPaymentConnector} from "../../clients/mockPaymentConnector";
 
 export type CreatePayment = {
   data: PaymentRequestSchemaDTO;

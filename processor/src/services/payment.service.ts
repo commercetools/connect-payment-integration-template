@@ -12,7 +12,8 @@ import {
 } from '../dtos/payment.dto';
 import { getCartIdFromContext } from '../libs/fastify/context/context';
 import {PaymentConnector} from "../clients/PaymentConnector";
-import {MockPaymentConnector} from "../clients/mockPaymentConnector";
+import {MockPaymentConnector} from "../clients/MockPaymentConnector";
+import {Payment} from "@commercetools/platform-sdk";
 
 export class DefaultPaymentService implements PaymentService {
   private ctCartService: CommercetoolsCartService;
@@ -97,10 +98,7 @@ export class DefaultPaymentService implements PaymentService {
       },
     });
 
-    const res = await this.paymentConnector.modifyPaymentByPspReference(
-        ctPayment.interfaceId as string,
-        ctPayment,
-    );
+    const res = await this.processPaymentModification(transactionType, ctPayment);
 
     await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
@@ -141,4 +139,28 @@ export class DefaultPaymentService implements PaymentService {
       }
     }
   }
+
+  private async processPaymentModification(transactionType: string, ctPayment: Payment) {
+    switch (transactionType) {
+      case 'CancelAuthorization': {
+        return await this.paymentConnector.cancelPayment(
+            ctPayment.interfaceId as string,
+            ctPayment,
+        );
+      }
+      case 'Charge': {
+        return await this.paymentConnector.capturePayment(
+            ctPayment.interfaceId as string,
+            ctPayment,
+        );
+      }
+      case 'Refund': {
+        return await this.paymentConnector.refundPayment(
+            ctPayment.interfaceId as string,
+            ctPayment,
+        );
+      }
+    }
+  }
+
 }

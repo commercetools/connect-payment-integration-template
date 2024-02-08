@@ -1,11 +1,8 @@
 import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
-import { paymentProviderApi } from '../clients/mockPaymentAPI';
 import {
-  CancelPayment,
-  CapturePayment,
-  CreatePayment,
+  CreatePayment, ModifyPayment,
   PaymentService,
-  PaymentServiceOptions, RefundPayment
+  PaymentServiceOptions
 } from './types/payment.type';
 import {
   PaymentModificationResponseDTO,
@@ -14,10 +11,13 @@ import {
   PaymentResponseSchemaDTO
 } from '../dtos/payment.dto';
 import { getCartIdFromContext } from '../libs/fastify/context/context';
+import {PaymentConnector} from "../clients/PaymentConnector";
+import {MockPaymentConnector} from "../clients/mockPaymentConnector";
 
 export class DefaultPaymentService implements PaymentService {
   private ctCartService: CommercetoolsCartService;
   private ctPaymentService: CommercetoolsPaymentService;
+  private paymentConnector: PaymentConnector = new MockPaymentConnector();
 
   constructor(opts: PaymentServiceOptions) {
     this.ctCartService = opts.ctCartService;
@@ -60,7 +60,8 @@ export class DefaultPaymentService implements PaymentService {
       payment: ctPayment,
     };
 
-    const res = await paymentProviderApi().processPayment(data);
+
+    const res = await this.paymentConnector.processPayment(data);
 
     const updatedPayment = await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
@@ -80,21 +81,23 @@ export class DefaultPaymentService implements PaymentService {
     };
   }
 
-  public async cancelPayment(opts: CancelPayment): Promise<PaymentModificationResponseDTO> {
+  public async modifyPayment(opts: ModifyPayment): Promise<PaymentModificationResponseDTO> {
     const ctPayment = await this.ctPaymentService.getPayment({
       id: opts.paymentId,
     });
 
+    const transactionType = this.getPaymentTransactionType(opts.data.action);
+
     await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       transaction: {
-        type: 'CancelAuthorization',
+        type: transactionType,
         amount: ctPayment.amountPlanned,
         state: 'Initial',
       },
     });
 
-    const res = await paymentProviderApi().cancelAuthorisedPaymentByPspReference(
+    const res = await this.paymentConnector.modifyPaymentByPspReference(
         ctPayment.interfaceId as string,
         ctPayment,
     );
@@ -102,96 +105,17 @@ export class DefaultPaymentService implements PaymentService {
     await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       transaction: {
-        type: 'CancelAuthorization',
+        type: transactionType,
         amount: ctPayment.amountPlanned,
         interactionId: res.pspReference,
-        state: 'Pending',
+        state: 'Success',
       },
     });
 
     return {
-      status: PaymentModificationStatus.RECEIVED,
+      outcome: PaymentModificationStatus.APPROVED,
     };
   }
-
-  public async capturePayment(opts: CapturePayment): Promise<PaymentModificationResponseDTO> {
-    const ctPayment = await this.ctPaymentService.getPayment({
-      id: opts.paymentId,
-    });
-
-    const data = { payment: ctPayment, data: opts.data };
-
-    await this.ctPaymentService.updatePayment({
-      id: ctPayment.id,
-      transaction: {
-        type: 'Charge',
-        amount: {
-          currencyCode: opts.data.amount.currencyCode,
-          centAmount: opts.data.amount.centAmount,
-        },
-        state: 'Initial',
-      },
-    });
-
-    const res = await paymentProviderApi().captureAuthorisedPayment(ctPayment.interfaceId as string, ctPayment);
-
-    await this.ctPaymentService.updatePayment({
-      id: ctPayment.id,
-      transaction: {
-        type: 'Charge',
-        amount: {
-          currencyCode: opts.data.amount.currencyCode,
-          centAmount: opts.data.amount.centAmount,
-        },
-        interactionId: res.pspReference,
-        state: 'Pending',
-      },
-    });
-
-    return {
-      status: PaymentModificationStatus.RECEIVED,
-    };
-  }
-
-  public async refundPayment(opts: RefundPayment): Promise<PaymentModificationResponseDTO> {
-    const ctPayment = await this.ctPaymentService.getPayment({
-      id: opts.paymentId,
-    });
-
-    const data = { payment: ctPayment, data: opts.data };
-
-    await this.ctPaymentService.updatePayment({
-      id: ctPayment.id,
-      transaction: {
-        type: 'Refund',
-        amount: {
-          currencyCode: opts.data.amount.currencyCode,
-          centAmount: opts.data.amount.centAmount,
-        },
-        state: 'Initial',
-      },
-    });
-
-    const res = await paymentProviderApi().refundCapturedPayment(ctPayment.interfaceId as string, ctPayment);
-
-    await this.ctPaymentService.updatePayment({
-      id: ctPayment.id,
-      transaction: {
-        type: 'Refund',
-        amount: {
-          currencyCode: opts.data.amount.currencyCode,
-          centAmount: opts.data.amount.centAmount,
-        },
-        interactionId: res.pspReference,
-        state: 'Pending',
-      },
-    });
-
-    return {
-      status: PaymentModificationStatus.RECEIVED,
-    };
-  }
-
 
   private convertPaymentResultCode(resultCode: PaymentOutcome): string {
     switch (resultCode) {
@@ -201,6 +125,20 @@ export class DefaultPaymentService implements PaymentService {
         return 'Failure';
       default:
         return 'Initial';
+    }
+  }
+
+  private getPaymentTransactionType(action: string): string {
+    switch (action) {
+      case 'cancelPayment': {
+        return 'CancelAuthorization';
+      }
+      case 'capturePayment': {
+        return 'Charge';
+      }
+      case 'refundPayment': {
+        return 'Refund';
+      }
     }
   }
 }

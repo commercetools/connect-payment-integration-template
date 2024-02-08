@@ -1,14 +1,14 @@
 import { Cart, Payment } from '@commercetools/platform-sdk';
 import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
 import {
-  CapturePaymentRequestDTO,
+  PaymentModificationRequestSchemaDTO,
   PaymentModificationResponseDTO,
   PaymentModificationStatus,
   PaymentOutcome,
   PaymentRequestSchemaDTO,
   PaymentResponseSchemaDTO,
-  RefundPaymentRequestDTO
 } from '../../dtos/payment.dto';
+import {MockPaymentConnector} from "../../clients/mockPaymentConnector";
 
 export type CreatePayment = {
   data: PaymentRequestSchemaDTO;
@@ -31,25 +31,14 @@ export type MockPaymentProviderModificationResponse = {
   pspReference: string;
 };
 
-export type CancelPayment = {
+export type ModifyPayment = {
   paymentId: string;
-};
-
-export type CapturePayment = {
-  paymentId: string;
-  data: CapturePaymentRequestDTO;
-};
-
-export type RefundPayment = {
-  paymentId: string;
-  data: RefundPaymentRequestDTO;
+  data: PaymentModificationRequestSchemaDTO;
 };
 
 export interface PaymentService {
   createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO>;
-  cancelPayment(opts: CancelPayment): Promise<PaymentModificationResponseDTO>;
-  capturePayment(opts: CapturePayment): Promise<PaymentModificationResponseDTO>;
-  refundPayment(opts: RefundPayment): Promise<PaymentModificationResponseDTO>;
+  modifyPayment(opts: ModifyPayment): Promise<PaymentModificationResponseDTO>;
 }
 
 export type PaymentServiceOptions = {

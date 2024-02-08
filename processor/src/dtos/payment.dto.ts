@@ -15,6 +15,14 @@ export const PaymentRequestSchema = Type.Object({
   paymentMethod: Type.Composite([CardPaymentMethod]),
 });
 
+export const PaymentModificationRequestSchema = Type.Object({
+  action: Type.String(),
+  amount: Type.Object({
+    centAmount: Type.Number(),
+    currencyCode: Type.String(),
+  })
+})
+
 export enum PaymentOutcome {
   AUTHORIZED = 'Authorized',
   REJECTED = 'Rejected',
@@ -27,31 +35,18 @@ export const PaymentResponseSchema = Type.Object({
   paymentReference: Type.String(),
 });
 
-export const CapturePaymentRequestSchema = Type.Object({
-  amount: Type.Object({
-    centAmount: Type.Number(),
-    currencyCode: Type.String(),
-  }),
-});
-
-export const RefundPaymentRequestSchema = Type.Object({
-  amount: Type.Object({
-    centAmount: Type.Number(),
-    currencyCode: Type.String(),
-  }),
-});
-
 export enum PaymentModificationStatus {
-  RECEIVED = 'received',
+  SUCCESS = 'success',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
 }
 const PaymentModificationSchema = Type.Enum(PaymentModificationStatus);
 
 export const PaymentModificationResponseSchema = Type.Object({
-  status: PaymentModificationSchema,
+  outcome: PaymentModificationSchema,
 });
 
 export type PaymentRequestSchemaDTO = Static<typeof PaymentRequestSchema>;
+export type PaymentModificationRequestSchemaDTO = Static<typeof PaymentModificationRequestSchema>;
 export type PaymentResponseSchemaDTO = Static<typeof PaymentResponseSchema>;
-export type CapturePaymentRequestDTO = Static<typeof CapturePaymentRequestSchema>;
-export type RefundPaymentRequestDTO = Static<typeof RefundPaymentRequestSchema>;
 export type PaymentModificationResponseDTO = Static<typeof PaymentModificationResponseSchema>;

@@ -1,3 +1,3 @@
-import { MockPaymentConnector } from './payment-connector/mockPaymentConnector';
+import { MockPaymentEnabler } from './payment-enabler/mockPaymentEnabler';
 
-export { MockPaymentConnector as Connector };
+export { MockPaymentEnabler as Enabler };

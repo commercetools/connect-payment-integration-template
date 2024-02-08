@@ -1,18 +1,18 @@
 import { FakeSdk } from '../FakeSdk';
-import { ComponentOptions, PaymentMethod, PaymentResult } from '../payment-connector/paymentConnector';
-
+import { ComponentOptions, PaymentComponent, PaymentMethod, PaymentResult } from '../payment-enabler/paymentEnabler';
 
 export type ElementOptions = {
   paymentMethod: PaymentMethod;
-  isOffsite?: boolean;
 };
 
 export type BaseOptions = {
   sdk: FakeSdk;
-  connectorUrl: string;
+  processorUrl: string;
   sessionId: string;
   environment: string;
-  config: any;
+  config: {
+    showPayButton?: boolean;
+  };
   onComplete: (result: PaymentResult) => void;
   onError: (error?: any) => void;
 }
@@ -20,18 +20,20 @@ export type BaseOptions = {
 /**
  * Base Web Component
  */
-export abstract class BaseComponent {
+export abstract class BaseComponent implements PaymentComponent {
   protected paymentMethod: ElementOptions['paymentMethod'];
   protected sdk: FakeSdk;
-  protected connectorUrl: BaseOptions['connectorUrl'];
+  protected processorUrl: BaseOptions['processorUrl'];
   protected sessionId: BaseOptions['sessionId'];
   protected environment: BaseOptions['environment'];
   protected config: BaseOptions['config'];
   protected showPayButton: boolean;
+  protected onComplete: (result: PaymentResult) => void;
+  protected onError: (error?: any) => void;
 
   constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
     this.sdk = baseOptions.sdk;
-    this.connectorUrl = baseOptions.connectorUrl;
+    this.processorUrl = baseOptions.processorUrl;
     this.sessionId = baseOptions.sessionId;
     this.environment = baseOptions.environment;
     this.config = baseOptions.config;
@@ -43,12 +45,17 @@ export abstract class BaseComponent {
           true;
   }
 
-  async updated() {}
-
   abstract submit(): void;
 
   abstract mount(selector: string): void ;
 
-  onComplete: (result: PaymentResult) => void;
-  onError: (error?: any) => void;
+  showValidation?(): void;
+  isValid?(): boolean;
+  getState?(): {
+    card?: {
+      endDigits?: string;
+      brand?: string;
+      expiryDate? : string;
+    }
+  };
 }

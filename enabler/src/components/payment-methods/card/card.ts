@@ -1,5 +1,5 @@
 import { BaseComponent, BaseOptions } from '../../base';
-import { ComponentOptions } from '../../../payment-connector/paymentConnector';
+import { ComponentOptions } from '../../../payment-enabler/paymentEnabler';
 import styles from '../../../style/style.module.scss';
 import inputFieldStyles from '../../../style/inputField.module.scss';
 import buttonStyles from '../../../style/button.module.scss';
@@ -39,10 +39,9 @@ export class Card extends BaseComponent {
             expiryYear: getInput(fieldIds.expiryDate).value.split('/')[1],
             cvc: getInput(fieldIds.cvv).value,
             holderName: getInput(fieldIds.holderName).value,
-        },
-        "paymentReference": "1234",
+        }
       };
-      const response = await fetch(this.connectorUrl + '/payments', {
+      const response = await fetch(this.processorUrl + '/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Session-Id': this.sessionId },
         body: JSON.stringify(requestData),
@@ -117,9 +116,11 @@ export class Card extends BaseComponent {
 
   getState() {
     return {
-      endDigits: getInput(fieldIds.cardNumber).value.slice(-4),
-      brand: getCardBrand(getInput(fieldIds.cardNumber).value),
-      expiryDate: getInput(fieldIds.expiryDate).value,
+      card: {
+        endDigits: getInput(fieldIds.cardNumber).value.slice(-4),
+        brand: getCardBrand(getInput(fieldIds.cardNumber).value),
+        expiryDate: getInput(fieldIds.expiryDate).value,
+      },
     };
   }
 }

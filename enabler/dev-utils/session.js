@@ -34,15 +34,15 @@ const fetchAdminToken = async () => {
   return token.access_token;
 }
 
-const getSessionId = async() => {
+const getSessionId = async(cartId) => {
   const accessToken = await fetchAdminToken();
 
   const sessionMetadata = {
-    cartId: '',
-    allowedPaymentMethods: ['card', 'ideal', 'googlepay'],
+    cartId: cartId,
+    allowedPaymentMethods: ['card'], // add here your allowed methods for development purposes
   };
 
-  const res = await fetch(`http://localhost:3004/api/${projectKey}/sessions`, {
+  const res = await fetch(`https://session.${__VITE_REGION__}.commercetools.com/${projectKey}/sessions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -15,13 +15,39 @@ export const PaymentRequestSchema = Type.Object({
   paymentMethod: Type.Composite([CardPaymentMethod]),
 });
 
-export const PaymentModificationRequestSchema = Type.Object({
-  action: Type.String(),
-  amount: Type.Object({
-    centAmount: Type.Number(),
-    currencyCode: Type.String(),
-  })
-})
+
+export const Amount = Type.Object({
+  amount: Type.Integer(),
+  currency: Type.String(),
+});
+
+export const ActionCapturePayment = Type.Composite([
+  Type.Object({
+    action: Type.Literal('capturePayment'),
+  }),
+  Type.Object({
+    amount: Amount,
+  }),
+]);
+
+export const ActionRefundPayment = Type.Composite([
+  Type.Object({
+    action: Type.Literal('refundPayment'),
+  }),
+  Type.Object({
+    amount: Amount,
+  }),
+]);
+
+export const ActionCancelPayment = Type.Composite([
+  Type.Object({
+    action: Type.Literal('cancelPayment'),
+  }),
+]);
+
+export const PaymentIntentUpdate = Type.Object({
+  actions: Type.Array(Type.Union([ActionCapturePayment, ActionRefundPayment, ActionCancelPayment]), { maxItems: 1 }),
+});
 
 export enum PaymentOutcome {
   AUTHORIZED = 'Authorized',
@@ -36,17 +62,16 @@ export const PaymentResponseSchema = Type.Object({
 });
 
 export enum PaymentModificationStatus {
-  SUCCESS = 'success',
   APPROVED = 'approved',
   REJECTED = 'rejected',
 }
 const PaymentModificationSchema = Type.Enum(PaymentModificationStatus);
 
-export const PaymentModificationResponseSchema = Type.Object({
+export const PaymentIntentUpdateResponse = Type.Object({
   outcome: PaymentModificationSchema,
 });
 
 export type PaymentRequestSchemaDTO = Static<typeof PaymentRequestSchema>;
-export type PaymentModificationRequestSchemaDTO = Static<typeof PaymentModificationRequestSchema>;
+export type PaymentIntentUpdateDTO = Static<typeof PaymentIntentUpdate>;
 export type PaymentResponseSchemaDTO = Static<typeof PaymentResponseSchema>;
-export type PaymentModificationResponseDTO = Static<typeof PaymentModificationResponseSchema>;
+export type PaymentIntentUpdateResponseDTO = Static<typeof PaymentIntentUpdateResponse>;

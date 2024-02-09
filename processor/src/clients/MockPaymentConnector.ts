@@ -1,10 +1,11 @@
 import { v4 as uuid } from 'uuid';
 import {
+  CancelPaymentRequest,
+  CapturePaymentRequest,
   CreatePaymentRequest, MockPaymentProviderModificationResponse,
-  MockPaymentProviderResponse
+  MockPaymentProviderResponse, RefundPaymentRequest
 } from '../services/types/payment.type';
 import { PaymentModificationStatus, PaymentOutcome } from '../dtos/payment.dto';
-import { Payment } from '@commercetools/platform-sdk';
 import {PaymentConnector} from "./PaymentConnector";
 
 export class MockPaymentConnector implements PaymentConnector {
@@ -26,19 +27,19 @@ export class MockPaymentConnector implements PaymentConnector {
     };
   }
 
-  async capturePayment(pspReference: string, payment: Payment): Promise<MockPaymentProviderModificationResponse> {
+  async capturePayment(request: CapturePaymentRequest): Promise<MockPaymentProviderModificationResponse> {
 
-    return { outcome: PaymentModificationStatus.APPROVED, pspReference: pspReference }
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.pspReference }
   }
 
-  async cancelPayment(pspReference: string, payment: Payment): Promise<MockPaymentProviderModificationResponse> {
+  async cancelPayment(request: CancelPaymentRequest): Promise<MockPaymentProviderModificationResponse> {
 
-    return { outcome: PaymentModificationStatus.APPROVED, pspReference: pspReference }
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.pspReference }
   }
 
-  async refundPayment(pspReference: string, payment: Payment): Promise<MockPaymentProviderModificationResponse> {
+  async refundPayment(request: RefundPaymentRequest): Promise<MockPaymentProviderModificationResponse> {
 
-    return { outcome: PaymentModificationStatus.APPROVED, pspReference: pspReference }
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.pspReference }
   }
 
   isCreditCardAllowed(cardNumber: string) {

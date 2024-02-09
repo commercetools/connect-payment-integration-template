@@ -1,14 +1,15 @@
 import {
+  CancelPaymentRequest,
+  CapturePaymentRequest,
   CreatePaymentRequest,
   MockPaymentProviderModificationResponse,
-  MockPaymentProviderResponse
+  MockPaymentProviderResponse, RefundPaymentRequest
 } from '../services/types/payment.type';
-import { Payment } from '@commercetools/platform-sdk';
 
 export interface PaymentConnector {
 
   processPayment: (request: CreatePaymentRequest) => Promise<MockPaymentProviderResponse>
-  capturePayment: (pspReference: string, payment: Payment) => Promise<MockPaymentProviderModificationResponse>
-  cancelPayment: (pspReference: string, payment: Payment) => Promise<MockPaymentProviderModificationResponse>
-  refundPayment: (pspReference: string, payment: Payment) => Promise<MockPaymentProviderModificationResponse>
+  capturePayment: (request: CapturePaymentRequest) => Promise<MockPaymentProviderModificationResponse>
+  cancelPayment: (request: CancelPaymentRequest) => Promise<MockPaymentProviderModificationResponse>
+  refundPayment: (request: RefundPaymentRequest) => Promise<MockPaymentProviderModificationResponse>
 }

@@ -2,10 +2,10 @@ import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commerce
 import {
   CreatePayment, ModifyPayment,
   PaymentService,
-  PaymentServiceOptions
+  PaymentServiceOptions, RequestAmount
 } from './types/payment.type';
 import {
-  PaymentModificationResponseDTO,
+  PaymentIntentUpdateResponseDTO,
   PaymentModificationStatus,
   PaymentOutcome,
   PaymentResponseSchemaDTO
@@ -13,7 +13,6 @@ import {
 import { getCartIdFromContext } from '../libs/fastify/context/context';
 import {PaymentConnector} from "../clients/PaymentConnector";
 import {MockPaymentConnector} from "../clients/MockPaymentConnector";
-import {Payment} from "@commercetools/platform-sdk";
 
 export class DefaultPaymentService implements PaymentService {
   private ctCartService: CommercetoolsCartService;
@@ -46,7 +45,7 @@ export class DefaultPaymentService implements PaymentService {
       }),
     });
 
-    ctCart = await this.ctCartService.addPayment({
+    await this.ctCartService.addPayment({
       resource: {
         id: ctCart.id,
         version: ctCart.version,
@@ -54,13 +53,9 @@ export class DefaultPaymentService implements PaymentService {
       paymentId: ctPayment.id,
     });
 
-    // TODO: consolidate payment amount if needed
     const data = {
       data: opts.data,
-      cart: ctCart,
-      payment: ctPayment,
     };
-
 
     const res = await this.paymentConnector.processPayment(data);
 
@@ -82,12 +77,19 @@ export class DefaultPaymentService implements PaymentService {
     };
   }
 
-  public async modifyPayment(opts: ModifyPayment): Promise<PaymentModificationResponseDTO> {
+  public async modifyPayment(opts: ModifyPayment): Promise<PaymentIntentUpdateResponseDTO> {
     const ctPayment = await this.ctPaymentService.getPayment({
       id: opts.paymentId,
     });
 
-    const transactionType = this.getPaymentTransactionType(opts.data.action);
+    const request = opts.data.actions[0];
+
+    let requestAmount!: RequestAmount;
+    if ( request.action != "cancelPayment" ) {
+      requestAmount = request.amount;
+    }
+
+    const transactionType = this.getPaymentTransactionType(request.action);
 
     await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
@@ -98,14 +100,15 @@ export class DefaultPaymentService implements PaymentService {
       },
     });
 
-    const res = await this.processPaymentModification(transactionType, ctPayment);
+    const res = await this.processPaymentModification(
+        transactionType, ctPayment.interfaceId as string, requestAmount);
 
     await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       transaction: {
         type: transactionType,
         amount: ctPayment.amountPlanned,
-        interactionId: res.pspReference,
+        interactionId: res?.pspReference,
         state: 'Success',
       },
     });
@@ -137,27 +140,30 @@ export class DefaultPaymentService implements PaymentService {
       case 'refundPayment': {
         return 'Refund';
       }
+      // TODO: Handle Error case
+      default : {
+        return '';
+      }
     }
   }
 
-  private async processPaymentModification(transactionType: string, ctPayment: Payment) {
+  private async processPaymentModification(transactionType: string,
+                                           pspReference: string,
+                                           requestAmount: RequestAmount) {
     switch (transactionType) {
       case 'CancelAuthorization': {
         return await this.paymentConnector.cancelPayment(
-            ctPayment.interfaceId as string,
-            ctPayment,
+            { pspReference }
         );
       }
       case 'Charge': {
         return await this.paymentConnector.capturePayment(
-            ctPayment.interfaceId as string,
-            ctPayment,
+            { amount : requestAmount, pspReference }
         );
       }
       case 'Refund': {
         return await this.paymentConnector.refundPayment(
-            ctPayment.interfaceId as string,
-            ctPayment,
+            { amount : requestAmount, pspReference }
         );
       }
     }

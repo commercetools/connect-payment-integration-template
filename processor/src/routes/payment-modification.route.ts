@@ -1,10 +1,10 @@
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
 import { PaymentService } from '../services/types/payment.type';
 import {
-    PaymentModificationRequestSchema,
-    PaymentModificationRequestSchemaDTO,
-    PaymentModificationResponseDTO,
-    PaymentModificationResponseSchema,
+    PaymentIntentUpdate,
+    PaymentIntentUpdateDTO,
+    PaymentIntentUpdateResponseDTO,
+    PaymentIntentUpdateResponse,
 } from '../dtos/payment.dto';
 
 type PaymentRoutesOptions = {
@@ -15,15 +15,15 @@ export const paymentModificationRoutes = async (
   fastify: FastifyInstance,
   opts: FastifyPluginOptions & PaymentRoutesOptions,
 ) => {
-    fastify.post<{ Body: PaymentModificationRequestSchemaDTO; Reply: PaymentModificationResponseDTO }>(
-        '/payment-intents/{id}',
+    fastify.post<{ Body: PaymentIntentUpdateDTO; Reply: PaymentIntentUpdateResponseDTO }>(
+        '/payment-intents/:id',
         {
             // TODO: use the oauth hook
-            onRequest: [opts.sessionAuthHook.authenticate()],
+            // onRequest: [opts.sessionAuthHook.authenticate()],
             schema: {
-                body: PaymentModificationRequestSchema,
+                body: PaymentIntentUpdate,
                 response: {
-                    200: PaymentModificationResponseSchema,
+                    200: PaymentIntentUpdateResponse,
                 },
             },
         },

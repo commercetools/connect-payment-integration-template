@@ -19,7 +19,7 @@
   "license": "ISC",
   "dependencies": {
     "@commercetools-backend/loggers": "22.17.0",
-    "@commercetools/connect-payments-sdk": "0.0.5",
+    "@commercetools/connect-payments-sdk": "0.0.7",
     "@commercetools/platform-sdk": "7.1.0",
     "@commercetools/sdk-client-v2": "2.3.0",
     "@fastify/cors": "9.0.1",

@@ -18,8 +18,10 @@ export const paymentModificationRoutes = async (
     fastify.post<{ Body: PaymentIntentUpdateDTO; Reply: PaymentIntentUpdateResponseDTO }>(
         '/payment-intents/:id',
         {
-            // TODO: use the oauth hook
-            // onRequest: [opts.sessionAuthHook.authenticate()],
+            preHandler: [
+                opts.oauth2AuthenticationHook.authenticate(),
+                opts.authorizationHook.authorize('manage_project', 'manage_checkout_payment_intents'),
+            ],
             schema: {
                 body: PaymentIntentUpdate,
                 response: {

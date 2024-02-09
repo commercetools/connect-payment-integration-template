@@ -6,6 +6,8 @@ export const config = {
   authUrl: process.env.CTP_AUTH_URL || 'https://auth.europe-west1.gcp.commercetools.com',
   apiUrl: process.env.CTP_API_URL || 'https://api.europe-west1.gcp.commercetools.com',
   sessionUrl: process.env.CTP_SESSION_URL || 'https://session-dev.europe-west1.gcp.commercetools.com/',
+  jwksUrl: process.env.JWKS_URL,
+  jwtIssuer: process.env.JWT_ISSUER,
 
   // Required by logger
   loggerLevel: process.env.LOGGER_LEVEL || 'info',

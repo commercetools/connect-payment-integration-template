@@ -57,6 +57,8 @@ export const setupFastify = async () => {
   });
   await server.register(paymentModificationRoutes, {
     paymentService,
+    oauth2AuthenticationHook: paymentSDK.oauth2AuthHookFn,
+    authorizationHook: paymentSDK.authorityAuthorizationHookFn
   });
 
   return server;

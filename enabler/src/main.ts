@@ -1,3 +1,3 @@
-import { MockPaymentEnabler } from './payment-enabler/mockPaymentEnabler';
+import { AdyenPaymentEnabler } from './payment-enabler/adyenPaymentEnabler';
 
-export { MockPaymentEnabler as Enabler };
+export { AdyenPaymentEnabler as Enabler };

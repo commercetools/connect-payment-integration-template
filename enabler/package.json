@@ -11,6 +11,7 @@
     "serve": "npm run build && npx http-server dist --port=3000  --cors"
   },
   "dependencies": {
+    "@adyen/adyen-web": "5.51.0",
     "http-server": "^14.1.1"
   },
   "devDependencies": {

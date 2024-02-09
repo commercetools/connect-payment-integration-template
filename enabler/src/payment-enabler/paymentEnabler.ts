@@ -16,11 +16,19 @@ export type EnablerOptions = {
   processorUrl: string;
   sessionId: string;
   config?: { showPayButton?: boolean };
+  onActionRequired?: () => Promise<void>;
   onComplete?: (result: PaymentResult) => void;
   onError?: (error: any) => void;
 };
 
-export type PaymentMethod = 'card';
+
+export enum PaymentMethod {
+  dropin = "dropin",
+  card = "card",
+  applepay = "applepay",
+  ideal = "ideal",
+  googlepay = "googlepay",
+}
 
 export type PaymentResult = {
   isSuccess: true;

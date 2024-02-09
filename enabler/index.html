@@ -5,69 +5,80 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + TS</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <script>
       var __VITE_ADMIN_CLIENT_ID__ = !'%VITE_ADMIN_CLIENT_ID%'.startsWith('%') && '%VITE_ADMIN_CLIENT_ID%';
       var __VITE_ADMIN_CLIENT_SECRET__ = !'%VITE_ADMIN_CLIENT_SECRET%'.startsWith('%') && '%VITE_ADMIN_CLIENT_SECRET%';
       var __VITE_ADMIN_SCOPE__ = !'%VITE_ADMIN_SCOPE%'.startsWith('%') && '%VITE_ADMIN_SCOPE%';
       var __VITE_REGION__ = !'%VITE_REGION%'.startsWith('%') && '%VITE_REGION%';
-      var __VITE_CART_ID__ = !'%VITE_CART_ID%'.startsWith('%') && '%VITE_CART_ID%';
+      var __VITE_PROCESSOR_URL__ = !'%VITE_PROCESSOR_URL%'.startsWith('%') && '%VITE_PROCESSOR_URL%';
     </script>
-    <script src="./session.js"></script>
+    <script src="../dev-utils/session.js"></script>
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module">
-      import { Connector } from '/enabler/src/main.ts';
 
-      const sessionId = await getSessionId();
 
-      const connector = new Connector({
-          connectorUrl: "http://0.0.0.0:5000",
-          sessionId: sessionId,
-          config: {
-            
-          },
-          onComplete: ({ isSuccess, paymentReference }) => {
-            console.log('onComplete', { isSuccess, paymentReference });
-          },
-      });
+    <main role="main">
 
-      connector.createComponent('dropin', {
-        config: {},
-      })
-      .then(e => e.mount('#adyen-dropin-component'));
+      <section class="jumbotron text-center">
+        <div class="container">
+          <form action="/action_page.php">
+            <div class="text-center mb-4">
+              <h1 class="h3 mb-3 font-weight-normal">Dev Site</h1>
+              <p>Use this site for development purposes</p>
+            </div>
+            <div class="form-group">
+              <label for="cartId">Cart ID:</label>
+              <input type="text" class="form-control" id="cartId">
+            </div>
+            <button id="createCheckout" class="btn btn-lg btn-primary btn-block" type="submit">Create checkout</button>
+          </form>
+        </div>
+      </section>
 
-      connector.createComponent('card', {
-        config: {},
-      })
-      .then(e => e.mount('#adyen-card-component'));
+      <div class="album py-5 bg-light">
+        <div class="container">
 
-      connector.createComponent('ideal', {
-        config: {showPayButton: false},
-      })
-      .then(e => e.mount('#adyen-ideal-component'));
+          <script type="module">
+            import { Enabler } from '/src/main.ts';
+      
+            document.getElementById('createCheckout').addEventListener('click', async (event) => {
+              event.preventDefault();
+              const cartId = document.getElementById('cartId').value;
+              const sessionId = await getSessionId(cartId);
 
-      connector.createComponent('googlepay', {})
-      .then(e => e.mount('#adyen-googlepay-component'));
-    </script>
-
-    <div class="container-md p-3 border m-3">
-      <div class="container-md p-3 border m-3">
-        <h5>Adyen dropin component:</h5>
-        <div id="adyen-dropin-component"></div>
+              const enabler = new Enabler({
+                processorUrl: __VITE_PROCESSOR_URL__,
+                sessionId: sessionId,
+                config: {
+                  
+                },
+                onComplete: ({ isSuccess, paymentReference }) => {
+                  console.log('onComplete', { isSuccess, paymentReference });
+                },
+              });
+        
+              enabler.createComponent('card', {
+                config: {},
+              })
+              .then(e => e.mount('#card-component'));
+            });
+      
+          </script>
+      
+          <div id="card-component"></div>
+        </div>
       </div>
-      <div class="container-md p-3 border m-3">
-        <h5>Adyen card component:</h5>
-        <div id="adyen-card-component"></div>
-      </div>
-      <div class="container-md p-3 border m-3">
-        <h5>Ideal component:</h5>
-        <div id="adyen-ideal-component"></div>
-      </div>
-      <div class="container-md p-3 border m-3">
-        <h5>Googlepay component:</h5>
-        <div id="adyen-googlepay-component"></div>
-      </div>
-    </div>
+
+    </main>
+
+
+
+    
+
+    
   </body>
 </html>

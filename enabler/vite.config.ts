@@ -13,7 +13,7 @@ export default defineConfig({
       name: 'Connector',
       formats: ['es','umd'],
       // the proper extensions will be added
-      fileName: 'connector',
+      fileName: (format) => `connector-enabler.${format}.js`,
     },
   },
 })

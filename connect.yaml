@@ -20,3 +20,10 @@ deployAs:
           description: Commercetools API URL
         - key: CTP_SESSION_URL
           description: Session API URL
+  - name: enabler
+    applicationType: service
+    endpoint: /enabler
+    configuration:
+      securedConfiguration:
+        - key: CTP_REGION
+          description: Region of Commercetools project

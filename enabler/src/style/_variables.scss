@@ -1,0 +1,102 @@
+$color-black: $color-style-black;
+$color-white: $color-style-white;
+
+/**
+* From https://www.figma.com/file/B3AuN5HVBARkLRXuYUWVY0/CA_UI-library?node-id=10-17139&t=HIYfSjMPWF7Q8zEX-0
+*/
+
+// TEXT
+$color-text-default: $color-style-text-black;
+$color-text-disabled: $color-style-text-disabled;
+$color-text-error: $color-style-error-main;
+$color-text-helper: $color-style-text-helper;
+$color-text-label-input-focused: $color-style-primary-main;
+$color-text-label: $color-style-text-label;
+$color-text-white: $color-style-white;
+
+// BORDER
+$color-border-default: $color-style-other-border-default;
+$color-border-divider: $color-style-other-border-divider;
+$color-border-disabled: $color-style-secondary-disabled-stroke;
+$color-border-error: $color-style-error-main;
+$color-border-focus: $color-style-other-border-dark;
+
+// STATUS
+$color-status-default: $color-style-primary-main;
+$color-status-focus: $color-style-primary-active;
+$color-status-hover: $color-style-primary-hover;
+
+// success
+$color-status-successful-active: $color-style-success-active;
+$color-status-successful-background: $color-style-success-background;
+$color-status-successful-dark: $color-style-success-dark;
+$color-status-successful-hover: $color-style-success-hover;
+$color-status-successful: $color-style-success-main;
+
+// warning
+$color-status-warning-active: $color-style-warning-active;
+$color-status-warning-background: $color-style-warning-background;
+$color-status-warning-dark: $color-style-warning-dark;
+$color-status-warning-hover: $color-style-warning-hover;
+$color-status-warning: $color-style-warning-main;
+
+// info
+$color-status-info-active: $color-style-info-active;
+$color-status-info-background: $color-style-info-background;
+$color-status-info-dark: $color-style-info-dark;
+$color-status-info-hover: $color-style-info-hover;
+$color-status-info: $color-style-info-main;
+
+// error
+$color-status-error-active: $color-style-error-active;
+$color-status-error-background: $color-style-error-background;
+$color-status-error-dark: $color-style-error-dark;
+$color-status-error-hover: $color-style-error-hover;
+$color-status-error: $color-style-error-main;
+
+// BUTTON
+$color-button-disabled: $color-style-primary-disabled-background;
+$color-button-focus: $color-style-primary-active;
+$color-button-hover: $color-style-primary-hover;
+$color-button-low-opacity: $color-style-primary-low-capacity;
+$color-button: $color-style-primary-main;
+
+// OTHER COMPONENTS
+$color-card-background: $color-style-other-card-background;
+$color-divider: $color-style-other-divider;
+$color-tag-background: $color-style-other-tag-background;
+$color-tag-background-discount: $color-style-other-tag-background-discount;
+$color-tooltip-background: $color-style-other-tooltip-background;
+
+// FONTS
+$font-family: var(--ctc-font-family);
+$font-weight-light: 300;
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+
+// Radiuses
+$border-radius: 0.25rem;
+
+// Shadows
+$box-shadow:
+  0 2px 2px 0 rgba(0, 0, 0, 0.14),
+  0 3px 1px -2px rgba(0, 0, 0, 0.12),
+  0 1px 5px 0 rgba(0, 0, 0, 0.2);
+
+// Z-Index
+$z-index-1: 1;
+$z-index-100: 100;
+$z-index-200: 200;
+
+// Breakpoints
+$breakpoints: (
+  'small': (
+    min-width: 360px,
+  ),
+  'medium': (
+    min-width: 576px,
+  ),
+  'large': (
+    min-width: 1024px,
+  ),
+) !default;

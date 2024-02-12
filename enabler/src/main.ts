@@ -1,4 +1,3 @@
-import '@adyen/adyen-web/dist/adyen.css';
-import { AdyenPaymentConnector } from './payment-connector/adyenPaymentConnector';
+import { MockPaymentEnabler } from './payment-enabler/mockPaymentEnabler';
 
-export { AdyenPaymentConnector as Connector };
+export { MockPaymentEnabler as Enabler };

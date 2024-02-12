@@ -13,6 +13,7 @@ type PaymentRoutesOptions = {
   sessionAuthHook: SessionAuthenticationHook;
 };
 
+// TODO: Handle exceptions for error cases (Bad request, Internal server)
 export const paymentRoutes = async (fastify: FastifyInstance, opts: FastifyPluginOptions & PaymentRoutesOptions) => {
   fastify.post<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
     '/operations/payments',

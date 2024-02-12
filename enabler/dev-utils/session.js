@@ -1,4 +1,4 @@
-const projectKey = 'commercetools-checkout';
+const projectKey = __VITE_ADMIN_PROJECT_KEY__;
 
 const fetchAdminToken = async () => {
   const myHeaders = new Headers();

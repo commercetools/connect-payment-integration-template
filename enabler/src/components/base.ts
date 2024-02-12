@@ -1,5 +1,5 @@
-import { FakeSdk } from '../FakeSdk';
-import { ComponentOptions, PaymentComponent, PaymentMethod, PaymentResult } from '../payment-enabler/paymentEnabler';
+import { FakeSdk } from '../fake-sdk';
+import { ComponentOptions, PaymentComponent, PaymentMethod, PaymentResult } from '../payment-enabler/payment-enabler';
 
 export type ElementOptions = {
   paymentMethod: PaymentMethod;

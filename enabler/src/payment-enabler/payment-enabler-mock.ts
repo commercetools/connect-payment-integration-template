@@ -1,7 +1,7 @@
-import { ComponentOptions, PaymentEnabler, PaymentMethod, EnablerOptions } from './paymentEnabler';
-import { Card } from '../components/payment-methods/card/card';
-import { FakeSdk } from '../FakeSdk';
 import { BaseOptions } from '../components/base';
+import { Card } from '../components/payment-methods/card/card';
+import { FakeSdk } from '../fake-sdk';
+import { ComponentOptions, EnablerOptions, PaymentEnabler, PaymentMethod } from './payment-enabler';
 
 const SupportedMethods: PaymentMethod[] = ['card'];
 

@@ -10,6 +10,7 @@ import { configRoutes } from './routes/config.route';
 import { paymentRoutes } from './routes/payment.route';
 import { statusRoutes } from './routes/status.route';
 import { DefaultPaymentService } from './services/payment.service';
+import {paymentModificationRoutes} from "./routes/payment-modification.route";
 
 /**
  * Setup Fastify server instance
@@ -57,6 +58,11 @@ export const setupFastify = async () => {
   await server.register(paymentRoutes, {
     paymentService,
     sessionAuthHook: paymentSDK.sessionAuthHookFn,
+  });
+  await server.register(paymentModificationRoutes, {
+    paymentService,
+    oauth2AuthenticationHook: paymentSDK.oauth2AuthHookFn,
+    authorizationHook: paymentSDK.authorityAuthorizationHookFn
   });
 
   return server;

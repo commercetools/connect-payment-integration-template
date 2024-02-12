@@ -11,13 +11,13 @@ import {
   PaymentResponseSchemaDTO
 } from '../dtos/payment.dto';
 import { getCartIdFromContext } from '../libs/fastify/context/context';
-import {PaymentConnector} from "../clients/PaymentConnector";
 import {MockPaymentConnector} from "../clients/MockPaymentConnector";
+import {DefaultMockPaymentConnector} from "../clients/DefaultMockPaymentConnector";
 
 export class DefaultPaymentService implements PaymentService {
   private ctCartService: CommercetoolsCartService;
   private ctPaymentService: CommercetoolsPaymentService;
-  private paymentConnector: PaymentConnector = new MockPaymentConnector();
+  private paymentConnector: MockPaymentConnector = new DefaultMockPaymentConnector();
 
   constructor(opts: PaymentServiceOptions) {
     this.ctCartService = opts.ctCartService;

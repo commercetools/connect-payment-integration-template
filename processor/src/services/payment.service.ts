@@ -15,7 +15,6 @@ export class DefaultPaymentService implements PaymentService {
   }
 
   public async getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO> {
-    // TODO : Implement actual API call to payment service provider
     return {
       components: [
         {

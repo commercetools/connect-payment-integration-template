@@ -8,6 +8,7 @@ import {
   PaymentResponseSchemaDTO,
 } from '../../dtos/payment.dto';
 
+
 export type CreatePayment = {
   data: PaymentRequestSchemaDTO;
 };
@@ -56,6 +57,7 @@ export type ModifyPayment = {
 
 export interface PaymentService {
   createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO>;
+  getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO>;
   modifyPayment(opts: ModifyPayment): Promise<PaymentIntentUpdateResponseDTO>;
 }
 

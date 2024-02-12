@@ -1,9 +1,9 @@
-import { BaseComponent, BaseOptions } from '../../base';
-import { ComponentOptions } from '../../../payment-enabler/paymentEnabler';
-import styles from '../../../style/style.module.scss';
-import inputFieldStyles from '../../../style/inputField.module.scss';
+import { ComponentOptions } from '../../../payment-enabler/payment-enabler';
 import buttonStyles from '../../../style/button.module.scss';
-import { addFormFieldsEventListeners, fieldIds, getInput, getCardBrand, validateAllFields } from './utils';
+import inputFieldStyles from '../../../style/inputField.module.scss';
+import styles from '../../../style/style.module.scss';
+import { BaseComponent, BaseOptions } from '../../base';
+import { addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validateAllFields } from './utils';
 
 export class Card extends BaseComponent {
   constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {

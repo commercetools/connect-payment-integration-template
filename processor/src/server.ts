@@ -9,6 +9,7 @@ import { paymentSDK } from './payment-sdk';
 import { configRoutes } from './routes/config.route';
 import { paymentRoutes } from './routes/payment.route';
 import { statusRoutes } from './routes/status.route';
+import { paymentComponentsRoute } from './routes/payment-components.route';
 import { DefaultPaymentService } from './services/payment.service';
 import {paymentModificationRoutes} from "./routes/payment-modification.route";
 
@@ -63,6 +64,11 @@ export const setupFastify = async () => {
     paymentService,
     oauth2AuthenticationHook: paymentSDK.oauth2AuthHookFn,
     authorizationHook: paymentSDK.authorityAuthorizationHookFn
+  });
+
+  await server.register(paymentComponentsRoute, {
+    paymentService,
+    jwtAuthHook: paymentSDK.jwtAuthHookFn,
   });
 
   return server;

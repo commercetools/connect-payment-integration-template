@@ -16,7 +16,7 @@ export const configRoutes = async (fastify: FastifyInstance, opts: FastifyPlugin
   });
 
   fastify.get(
-    '/config',
+    '/operations/config',
     {
       preHandler: [opts.sessionAuthHook.authenticate()],
       schema: {

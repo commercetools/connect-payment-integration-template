@@ -16,7 +16,7 @@ export const paymentModificationRoutes = async (
   opts: FastifyPluginOptions & PaymentRoutesOptions,
 ) => {
     fastify.post<{ Body: PaymentIntentUpdateDTO; Reply: PaymentIntentUpdateResponseDTO }>(
-        '/payment-intents/:id',
+        '/operations/payment-intents/:id',
         {
             preHandler: [
                 opts.oauth2AuthenticationHook.authenticate(),

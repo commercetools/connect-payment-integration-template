@@ -15,7 +15,7 @@ type PaymentRoutesOptions = {
 
 export const paymentRoutes = async (fastify: FastifyInstance, opts: FastifyPluginOptions & PaymentRoutesOptions) => {
   fastify.post<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
-    '/payments',
+    '/operations/payments',
     {
       preHandler: [opts.sessionAuthHook.authenticate()],
       schema: {

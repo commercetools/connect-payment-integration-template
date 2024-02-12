@@ -11,8 +11,11 @@ import {
   PaymentResponseSchemaDTO
 } from '../dtos/payment.dto';
 import { getCartIdFromContext } from '../libs/fastify/context/context';
-import {MockPaymentConnector} from "../clients/MockPaymentConnector";
-import {DefaultMockPaymentConnector} from "../clients/DefaultMockPaymentConnector";
+
+import { SupportedPaymentComponentsSchemaDTO } from '../dtos/payment-methods.dto';
+import { MockPaymentConnector } from "../clients/MockPaymentConnector";
+import { DefaultMockPaymentConnector } from "../clients/DefaultMockPaymentConnector";
+
 
 export class DefaultPaymentService implements PaymentService {
   private ctCartService: CommercetoolsCartService;
@@ -22,6 +25,16 @@ export class DefaultPaymentService implements PaymentService {
   constructor(opts: PaymentServiceOptions) {
     this.ctCartService = opts.ctCartService;
     this.ctPaymentService = opts.ctPaymentService;
+  }
+
+  public async getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO> {
+    return {
+      components: [
+        {
+          type: 'card',
+        },
+      ],
+    };
   }
 
   public async createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO> {

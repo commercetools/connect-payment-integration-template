@@ -1,15 +1,15 @@
+import autoLoad from '@fastify/autoload';
 import cors from '@fastify/cors';
 import fastifyFormBody from '@fastify/formbody';
-import Fastify, { FastifyRequest } from 'fastify';
+import Fastify from 'fastify';
 import { randomUUID } from 'node:crypto';
-import { config } from './config/config';
-import { requestContextPlugin } from './libs/fastify/context/context';
-import { errorHandler } from './libs/fastify/error-handler';
-import { paymentSDK } from './payment-sdk';
-import { configRoutes } from './routes/config.route';
-import { paymentRoutes } from './routes/payment.route';
-import { statusRoutes } from './routes/status.route';
-import { DefaultPaymentService } from './services/payment.service';
+import { join } from 'path';
+import { config } from '../config/config';
+import { requestContextPlugin } from '../libs/fastify/context/context';
+import { errorHandler } from '../libs/fastify/error-handler';
+
+// const __filename = fileURLToPath(import.meta.url)
+// const __dirname = dirname(__filename)
 
 /**
  * Setup Fastify server instance
@@ -41,18 +41,8 @@ export const setupFastify = async () => {
   // Register context plugin
   await server.register(requestContextPlugin);
 
-  // Register default routes
-  await server.register(statusRoutes);
-  await server.register(configRoutes);
-
-  const paymentService = new DefaultPaymentService({
-    ctCartService: paymentSDK.ctCartService,
-    ctPaymentService: paymentSDK.ctPaymentService,
-  });
-
-  await server.register(paymentRoutes, {
-    paymentService,
-    sessionAuthHook: paymentSDK.sessionAuthHookFn,
+  await server.register(autoLoad, {
+    dir: join(__dirname, 'plugins'),
   });
 
   return server;

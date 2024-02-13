@@ -1,0 +1,23 @@
+{
+  "name": "enabler",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3000",
+    "start": "serve dist -l 8080 --cors",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "serve": "npm run build && serve dist -l 3000 --cors"
+  },
+  "dependencies": {
+    "serve": "14.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "20.11.17",
+    "sass": "1.70.0",
+    "typescript": "5.3.3",
+    "vite": "5.1.1",
+    "vite-plugin-css-injected-by-js": "3.4.0"
+  }
+}

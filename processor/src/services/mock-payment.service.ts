@@ -1,21 +1,31 @@
 import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
-import { paymentProviderApi } from '../clients/mockPaymentAPI';
-import { CreatePayment, PaymentService, PaymentServiceOptions } from './types/payment.type';
-import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/payment.dto';
-import { getCartIdFromContext } from '../libs/fastify/context/context';
+import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/mock-payment.dto';
 
-export class DefaultPaymentService implements PaymentService {
+import { randomUUID } from 'crypto';
+import { getCartIdFromContext } from '../libs/fastify/context/context';
+import { CreatePayment } from './types/mock-payment.type';
+
+export type MockPaymentServiceOptions = {
+  ctCartService: CommercetoolsCartService;
+  ctPaymentService: CommercetoolsPaymentService;
+};
+
+export class MockPaymentService {
   private ctCartService: CommercetoolsCartService;
   private ctPaymentService: CommercetoolsPaymentService;
+  private allowedCreditCards = ['4111111111111111', '5555555555554444', '341925950237632'];
 
-  constructor(opts: PaymentServiceOptions) {
+  constructor(opts: MockPaymentServiceOptions) {
     this.ctCartService = opts.ctCartService;
     this.ctPaymentService = opts.ctPaymentService;
   }
 
+  private isCreditCardAllowed(cardNumber: string) {
+    return this.allowedCreditCards.includes(cardNumber);
+  }
+
   public async createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO> {
-    let ctCart;
-    ctCart = await this.ctCartService.getCart({
+    const ctCart = await this.ctCartService.getCart({
       id: getCartIdFromContext(),
     });
 
@@ -34,7 +44,7 @@ export class DefaultPaymentService implements PaymentService {
       }),
     });
 
-    ctCart = await this.ctCartService.addPayment({
+    await this.ctCartService.addPayment({
       resource: {
         id: ctCart.id,
         version: ctCart.version,
@@ -42,29 +52,29 @@ export class DefaultPaymentService implements PaymentService {
       paymentId: ctPayment.id,
     });
 
-    // TODO: consolidate payment amount if needed
-    const data = {
-      data: opts.data,
-      cart: ctCart,
-      payment: ctPayment,
-    };
+    const paymentMethod = opts.data.paymentMethod;
+    const isAuthorized = this.isCreditCardAllowed(paymentMethod.cardNumber);
 
-    const res = await paymentProviderApi().processPayment(data);
+    const resultCode = isAuthorized ? PaymentOutcome.AUTHORIZED : PaymentOutcome.REJECTED;
+
+    const pspReference = randomUUID().toString();
+
+    const paymentMethodType = paymentMethod.type;
 
     const updatedPayment = await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
-      pspReference: res.pspReference,
-      paymentMethod: res.paymentMethodType,
+      pspReference: pspReference,
+      paymentMethod: paymentMethodType,
       transaction: {
         type: 'Authorization',
         amount: ctPayment.amountPlanned,
-        interactionId: res.pspReference,
-        state: this.convertPaymentResultCode(res.resultCode as PaymentOutcome),
+        interactionId: pspReference,
+        state: this.convertPaymentResultCode(resultCode as PaymentOutcome),
       },
     });
 
     return {
-      outcome: res.resultCode,
+      outcome: resultCode,
       paymentReference: updatedPayment.id,
     };
   }

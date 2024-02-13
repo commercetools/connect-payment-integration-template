@@ -56,7 +56,8 @@ export const errorHandler = (error: Error, req: FastifyRequest, reply: FastifyRe
   if (error instanceof Errorx) {
     return handleErrorx(error, reply);
   } else {
-    log.error(error);
+    const { message, ...meta } = error;
+    log.error(message, meta);
     return reply.code(500).send({
       code: 'General',
       message: 'Internal server error.',
@@ -66,7 +67,8 @@ export const errorHandler = (error: Error, req: FastifyRequest, reply: FastifyRe
 };
 
 const handleErrorx = (error: Errorx, reply: FastifyReply) => {
-  log.error(error);
+  const { message, ...meta } = error;
+  log.error(message, meta);
   const errorBuilder: TError = {
     statusCode: error.httpErrorStatus,
     code: error.code,

@@ -1,0 +1,196 @@
+
+@use './vx' as *;
+
+.inputContainer {
+  position: relative;
+  width: 100%;
+  font-family: $font-family;
+  margin-bottom: 1.5rem;
+
+  .inputLabel {
+    position: absolute;
+    width: 100%;
+    top: 1rem;
+    padding: 0 0.25rem 0 1rem;
+
+    font-size: 1rem;
+    line-height: 1.5rem;
+    background-color: transparent;
+    color: $color-border-focus;
+    transition: 0.3s all;
+    pointer-events: none;
+    z-index: $z-index-1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .inputField {
+    width: 100%;
+    margin: 0;
+    padding: 1rem 0.75rem;
+    box-sizing: border-box;
+    font-size: 1rem;
+    line-height: 1rem;
+    border: 1px solid $color-border-default;
+    border-radius: 4px;
+    &::placeholder {
+      opacity: 0;
+      transition: 0.3s opacity;
+    }
+  }
+
+  .inputField:hover {
+    border: 1px solid $color-border-focus;
+    cursor: pointer;
+  }
+
+  .helperText {
+    color: $color-text-helper;
+    font-size: 0.75rem;
+    line-height: 0.75rem;
+    padding: 0.25rem 0.75rem 0.25rem 1rem;
+  }
+}
+
+.inputContainer:not(.containValue) {
+  .inputField {
+    width: 100%;
+    margin: 0;
+    padding: 1rem 0.75rem;
+    box-sizing: border-box;
+    font-size: 1rem;
+    line-height: 1rem;
+    border: 1px solid $color-border-default;
+    border-radius: 4px;
+    &::placeholder {
+      opacity: 0;
+      transition: 0.3s opacity;
+    }
+    &:not(:focus)::-webkit-datetime-edit-year-field:not([aria-valuenow]),
+    &:not(:focus)::-webkit-datetime-edit-month-field:not([aria-valuenow]),
+    &:not(:focus)::-webkit-datetime-edit-day-field:not([aria-valuenow]) {
+      color: transparent;
+    }
+    &:not(:focus):in-range::-webkit-datetime-edit-year-field,
+    &:not(:focus):in-range::-webkit-datetime-edit-month-field,
+    &:not(:focus):in-range::-webkit-datetime-edit-day-field,
+    &:not(:focus):in-range::-webkit-datetime-edit-hour-field,
+    &:not(:focus):in-range::-webkit-datetime-edit-minute-field,
+    &:not(:focus):in-range::-webkit-datetime-edit-text {
+      color: transparent;
+    }
+  }
+}
+
+.inputContainer:focus-within,
+.disabledWithValue,
+.inputContainer.containValue {
+  overflow: initial;
+
+  .inputLabel {
+    transform: translateY(-1.375rem);
+    width: auto;
+    padding: 0 0.25rem;
+    left: 0.75rem;
+    color: var(--ctc-input-field-focus);
+    background-color: #fff;
+    font-size: 0.75rem;
+    line-height: 0.75rem;
+  }
+
+  .inputField {
+    outline-color: var(--ctc-input-field-focus);
+  }
+
+  .inputField::placeholder {
+    opacity: 1;
+  }
+}
+
+.hasGreyBackground.inputContainer:focus-within {
+  .inputLabel {
+    background-color: $color-style-side-background;
+  }
+}
+
+.containValue:not(:focus-within),
+.disabledWithValue {
+  .inputLabel {
+    color: $color-border-default;
+  }
+}
+
+.trailingIconContainer {
+  .inputField {
+    padding-right: 3.25rem;
+  }
+  .trailingIcon {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+  }
+}
+
+.leadingIconContainer {
+  .inputField {
+    padding-left: 3rem;
+  }
+  .leadingIcon {
+    position: absolute;
+    left: 0.75rem;
+    top: 1rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+  }
+  .inputLabel {
+    left: 3rem;
+  }
+}
+
+.inputContainer.error {
+  margin-bottom: 1rem;
+  .inputField {
+    border: 2px solid $color-status-error;
+    outline: none;
+  }
+  .helperText {
+    color: $color-status-error;
+  }
+}
+
+.inputContainer.error:focus-within,
+.inputContainer.error.containValue {
+  .inputLabel {
+    color: $color-status-error;
+    max-width: calc(100% - 1rem);
+  }
+}
+
+.inputContainer.disabled {
+  .inputField {
+    cursor: not-allowed;
+    border: 1px solid $color-border-default;
+    color: $color-border-default;
+    background-color: $color-text-white;
+  }
+  .inputLabel {
+    color: $color-border-default;
+  }
+}
+
+.inputFieldTooltip {
+  position: absolute;
+  top: 1rem;
+  right: 0.35rem;
+}
+
+.errorField {
+  color: $color-status-error;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.75rem 0.25rem 1rem;
+}

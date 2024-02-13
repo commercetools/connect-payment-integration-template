@@ -1,6 +1,6 @@
 import { Static, Type } from '@sinclair/typebox';
 
-export const CardPaymentMethod = Type.Object({
+export const CardPaymentMethodSchema = Type.Object({
   // TODO: Remove the fields according to the payment provider solution,
   //  Strongly recommend not to process PAN data to Connectors.
   type: Type.Literal('card'),
@@ -12,7 +12,7 @@ export const CardPaymentMethod = Type.Object({
 });
 
 export const PaymentRequestSchema = Type.Object({
-  paymentMethod: Type.Composite([CardPaymentMethod]),
+  paymentMethod: Type.Composite([CardPaymentMethodSchema]),
 });
 
 export enum PaymentOutcome {

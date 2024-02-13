@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/processor"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10
+  - package-ecosystem: "npm"
+    directory: "/enabler"
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 10

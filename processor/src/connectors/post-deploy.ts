@@ -1,5 +1,7 @@
 async function postDeploy(properties: any) {
-  // TODO: Implement postDeploy scripts if any
+  if (properties) {
+    // TODO: Implement postDeploy scripts if any
+  }
 }
 
 async function runPostDeployScripts() {

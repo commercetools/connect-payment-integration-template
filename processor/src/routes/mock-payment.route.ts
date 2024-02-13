@@ -5,17 +5,17 @@ import {
   PaymentRequestSchemaDTO,
   PaymentResponseSchema,
   PaymentResponseSchemaDTO,
-} from '../dtos/payment.dto';
-import { PaymentService } from '../services/types/payment.type';
+} from '../dtos/mock-payment.dto';
+import { MockPaymentService } from '../services/mock-payment.service';
 
 type PaymentRoutesOptions = {
-  paymentService: PaymentService;
+  paymentService: MockPaymentService;
   sessionAuthHook: SessionAuthenticationHook;
 };
 
 export const paymentRoutes = async (fastify: FastifyInstance, opts: FastifyPluginOptions & PaymentRoutesOptions) => {
   fastify.post<{ Body: PaymentRequestSchemaDTO; Reply: PaymentResponseSchemaDTO }>(
-    '/operations/payments',
+    '/payments',
     {
       preHandler: [opts.sessionAuthHook.authenticate()],
       schema: {

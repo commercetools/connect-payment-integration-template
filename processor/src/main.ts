@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-import { setupFastify } from './server';
+import { setupFastify } from './server/server';
 
 (async () => {
   const server = await setupFastify();

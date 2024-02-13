@@ -11,7 +11,7 @@ import {
   StatusResponse,
 } from '../types/operation.type';
 import { OperationProcessor } from './operation.processor';
-const packageJSON = require('../../package.json');
+const packageJSON = require('../../../package.json');
 
 export class MockOperationProcessor implements OperationProcessor {
   async config(): Promise<ConfigResponse> {

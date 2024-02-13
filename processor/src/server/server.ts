@@ -48,7 +48,5 @@ export const setupFastify = async () => {
     dir: join(__dirname, 'plugins')
   })
 
-
-
   return server;
 };

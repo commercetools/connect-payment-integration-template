@@ -6,15 +6,15 @@ import {
 } from '@commercetools/connect-payments-sdk';
 import { Type } from '@sinclair/typebox';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { ConfigResponseSchema, ConfigResponseSchemaDTO } from '../dtos/config.dto';
-import { SupportedPaymentComponentsSchema } from '../dtos/payment-componets.dto';
+import { ConfigResponseSchema, ConfigResponseSchemaDTO } from '../dtos/operations/config.dto';
+import { SupportedPaymentComponentsSchema } from '../dtos/operations/payment-componets.dto';
 import {
   PaymentIntentRequestSchema,
   PaymentIntentRequestSchemaDTO,
   PaymentIntentResponseSchema,
   PaymentIntentResponseSchemaDTO,
-} from '../dtos/payment-intents.dto';
-import { StatusResponseSchema, StatusResponseSchemaDTO } from '../dtos/status.dto';
+} from '../dtos/operations/payment-intents.dto';
+import { StatusResponseSchema, StatusResponseSchemaDTO } from '../dtos/operations/status.dto';
 import { OperationService } from '../services/types/operation.type';
 
 type OperationRouteOptions = {

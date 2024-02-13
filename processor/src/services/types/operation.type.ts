@@ -1,14 +1,14 @@
 import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
-import { ConfigResponseSchemaDTO } from '../../dtos/config.dto';
 import { PaymentOutcome, PaymentRequestSchemaDTO } from '../../dtos/mock-payment.dto';
-import { SupportedPaymentComponentsSchemaDTO } from '../../dtos/payment-componets.dto';
+import { ConfigResponseSchemaDTO } from '../../dtos/operations/config.dto';
+import { SupportedPaymentComponentsSchemaDTO } from '../../dtos/operations/payment-componets.dto';
 import {
   AmountSchemaDTO,
   PaymentIntentRequestSchemaDTO,
   PaymentIntentResponseSchemaDTO,
   PaymentModificationStatus,
-} from '../../dtos/payment-intents.dto';
-import { StatusResponseSchemaDTO } from '../../dtos/status.dto';
+} from '../../dtos/operations/payment-intents.dto';
+import { StatusResponseSchemaDTO } from '../../dtos/operations/status.dto';
 import { OperationProcessor } from '../processors/operation.processor';
 
 export type CreatePaymentRequest = {

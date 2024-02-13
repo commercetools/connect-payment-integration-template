@@ -1,10 +1,18 @@
-import { CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
+import {
+  CommercetoolsPaymentService,
+  ErrorInvalidJsonInput,
+  ErrorInvalidOperation,
+} from '@commercetools/connect-payments-sdk';
 import { ModifyPayment, OperationService, OperationServiceOptions } from './types/operation.type';
 
-import { ConfigResponseSchemaDTO } from '../dtos/config.dto';
-import { SupportedPaymentComponentsSchemaDTO } from '../dtos/payment-componets.dto';
-import { AmountSchemaDTO, PaymentIntentResponseSchemaDTO, PaymentModificationStatus } from '../dtos/payment-intents.dto';
-import { StatusResponseSchemaDTO } from '../dtos/status.dto';
+import { ConfigResponseSchemaDTO } from '../dtos/operations/config.dto';
+import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
+import {
+  AmountSchemaDTO,
+  PaymentIntentResponseSchemaDTO,
+  PaymentModificationStatus,
+} from '../dtos/operations/payment-intents.dto';
+import { StatusResponseSchemaDTO } from '../dtos/operations/status.dto';
 import { OperationProcessor } from './processors/operation.processor';
 
 export class DefaultOperationService implements OperationService {
@@ -13,7 +21,7 @@ export class DefaultOperationService implements OperationService {
 
   constructor(opts: OperationServiceOptions) {
     this.ctPaymentService = opts.ctPaymentService;
-    this.operationProcessor = opts.operationProcessor
+    this.operationProcessor = opts.operationProcessor;
   }
 
   public async getStatus(): Promise<StatusResponseSchemaDTO> {
@@ -65,12 +73,12 @@ export class DefaultOperationService implements OperationService {
         type: transactionType,
         amount: ctPayment.amountPlanned,
         interactionId: res?.pspReference,
-        state: 'Success',
+        state: res.outcome === PaymentModificationStatus.APPROVED ? 'Success' : 'Failure',
       },
     });
 
     return {
-      outcome: PaymentModificationStatus.APPROVED,
+      outcome: res.outcome,
     };
   }
 
@@ -87,7 +95,7 @@ export class DefaultOperationService implements OperationService {
       }
       // TODO: Handle Error case
       default: {
-        return '';
+        throw new ErrorInvalidJsonInput(`Request body does not contain valid JSON.`);
       }
     }
   }
@@ -106,6 +114,9 @@ export class DefaultOperationService implements OperationService {
       }
       case 'Refund': {
         return await this.operationProcessor.refundPayment({ amount: requestAmount, pspReference });
+      }
+      default: {
+        throw new ErrorInvalidOperation(`Operation ${transactionType} not supported.`);
       }
     }
   }

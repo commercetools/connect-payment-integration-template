@@ -1,7 +1,7 @@
 import { healthCheckCommercetoolsPermissions, statusHandler } from '@commercetools/connect-payments-sdk';
-import { config } from '../../config/config';
-import { PaymentModificationStatus } from '../../dtos/operations/payment-intents.dto';
-import { paymentSDK } from '../../payment-sdk';
+import { config } from '../config/config';
+import { PaymentModificationStatus } from '../dtos/operations/payment-intents.dto';
+import { paymentSDK } from '../payment-sdk';
 import {
     CancelPaymentRequest,
     CapturePaymentRequest,
@@ -9,7 +9,7 @@ import {
     PaymentProviderModificationResponse,
     RefundPaymentRequest,
     StatusResponse
-} from '../types/operation.type';
+} from '../services/types/operation.type';
 import { OperationProcessor } from './operation.processor';
 const packageJSON = require('../../package.json');
 

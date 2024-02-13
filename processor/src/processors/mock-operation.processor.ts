@@ -10,7 +10,7 @@ import {
   RefundPaymentRequest,
   StatusResponse,
 } from '../services/types/operation.type';
-import { OperationProcessor } from './operation.processor';
+import { OperationProcessor } from '../services/processors/operation.processor';
 const packageJSON = require('../../package.json');
 
 export class MockOperationProcessor implements OperationProcessor {

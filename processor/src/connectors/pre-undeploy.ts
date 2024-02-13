@@ -12,3 +12,4 @@ async function run() {
     process.exitCode = 1;
   }
 }
+run();

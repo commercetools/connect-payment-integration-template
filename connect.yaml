@@ -22,7 +22,7 @@ deployAs:
           description: Session API URL
   - name: enabler
     applicationType: service
-    endpoint: /enabler
+    endpoint: /
     configuration:
       securedConfiguration:
         - key: CTP_REGION

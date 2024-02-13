@@ -56,7 +56,7 @@ Make sure commercetools client credential have at least the following permission
 
 * `manage_payments`
 * `manage_checkout_payment_intents`
-* `manage_sessions`
+* `view_sessions`
 * `introspect_oauth_tokens`
 
 ```

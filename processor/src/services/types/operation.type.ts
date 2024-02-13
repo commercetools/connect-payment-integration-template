@@ -52,14 +52,14 @@ export type ModifyPayment = {
 };
 
 export interface OperationService {
-  getStatus(): Promise<StatusResponseSchemaDTO>
+  getStatus(): Promise<StatusResponseSchemaDTO>;
   getConfig(): Promise<ConfigResponseSchemaDTO>;
   getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO>;
   modifyPayment(opts: ModifyPayment): Promise<PaymentIntentResponseSchemaDTO>;
 }
 
 export type OperationServiceOptions = {
-  operationProcessor: OperationProcessor
+  operationProcessor: OperationProcessor;
   ctCartService: CommercetoolsCartService;
   ctPaymentService: CommercetoolsPaymentService;
 };

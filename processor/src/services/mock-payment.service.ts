@@ -25,8 +25,7 @@ export class MockPaymentService {
   }
 
   public async createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO> {
-    let ctCart;
-    ctCart = await this.ctCartService.getCart({
+    const ctCart = await this.ctCartService.getCart({
       id: getCartIdFromContext(),
     });
 

@@ -4,41 +4,40 @@ import {
   ConfigResponse,
   PaymentProviderModificationResponse,
   RefundPaymentRequest,
-  StatusResponse
+  StatusResponse,
 } from '../types/operation.type';
 
 export interface OperationProcessor {
-
   /**
    * Get configuration information
-   * @returns 
+   * @returns
    */
-  config: () => Promise<ConfigResponse>
+  config: () => Promise<ConfigResponse>;
 
   /**
    * Get stats information
-   * @returns 
+   * @returns
    */
-  status: () => Promise<StatusResponse>
+  status: () => Promise<StatusResponse>;
 
   /**
    * Capture payment
-   * @param request 
-   * @returns 
+   * @param request
+   * @returns
    */
-  capturePayment: (request: CapturePaymentRequest) => Promise<PaymentProviderModificationResponse>
+  capturePayment: (request: CapturePaymentRequest) => Promise<PaymentProviderModificationResponse>;
 
   /**
    * Cancel payment
-   * @param request 
-   * @returns 
+   * @param request
+   * @returns
    */
-  cancelPayment: (request: CancelPaymentRequest) => Promise<PaymentProviderModificationResponse>
+  cancelPayment: (request: CancelPaymentRequest) => Promise<PaymentProviderModificationResponse>;
 
   /**
    * Refund payment
-   * @param request 
-   * @returns 
+   * @param request
+   * @returns
    */
-  refundPayment: (request: RefundPaymentRequest) => Promise<PaymentProviderModificationResponse>
+  refundPayment: (request: RefundPaymentRequest) => Promise<PaymentProviderModificationResponse>;
 }

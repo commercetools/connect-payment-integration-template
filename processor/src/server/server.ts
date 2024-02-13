@@ -3,15 +3,13 @@ import cors from '@fastify/cors';
 import fastifyFormBody from '@fastify/formbody';
 import Fastify from 'fastify';
 import { randomUUID } from 'node:crypto';
-import { dirname, join } from 'path';
-import { fileURLToPath } from 'url';
+import { join } from 'path';
 import { config } from '../config/config';
 import { requestContextPlugin } from '../libs/fastify/context/context';
 import { errorHandler } from '../libs/fastify/error-handler';
 
 // const __filename = fileURLToPath(import.meta.url)
 // const __dirname = dirname(__filename)
-
 
 /**
  * Setup Fastify server instance
@@ -43,10 +41,9 @@ export const setupFastify = async () => {
   // Register context plugin
   await server.register(requestContextPlugin);
 
-
   await server.register(autoLoad, {
-    dir: join(__dirname, 'plugins')
-  })
+    dir: join(__dirname, 'plugins'),
+  });
 
   return server;
 };

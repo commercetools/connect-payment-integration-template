@@ -30,7 +30,9 @@ export const ActionCancelPaymentSchema = Type.Composite([
 ]);
 
 export const PaymentIntentRequestSchema = Type.Object({
-  actions: Type.Array(Type.Union([ActionCapturePaymentSchema, ActionRefundPaymentSchema, ActionCancelPaymentSchema]), { maxItems: 1 }),
+  actions: Type.Array(Type.Union([ActionCapturePaymentSchema, ActionRefundPaymentSchema, ActionCancelPaymentSchema]), {
+    maxItems: 1,
+  }),
 });
 
 export enum PaymentModificationStatus {

@@ -3,26 +3,25 @@ import { config } from '../../config/config';
 import { PaymentModificationStatus } from '../../dtos/operations/payment-intents.dto';
 import { paymentSDK } from '../../payment-sdk';
 import {
-    CancelPaymentRequest,
-    CapturePaymentRequest,
-    ConfigResponse,
-    PaymentProviderModificationResponse,
-    RefundPaymentRequest,
-    StatusResponse
+  CancelPaymentRequest,
+  CapturePaymentRequest,
+  ConfigResponse,
+  PaymentProviderModificationResponse,
+  RefundPaymentRequest,
+  StatusResponse,
 } from '../types/operation.type';
 import { OperationProcessor } from './operation.processor';
 const packageJSON = require('../../package.json');
 
 export class MockOperationProcessor implements OperationProcessor {
-
-  async config (): Promise<ConfigResponse> {
+  async config(): Promise<ConfigResponse> {
     return {
       clientKey: config.mockClientKey,
       environment: config.mockEnvironment,
     };
   }
 
-  async status (): Promise<StatusResponse> {
+  async status(): Promise<StatusResponse> {
     const handler = await statusHandler({
       timeout: config.healthCheckTimeout,
       checks: [
@@ -60,8 +59,7 @@ export class MockOperationProcessor implements OperationProcessor {
       }),
     })();
 
-    return handler.body
-
+    return handler.body;
   }
 
   async capturePayment(request: CapturePaymentRequest): Promise<PaymentProviderModificationResponse> {
@@ -75,5 +73,4 @@ export class MockOperationProcessor implements OperationProcessor {
   async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.pspReference };
   }
-
 }

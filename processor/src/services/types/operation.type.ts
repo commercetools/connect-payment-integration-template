@@ -18,18 +18,15 @@ export type CreatePaymentRequest = {
 
 export type CapturePaymentRequest = {
   amount: AmountSchemaDTO;
-  pspReference: string;
   payment: Payment;
 };
 
 export type CancelPaymentRequest = {
-  pspReference: string;
   payment: Payment;
 };
 
 export type RefundPaymentRequest = {
   amount: AmountSchemaDTO;
-  pspReference: string;
   payment: Payment;
 };
 

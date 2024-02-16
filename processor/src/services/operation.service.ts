@@ -57,7 +57,7 @@ export class DefaultOperationService implements OperationService {
 
     const transactionType = this.getPaymentTransactionType(request.action);
 
-    const payment = await this.ctPaymentService.updatePayment({
+    const updatedPayment = await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       transaction: {
         type: transactionType,
@@ -66,7 +66,7 @@ export class DefaultOperationService implements OperationService {
       },
     });
 
-    const res = await this.processPaymentModification(payment, transactionType, ctPayment.interfaceId as string, requestAmount);
+    const res = await this.processPaymentModification(updatedPayment, transactionType, requestAmount);
 
     await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
@@ -101,21 +101,16 @@ export class DefaultOperationService implements OperationService {
     }
   }
 
-  private async processPaymentModification(
-    payment: Payment,
-    transactionType: string,
-    pspReference: string,
-    requestAmount: AmountSchemaDTO,
-  ) {
+  private async processPaymentModification(payment: Payment, transactionType: string, requestAmount: AmountSchemaDTO) {
     switch (transactionType) {
       case 'CancelAuthorization': {
-        return await this.operationProcessor.cancelPayment({ pspReference, payment });
+        return await this.operationProcessor.cancelPayment({ payment });
       }
       case 'Charge': {
-        return await this.operationProcessor.capturePayment({ amount: requestAmount, pspReference, payment });
+        return await this.operationProcessor.capturePayment({ amount: requestAmount, payment });
       }
       case 'Refund': {
-        return await this.operationProcessor.refundPayment({ amount: requestAmount, pspReference, payment });
+        return await this.operationProcessor.refundPayment({ amount: requestAmount, payment });
       }
       default: {
         throw new ErrorInvalidOperation(`Operation ${transactionType} not supported.`);

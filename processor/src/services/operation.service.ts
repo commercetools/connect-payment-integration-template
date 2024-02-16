@@ -53,6 +53,8 @@ export class DefaultOperationService implements OperationService {
     let requestAmount!: AmountSchemaDTO;
     if (request.action != 'cancelPayment') {
       requestAmount = request.amount;
+    } else {
+      requestAmount = ctPayment.amountPlanned;
     }
 
     const transactionType = this.getPaymentTransactionType(request.action);
@@ -61,7 +63,7 @@ export class DefaultOperationService implements OperationService {
       id: ctPayment.id,
       transaction: {
         type: transactionType,
-        amount: ctPayment.amountPlanned,
+        amount: requestAmount,
         state: 'Initial',
       },
     });
@@ -72,7 +74,7 @@ export class DefaultOperationService implements OperationService {
       id: ctPayment.id,
       transaction: {
         type: transactionType,
-        amount: ctPayment.amountPlanned,
+        amount: requestAmount,
         interactionId: res?.pspReference,
         state: res.outcome === PaymentModificationStatus.APPROVED ? 'Success' : 'Failure',
       },

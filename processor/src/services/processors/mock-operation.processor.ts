@@ -63,14 +63,14 @@ export class MockOperationProcessor implements OperationProcessor {
   }
 
   async capturePayment(request: CapturePaymentRequest): Promise<PaymentProviderModificationResponse> {
-    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.pspReference };
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
   }
 
   async cancelPayment(request: CancelPaymentRequest): Promise<PaymentProviderModificationResponse> {
-    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.pspReference };
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
   }
 
   async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
-    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.pspReference };
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
   }
 }

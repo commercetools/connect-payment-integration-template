@@ -38,6 +38,7 @@ export const PaymentIntentRequestSchema = Type.Object({
 export enum PaymentModificationStatus {
   APPROVED = 'approved',
   REJECTED = 'rejected',
+  RECEIVED = 'received',
 }
 const PaymentModificationSchema = Type.Enum(PaymentModificationStatus);
 

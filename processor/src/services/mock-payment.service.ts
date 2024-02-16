@@ -30,7 +30,7 @@ export class MockPaymentService {
     });
 
     const ctPayment = await this.ctPaymentService.createPayment({
-      amountPlanned: this.ctCartService.getPaymentAmount({
+      amountPlanned: await this.ctCartService.getPaymentAmount({
         cart: ctCart,
       }),
       paymentMethodInfo: {

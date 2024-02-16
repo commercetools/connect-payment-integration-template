@@ -14,6 +14,7 @@ import {
 } from '../dtos/operations/payment-intents.dto';
 import { StatusResponseSchemaDTO } from '../dtos/operations/status.dto';
 import { OperationProcessor } from './processors/operation.processor';
+import { Payment } from '@commercetools/platform-sdk';
 
 export class DefaultOperationService implements OperationService {
   private ctPaymentService: CommercetoolsPaymentService;
@@ -56,7 +57,7 @@ export class DefaultOperationService implements OperationService {
 
     const transactionType = this.getPaymentTransactionType(request.action);
 
-    await this.ctPaymentService.updatePayment({
+    const payment = await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       transaction: {
         type: transactionType,
@@ -65,7 +66,7 @@ export class DefaultOperationService implements OperationService {
       },
     });
 
-    const res = await this.processPaymentModification(transactionType, ctPayment.interfaceId as string, requestAmount);
+    const res = await this.processPaymentModification(payment, transactionType, ctPayment.interfaceId as string, requestAmount);
 
     await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
@@ -101,19 +102,20 @@ export class DefaultOperationService implements OperationService {
   }
 
   private async processPaymentModification(
+    payment: Payment,
     transactionType: string,
     pspReference: string,
     requestAmount: AmountSchemaDTO,
   ) {
     switch (transactionType) {
       case 'CancelAuthorization': {
-        return await this.operationProcessor.cancelPayment({ pspReference });
+        return await this.operationProcessor.cancelPayment({ pspReference, payment });
       }
       case 'Charge': {
-        return await this.operationProcessor.capturePayment({ amount: requestAmount, pspReference });
+        return await this.operationProcessor.capturePayment({ amount: requestAmount, pspReference, payment });
       }
       case 'Refund': {
-        return await this.operationProcessor.refundPayment({ amount: requestAmount, pspReference });
+        return await this.operationProcessor.refundPayment({ amount: requestAmount, pspReference, payment });
       }
       default: {
         throw new ErrorInvalidOperation(`Operation ${transactionType} not supported.`);

@@ -10,6 +10,7 @@ import {
 } from '../../dtos/operations/payment-intents.dto';
 import { StatusResponseSchemaDTO } from '../../dtos/operations/status.dto';
 import { OperationProcessor } from '../processors/operation.processor';
+import { Payment } from '@commercetools/platform-sdk';
 
 export type CreatePaymentRequest = {
   data: PaymentRequestSchemaDTO;
@@ -18,15 +19,18 @@ export type CreatePaymentRequest = {
 export type CapturePaymentRequest = {
   amount: AmountSchemaDTO;
   pspReference: string;
+  payment: Payment;
 };
 
 export type CancelPaymentRequest = {
   pspReference: string;
+  payment: Payment;
 };
 
 export type RefundPaymentRequest = {
   amount: AmountSchemaDTO;
   pspReference: string;
+  payment: Payment;
 };
 
 export type PaymentProviderResponse = {

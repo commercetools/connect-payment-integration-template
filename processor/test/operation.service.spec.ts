@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals';
+import { describe, test, expect, afterEach } from '@jest/globals';
 import { ConfigResponse, OperationService, OperationServiceOptions } from '../src/services/types/operation.type';
 import { DefaultOperationService } from '../src/services/operation.service';
 import { StatusResponseSchemaDTO } from '../src/dtos/operations/status.dto';
@@ -13,12 +13,16 @@ import { HealthCheckResult } from '@commercetools/connect-payments-sdk/dist/api/
 import * as Config from '../src/config/config';
 
 describe('operation.service', () => {
+  const opts: OperationServiceOptions = {
+    operationProcessor: new MockOperationProcessor(),
+    ctCartService: paymentSDK.ctCartService,
+    ctPaymentService: paymentSDK.ctPaymentService,
+  };
+
+  afterEach(() => {
+    sinon.restore();
+  });
   test('getConfig', async () => {
-    const opts: OperationServiceOptions = {
-      operationProcessor: new MockOperationProcessor(),
-      ctCartService: paymentSDK.ctCartService,
-      ctPaymentService: paymentSDK.ctPaymentService,
-    };
     sinon.stub(Config, 'getConfig').callsFake(() => {
       const config = Config.config;
       config.mockClientKey = '';
@@ -31,13 +35,19 @@ describe('operation.service', () => {
     expect(result?.environment).toStrictEqual('test');
   });
 
+  test('getSupportedPaymentComponents', async () => {
+    sinon.stub(Config, 'getConfig').callsFake(() => {
+      const config = Config.config;
+      config.mockClientKey = '';
+      config.mockEnvironment = 'test';
+      return config;
+    });
+    const opService: OperationService = new DefaultOperationService(opts);
+    const result: ConfigResponse = await opService.getSupportedPaymentComponents();
+    expect(result?.components).toHaveLength(1);
+    expect(result?.components[0]?.type).toStrictEqual('card');
+  });
   test.skip('getStatus', async () => {
-    const opts: OperationServiceOptions = {
-      operationProcessor: new MockOperationProcessor(),
-      ctCartService: paymentSDK.ctCartService,
-      ctPaymentService: paymentSDK.ctPaymentService,
-    };
-
     const getMockFunction: () => Promise<HealthCheckResult> = async () => {
       return {
         name: 'CoCo Permissions',

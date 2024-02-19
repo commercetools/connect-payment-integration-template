@@ -1,5 +1,5 @@
 import { healthCheckCommercetoolsPermissions, statusHandler } from '@commercetools/connect-payments-sdk';
-import { config } from '../../config/config';
+import { getConfig } from '../../config/config';
 import { PaymentModificationStatus } from '../../dtos/operations/payment-intents.dto';
 import { paymentSDK } from '../../payment-sdk';
 import {
@@ -15,6 +15,7 @@ const packageJSON = require('../../../package.json');
 
 export class MockOperationProcessor implements OperationProcessor {
   async config(): Promise<ConfigResponse> {
+    const config = getConfig();
     return {
       clientKey: config.mockClientKey,
       environment: config.mockEnvironment,
@@ -23,12 +24,12 @@ export class MockOperationProcessor implements OperationProcessor {
 
   async status(): Promise<StatusResponse> {
     const handler = await statusHandler({
-      timeout: config.healthCheckTimeout,
+      timeout: getConfig().healthCheckTimeout,
       checks: [
         healthCheckCommercetoolsPermissions({
           requiredPermissions: ['manage_project'],
           ctAuthorizationService: paymentSDK.ctAuthorizationService,
-          projectKey: config.projectKey,
+          projectKey: getConfig().projectKey,
         }),
         async () => {
           try {

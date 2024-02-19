@@ -2,10 +2,7 @@
   "ts-node": {
     "files": true
   },
-  "files": [
-    "src/main.ts",
-    "src/global.d.ts"
-  ],
+  "files": ["src/main.ts", "src/global.d.ts"],
   "compilerOptions": {
     "target": "es2022",
     "module": "Node16",
@@ -15,10 +12,8 @@
     "strict": true,
     "skipLibCheck": true,
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "./dist"
   },
-  "include": [
-    "src/**/*",
-  ],
+  "include": ["src/**/*"],
   "exclude": ["src/**/*.[test|spec].ts"]
 }

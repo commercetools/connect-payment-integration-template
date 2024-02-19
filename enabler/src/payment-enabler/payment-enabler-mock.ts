@@ -14,7 +14,7 @@ declare global {
 export class MockPaymentEnabler implements PaymentEnabler {
   setupData: Promise<{ baseOptions: BaseOptions }>;
 
-  private constructor(options: EnablerOptions) {
+  constructor(options: EnablerOptions) {
     this.setupData = MockPaymentEnabler._Setup(options);
   }
 

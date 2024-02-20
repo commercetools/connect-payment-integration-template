@@ -47,7 +47,6 @@ export class DefaultOperationService implements OperationService {
     const ctPayment = await this.ctPaymentService.getPayment({
       id: opts.paymentId,
     });
-
     const request = opts.data.actions[0];
 
     let requestAmount!: AmountSchemaDTO;
@@ -58,7 +57,6 @@ export class DefaultOperationService implements OperationService {
     }
 
     const transactionType = this.getPaymentTransactionType(request.action);
-
     const updatedPayment = await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       transaction: {
@@ -67,7 +65,6 @@ export class DefaultOperationService implements OperationService {
         state: 'Initial',
       },
     });
-
     const res = await this.processPaymentModification(updatedPayment, transactionType, requestAmount);
 
     await this.ctPaymentService.updatePayment({

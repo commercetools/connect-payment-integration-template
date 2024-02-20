@@ -78,8 +78,8 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
     '/payment-intents/:id',
     {
       preHandler: [
-        opts.oauth2AuthHook.authenticate(),
-        opts.authorizationHook.authorize('manage_project', 'manage_checkout_payment_intents'),
+        // opts.oauth2AuthHook.authenticate(),
+        // opts.authorizationHook.authorize('manage_project', 'manage_checkout_payment_intents'),
       ],
       schema: {
         params: {

@@ -41,9 +41,7 @@ export type PaymentProviderModificationResponse = {
   pspReference: string;
 };
 
-export type ConfigResponse = {
-  [key: string]: any;
-};
+export type ConfigResponse = ConfigResponseSchemaDTO;
 
 export type StatusResponse = StatusResponseSchemaDTO;
 

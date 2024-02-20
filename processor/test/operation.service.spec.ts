@@ -10,7 +10,6 @@ import { MockOperationProcessor } from '../src/services/processors/mock-operatio
 import { paymentSDK } from '../src/payment-sdk';
 import { DefaultPaymentService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service';
 import { mockGetPaymentResult, mockUpdatePaymentResult } from './utils/mock-payment-data';
-import sinon from 'sinon';
 import * as Config from '../src/config/config';
 
 describe('operation.service', () => {
@@ -21,15 +20,14 @@ describe('operation.service', () => {
   };
 
   afterEach(() => {
-    sinon.restore();
+    jest.restoreAllMocks();
   });
   test('getConfig', async () => {
-    sinon.stub(Config, 'getConfig').callsFake(() => {
-      const config = Config.config;
-      config.mockClientKey = '';
-      config.mockEnvironment = 'test';
-      return config;
-    });
+    const mockConfig = Config.config;
+    mockConfig.mockClientKey = '';
+    mockConfig.mockEnvironment = 'test';
+
+    jest.spyOn(Config, 'getConfig').mockReturnValue(mockConfig);
     const opService: OperationService = new DefaultOperationService(opts);
     const result: ConfigResponse = await opService.getConfig();
     expect(result?.clientKey).toStrictEqual('');
@@ -56,13 +54,9 @@ describe('operation.service', () => {
       },
     };
 
-    sinon.stub(DefaultPaymentService.prototype, 'getPayment').callsFake(async () => {
-      return mockGetPaymentResult;
-    });
+    jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockResolvedValue(mockGetPaymentResult);
+    jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockResolvedValue(mockUpdatePaymentResult);
 
-    sinon.stub(DefaultPaymentService.prototype, 'updatePayment').callsFake(async () => {
-      return mockUpdatePaymentResult;
-    });
     const result = await opService.modifyPayment(modifyPaymentOpts);
     expect(result?.outcome).toStrictEqual('approved');
   });

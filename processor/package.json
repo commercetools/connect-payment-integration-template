@@ -6,8 +6,8 @@
   "scripts": {
     "start": "node dist/main.js",
     "start:dev": "node_modules/.bin/nodemon -q dist/main.js",
-    "lint": "prettier --check \"src/**/*.{ts,js,json}\" && eslint --ext .ts src",
-    "lint:fix": "prettier --write \"src/**/*.{ts,js,json}\" && eslint --fix --ext .ts src",
+    "lint": "prettier --check \"**/**/*.{ts,js,json}\" && eslint --ext .ts src test",
+    "lint:fix": "prettier --write \"**/**/*.{ts,js,json}\" && eslint --fix --ext .ts src test",
     "build": "rm -rf /dist && tsc",
     "dev": "ts-node src/main.ts",
     "test": "jest --detectOpenHandles",

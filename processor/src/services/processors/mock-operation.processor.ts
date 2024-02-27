@@ -37,7 +37,7 @@ export class MockOperationProcessor implements OperationProcessor {
             return {
               name: 'Mock Payment API',
               status: 'UP',
-              data: {
+              details: {
                 paymentMethods,
               },
             };
@@ -45,7 +45,7 @@ export class MockOperationProcessor implements OperationProcessor {
             return {
               name: 'Mock Payment API',
               status: 'DOWN',
-              data: {
+              details: {
                 // TODO do not expose the error
                 error: e,
               },

@@ -23,7 +23,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
 
     // const configResponse = await fetch(instance.processorUrl + '/config', {
     //   method: 'GET',
-    //   headers: { 'Content-Type': 'application/json' },
+    //   headers: { 'Content-Type': 'application/json', 'X-Session-Id': options.sessionId },
     // });
 
     // const configJson = await configResponse.json();

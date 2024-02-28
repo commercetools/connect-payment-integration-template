@@ -10,8 +10,6 @@ deployAs:
           description: Commercetools client ID
         - key: CTP_SCOPE
           description: Commercetools client scope
-         - key: CTP_REGION
-          description: Region of Commercetools project
         - key: CTP_AUTH_URL
           description: Commercetools Auth URL
         - key: CTP_API_URL

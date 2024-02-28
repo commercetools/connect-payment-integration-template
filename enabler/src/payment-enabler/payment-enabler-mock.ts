@@ -1,9 +1,7 @@
 import { BaseOptions } from '../components/base';
 import { Card } from '../components/payment-methods/card/card';
 import { FakeSdk } from '../fake-sdk';
-import { ComponentOptions, EnablerOptions, PaymentEnabler, PaymentMethod } from './payment-enabler';
-
-const SupportedMethods: PaymentMethod[] = ['card'];
+import { ComponentOptions, EnablerOptions, PaymentEnabler } from './payment-enabler';
 
 declare global {
   interface ImportMeta {
@@ -47,11 +45,13 @@ export class MockPaymentEnabler implements PaymentEnabler {
 
   async createComponent(type: string, componentOptions: ComponentOptions) {
     const { baseOptions } = await this.setupData;
-
-    switch (type) {
-      case 'card': 
-        return new Card(baseOptions, componentOptions);
+    const supportedMethods = {
+      card: Card,
     }
-    throw new Error(`Payment method not supported: ${type}. Supported methods: ${Object.keys(SupportedMethods).join(', ')}`);
+    if (!Object.keys(supportedMethods).includes(type)) {
+      throw new Error(`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(', ')}`);
+    }
+    return new supportedMethods[type](baseOptions, componentOptions);
   }
+
 }

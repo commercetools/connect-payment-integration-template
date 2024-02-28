@@ -30,7 +30,7 @@ jobs:
     name: Build the application for processor
     runs-on: ubuntu-latest
     env:
-      CTP_SCOPE: ${{ secrets.CTP_SCOPE }}
+      CTP_REGION: ${{ secrets.CTP_REGION }}
     defaults:
       run:
         working-directory: processor

@@ -6,8 +6,6 @@ jobs:
   build-enabler:
     name: Build the application for enabler
     runs-on: ubuntu-latest
-    env:
-      CTP_REGION: ${{ secrets.CTP_REGION }}
     defaults:
       run:
         working-directory: enabler
@@ -29,8 +27,6 @@ jobs:
   build-processor:
     name: Build the application for processor
     runs-on: ubuntu-latest
-    env:
-      CTP_REGION: ${{ secrets.CTP_REGION }}
     defaults:
       run:
         working-directory: processor

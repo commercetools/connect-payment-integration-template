@@ -3,27 +3,26 @@ deployAs:
     applicationType: service
     endpoint: /
     configuration:
-      securedConfiguration:
+      standardConfiguration:
         - key: CTP_PROJECT_KEY
           description: Commercetools project key
         - key: CTP_CLIENT_ID
           description: Commercetools client ID
-        - key: CTP_CLIENT_SECRET
-          description: Commercetools client secret
         - key: CTP_SCOPE
           description: Commercetools client scope
-        - key: CTP_REGION
-          description: Region of Commercetools project
         - key: CTP_AUTH_URL
           description: Commercetools Auth URL
         - key: CTP_API_URL
           description: Commercetools API URL
         - key: CTP_SESSION_URL
           description: Session API URL
+      securedConfiguration:
+        - key: CTP_CLIENT_SECRET
+          description: Commercetools client secret
   - name: enabler
     applicationType: service
     endpoint: /
     configuration:
-      securedConfiguration:
+      standardConfiguration:
         - key: CTP_REGION
           description: Region of Commercetools project

@@ -30,7 +30,16 @@ jobs:
     name: Build the application for processor
     runs-on: ubuntu-latest
     env:
+      CTP_PROJECT_KEY: ${{ secrets.CTP_PROJECT_KEY }}
+      CTP_CLIENT_ID: ${{ secrets.CTP_CLIENT_ID }}
+      CTP_CLIENT_SECRET: ${{ secrets.CTP_CLIENT_SECRET }}
+      CTP_SCOPE: ${{ secrets.CTP_SCOPE }}
       CTP_REGION: ${{ secrets.CTP_REGION }}
+      CTP_API_URL: ${{ secrets.CTP_API_URL }}
+      CTP_AUTH_URL: ${{ secrets.CTP_AUTH_URL }}
+      CTP_SESSION_URL: ${{ secrets.CTP_SESSION_URL }}
+      CTP_JWKS_URL: ${{ secrets.CTP_JWKS_URL }}
+      CTP_JWT_ISSUER: ${{ secrets.CTP_JWT_ISSUER }}
     defaults:
       run:
         working-directory: processor

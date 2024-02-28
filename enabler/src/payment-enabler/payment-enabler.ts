@@ -37,5 +37,5 @@ export interface PaymentEnabler {
   /** 
    * @throws {Error}
    */
-  createComponent: (type: string, opts: ComponentOptions, sessionId?: string) => Promise<PaymentComponent | never>
+  createComponent: (type: string, opts: ComponentOptions) => Promise<PaymentComponent | never>
 }

@@ -15,14 +15,14 @@ import {
   PaymentIntentResponseSchemaDTO,
 } from '../dtos/operations/payment-intents.dto';
 import { StatusResponseSchema, StatusResponseSchemaDTO } from '../dtos/operations/status.dto';
-import { OperationService } from '../services/types/operation.type';
+import { AbstractPaymentService } from '../services/abstract-payment.service';
 
 type OperationRouteOptions = {
   sessionAuthHook: SessionAuthenticationHook;
   oauth2AuthHook: Oauth2AuthenticationHook;
   jwtAuthHook: JWTAuthenticationHook;
   authorizationHook: AuthorityAuthorizationHook;
-  operationService: OperationService;
+  paymentService: AbstractPaymentService;
 };
 
 export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPluginOptions & OperationRouteOptions) => {
@@ -37,7 +37,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
       },
     },
     async (request, reply) => {
-      const config = await opts.operationService.getConfig();
+      const config = await opts.paymentService.config();
       reply.code(200).send(config);
     },
   );
@@ -53,7 +53,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
       },
     },
     async (request, reply) => {
-      const status = await opts.operationService.getStatus();
+      const status = await opts.paymentService.status();
       reply.code(200).send(status);
     },
   );
@@ -69,7 +69,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
       },
     },
     async (request, reply) => {
-      const result = await opts.operationService.getSupportedPaymentComponents();
+      const result = await opts.paymentService.getSupportedPaymentComponents();
       reply.code(200).send(result);
     },
   );
@@ -93,7 +93,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
     },
     async (request, reply) => {
       const { id } = request.params;
-      const resp = await opts.operationService.modifyPayment({
+      const resp = await opts.paymentService.modifyPayment({
         paymentId: id,
         data: request.body,
       });

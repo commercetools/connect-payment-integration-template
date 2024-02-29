@@ -1,43 +1,30 @@
-import {
-  CommercetoolsPaymentService,
-  CommercetoolsCartService,
-  statusHandler, healthCheckCommercetoolsPermissions,
-} from '@commercetools/connect-payments-sdk';
+import { statusHandler, healthCheckCommercetoolsPermissions } from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
   CapturePaymentRequest,
   ConfigResponse,
-  PaymentProviderModificationResponse, RefundPaymentRequest,
-  StatusResponse
+  PaymentProviderModificationResponse,
+  RefundPaymentRequest,
+  StatusResponse,
 } from './types/operation.type';
 
 import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
-import {
-  AmountSchemaDTO,
-  PaymentIntentResponseSchemaDTO,
-  PaymentModificationStatus,
-} from '../dtos/operations/payment-intents.dto';
+import { PaymentModificationStatus } from '../dtos/operations/payment-intents.dto';
 const packageJSON = require('../../../package.json');
 
-
-
-import { AbstractPaymentService } from "./abstract-payment.service";
-import { getConfig } from "../config/config";
-import { paymentSDK } from "../payment-sdk";
-import { CreatePayment, MockPaymentServiceOptions } from "./types/mock-payment.type";
-import { PaymentOutcome, PaymentResponseSchemaDTO} from "../dtos/mock-payment.dto";
-import { getCartIdFromContext } from "../libs/fastify/context/context";
-import { randomUUID } from "crypto";
+import { AbstractPaymentService } from './abstract-payment.service';
+import { getConfig } from '../config/config';
+import { paymentSDK } from '../payment-sdk';
+import { CreatePayment, MockPaymentServiceOptions } from './types/mock-payment.type';
+import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/mock-payment.dto';
+import { getCartIdFromContext } from '../libs/fastify/context/context';
+import { randomUUID } from 'crypto';
 
 export class MockPaymentService extends AbstractPaymentService {
-  private ctPaymentService: CommercetoolsPaymentService;
-  private ctCartService: CommercetoolsCartService;
   private allowedCreditCards = ['4111111111111111', '5555555555554444', '341925950237632'];
 
   constructor(opts: MockPaymentServiceOptions) {
     super(opts.ctCartService, opts.ctPaymentService);
-    this.ctCartService = opts.ctCartService;
-    this.ctPaymentService = opts.ctPaymentService;
   }
 
   public async config(): Promise<ConfigResponse> {
@@ -110,7 +97,6 @@ export class MockPaymentService extends AbstractPaymentService {
   public async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
   }
-
 
   private isCreditCardAllowed(cardNumber: string) {
     return this.allowedCreditCards.includes(cardNumber);

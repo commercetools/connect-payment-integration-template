@@ -1,24 +1,116 @@
-import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
-import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/mock-payment.dto';
+import {
+  CommercetoolsPaymentService,
+  CommercetoolsCartService,
+  statusHandler, healthCheckCommercetoolsPermissions,
+} from '@commercetools/connect-payments-sdk';
+import {
+  CancelPaymentRequest,
+  CapturePaymentRequest,
+  ConfigResponse,
+  PaymentProviderModificationResponse, RefundPaymentRequest,
+  StatusResponse
+} from './types/operation.type';
 
-import { randomUUID } from 'crypto';
-import { getCartIdFromContext } from '../libs/fastify/context/context';
-import { CreatePayment } from './types/mock-payment.type';
+import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
+import {
+  AmountSchemaDTO,
+  PaymentIntentResponseSchemaDTO,
+  PaymentModificationStatus,
+} from '../dtos/operations/payment-intents.dto';
+const packageJSON = require('../../../package.json');
 
-export type MockPaymentServiceOptions = {
-  ctCartService: CommercetoolsCartService;
-  ctPaymentService: CommercetoolsPaymentService;
-};
 
-export class MockPaymentService {
-  private ctCartService: CommercetoolsCartService;
+
+import { AbstractPaymentService } from "./abstract-payment.service";
+import { getConfig } from "../config/config";
+import { paymentSDK } from "../payment-sdk";
+import { CreatePayment, MockPaymentServiceOptions } from "./types/mock-payment.type";
+import { PaymentOutcome, PaymentResponseSchemaDTO} from "../dtos/mock-payment.dto";
+import { getCartIdFromContext } from "../libs/fastify/context/context";
+import { randomUUID } from "crypto";
+
+export class MockPaymentService extends AbstractPaymentService {
   private ctPaymentService: CommercetoolsPaymentService;
+  private ctCartService: CommercetoolsCartService;
   private allowedCreditCards = ['4111111111111111', '5555555555554444', '341925950237632'];
 
   constructor(opts: MockPaymentServiceOptions) {
+    super(opts.ctCartService, opts.ctPaymentService);
     this.ctCartService = opts.ctCartService;
     this.ctPaymentService = opts.ctPaymentService;
   }
+
+  public async config(): Promise<ConfigResponse> {
+    const config = getConfig();
+    return {
+      clientKey: config.mockClientKey,
+      environment: config.mockEnvironment,
+    };
+  }
+
+  public async status(): Promise<StatusResponse> {
+    const handler = await statusHandler({
+      timeout: getConfig().healthCheckTimeout,
+      checks: [
+        healthCheckCommercetoolsPermissions({
+          requiredPermissions: ['manage_project'],
+          ctAuthorizationService: paymentSDK.ctAuthorizationService,
+          projectKey: getConfig().projectKey,
+        }),
+        async () => {
+          try {
+            const paymentMethods = 'card';
+            return {
+              name: 'Mock Payment API',
+              status: 'UP',
+              details: {
+                paymentMethods,
+              },
+            };
+          } catch (e) {
+            return {
+              name: 'Mock Payment API',
+              status: 'DOWN',
+              details: {
+                // TODO do not expose the error
+                error: e,
+              },
+            };
+          }
+        },
+      ],
+      metadataFn: async () => ({
+        name: packageJSON.name,
+        description: packageJSON.description,
+        '@commercetools/sdk-client-v2': packageJSON.dependencies['@commercetools/sdk-client-v2'],
+      }),
+    })();
+
+    return handler.body;
+  }
+
+  public async getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO> {
+    return {
+      components: [
+        {
+          type: 'card',
+        },
+      ],
+    };
+  }
+
+  public async capturePayment(request: CapturePaymentRequest): Promise<PaymentProviderModificationResponse> {
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
+  }
+
+  public async cancelPayment(request: CancelPaymentRequest): Promise<PaymentProviderModificationResponse> {
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
+  }
+
+  public async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
+    return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
+  }
+
 
   private isCreditCardAllowed(cardNumber: string) {
     return this.allowedCreditCards.includes(cardNumber);

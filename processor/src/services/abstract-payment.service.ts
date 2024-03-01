@@ -1,47 +1,73 @@
 import {
+  CommercetoolsCartService,
   CommercetoolsPaymentService,
   ErrorInvalidJsonInput,
   ErrorInvalidOperation,
 } from '@commercetools/connect-payments-sdk';
-import { ModifyPayment, OperationService, OperationServiceOptions } from './types/operation.type';
-
-import { ConfigResponseSchemaDTO } from '../dtos/operations/config.dto';
-import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
+import {
+  CancelPaymentRequest,
+  CapturePaymentRequest,
+  ConfigResponse,
+  ModifyPayment,
+  PaymentProviderModificationResponse,
+  RefundPaymentRequest,
+  StatusResponse,
+} from './types/operation.type';
 import {
   AmountSchemaDTO,
   PaymentIntentResponseSchemaDTO,
   PaymentModificationStatus,
 } from '../dtos/operations/payment-intents.dto';
-import { StatusResponseSchemaDTO } from '../dtos/operations/status.dto';
-import { OperationProcessor } from './processors/operation.processor';
+
 import { Payment } from '@commercetools/platform-sdk';
+import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
 
-export class DefaultOperationService implements OperationService {
-  private ctPaymentService: CommercetoolsPaymentService;
-  private operationProcessor: OperationProcessor;
+export abstract class AbstractPaymentService {
+  protected ctCartService: CommercetoolsCartService;
+  protected ctPaymentService: CommercetoolsPaymentService;
 
-  constructor(opts: OperationServiceOptions) {
-    this.ctPaymentService = opts.ctPaymentService;
-    this.operationProcessor = opts.operationProcessor;
+  protected constructor(ctCartService: CommercetoolsCartService, ctPaymentService: CommercetoolsPaymentService) {
+    this.ctCartService = ctCartService;
+    this.ctPaymentService = ctPaymentService;
   }
 
-  public async getStatus(): Promise<StatusResponseSchemaDTO> {
-    return this.operationProcessor.status();
-  }
+  /**
+   * Get configuration information
+   * @returns
+   */
+  abstract config(): Promise<ConfigResponse>;
 
-  public async getConfig(): Promise<ConfigResponseSchemaDTO> {
-    return this.operationProcessor.config();
-  }
+  /**
+   * Get stats information
+   * @returns
+   */
+  abstract status(): Promise<StatusResponse>;
 
-  public async getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO> {
-    return {
-      components: [
-        {
-          type: 'card',
-        },
-      ],
-    };
-  }
+  /**
+   * Get supported payment components by the processor
+   */
+  abstract getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO>;
+
+  /**
+   * Capture payment
+   * @param request
+   * @returns
+   */
+  abstract capturePayment(request: CapturePaymentRequest): Promise<PaymentProviderModificationResponse>;
+
+  /**
+   * Cancel payment
+   * @param request
+   * @returns
+   */
+  abstract cancelPayment(request: CancelPaymentRequest): Promise<PaymentProviderModificationResponse>;
+
+  /**
+   * Refund payment
+   * @param request
+   * @returns
+   */
+  abstract refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse>;
 
   public async modifyPayment(opts: ModifyPayment): Promise<PaymentIntentResponseSchemaDTO> {
     const ctPayment = await this.ctPaymentService.getPayment({
@@ -72,7 +98,7 @@ export class DefaultOperationService implements OperationService {
       transaction: {
         type: transactionType,
         amount: requestAmount,
-        interactionId: res?.pspReference,
+        interactionId: res.pspReference,
         state: res.outcome === PaymentModificationStatus.APPROVED ? 'Success' : 'Failure',
       },
     });
@@ -82,7 +108,7 @@ export class DefaultOperationService implements OperationService {
     };
   }
 
-  private getPaymentTransactionType(action: string): string {
+  protected getPaymentTransactionType(action: string): string {
     switch (action) {
       case 'cancelPayment': {
         return 'CancelAuthorization';
@@ -100,16 +126,20 @@ export class DefaultOperationService implements OperationService {
     }
   }
 
-  private async processPaymentModification(payment: Payment, transactionType: string, requestAmount: AmountSchemaDTO) {
+  protected async processPaymentModification(
+    payment: Payment,
+    transactionType: string,
+    requestAmount: AmountSchemaDTO,
+  ) {
     switch (transactionType) {
       case 'CancelAuthorization': {
-        return await this.operationProcessor.cancelPayment({ payment });
+        return await this.cancelPayment({ payment });
       }
       case 'Charge': {
-        return await this.operationProcessor.capturePayment({ amount: requestAmount, payment });
+        return await this.capturePayment({ amount: requestAmount, payment });
       }
       case 'Refund': {
-        return await this.operationProcessor.refundPayment({ amount: requestAmount, payment });
+        return await this.refundPayment({ amount: requestAmount, payment });
       }
       default: {
         throw new ErrorInvalidOperation(`Operation ${transactionType} not supported.`);

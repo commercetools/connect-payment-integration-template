@@ -1,15 +1,11 @@
-import { PaymentOutcome, PaymentRequestSchemaDTO } from '../../dtos/mock-payment.dto';
+import { PaymentRequestSchemaDTO } from '../../dtos/mock-payment.dto';
+import { CommercetoolsCartService, CommercetoolsPaymentService } from '@commercetools/connect-payments-sdk';
+
+export type MockPaymentServiceOptions = {
+  ctCartService: CommercetoolsCartService;
+  ctPaymentService: CommercetoolsPaymentService;
+};
 
 export type CreatePayment = {
   data: PaymentRequestSchemaDTO;
-};
-
-export type CreatePaymentRequest = {
-  data: PaymentRequestSchemaDTO;
-};
-
-export type MockPaymentProviderResponse = {
-  resultCode: PaymentOutcome;
-  pspReference: string;
-  paymentMethodType: string;
 };

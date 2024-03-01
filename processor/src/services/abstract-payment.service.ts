@@ -32,7 +32,11 @@ export abstract class AbstractPaymentService {
   }
 
   /**
+   * Get configurations
+   *
+   * @remarks
    * Abstract method to get configuration information
+   *
    * @returns object containing configuration information
    */
   abstract config(): Promise<ConfigResponse>;
@@ -74,7 +78,7 @@ export abstract class AbstractPaymentService {
    * @remarks
    * Abstract method to execute payment cancel in external PSPs. The actual invocation to PSPs should be implemented in subclasses
    *
-   * @param request - contains the amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
+   * @param request - contains {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
    * @returns outcome with operation status and PSP reference
    */
   abstract cancelPayment(request: CancelPaymentRequest): Promise<PaymentProviderModificationResponse>;
@@ -86,7 +90,7 @@ export abstract class AbstractPaymentService {
    * Abstract method to execute payment refund in external PSPs. The actual invocation to PSPs should be implemented in subclasses
    *
    * @param request
-   * @returns
+   * @returns outcome with operation status and PSP reference
    */
   abstract refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse>;
 

@@ -10,7 +10,7 @@ import {
 
 import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
 import { PaymentModificationStatus } from '../dtos/operations/payment-intents.dto';
-const packageJSON = require('../../../package.json');
+import packageJSON from '../../package.json';
 
 import { AbstractPaymentService } from './abstract-payment.service';
 import { getConfig } from '../config/config';

@@ -42,6 +42,16 @@ export const getAllowedPaymentMethodsFromContext = (): string[] => {
   return authentication?.getPrincipal().allowedPaymentMethods;
 };
 
+export const getPaymentInterfaceFromContext = (): string | undefined => {
+  const authentication = getRequestContext().authentication as SessionAuthentication;
+  return authentication?.getPrincipal().paymentInterface;
+};
+
+export const getProcessorUrlFromContext = (): string => {
+  const authentication = getRequestContext().authentication as SessionAuthentication;
+  return authentication?.getPrincipal().processorUrl;
+};
+
 export const requestContextPlugin = fp(async (fastify: FastifyInstance) => {
   // Enance the request object with a correlationId property
   fastify.decorateRequest('correlationId', '');

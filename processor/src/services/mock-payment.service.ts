@@ -17,7 +17,7 @@ import { getConfig } from '../config/config';
 import { paymentSDK } from '../payment-sdk';
 import { CreatePayment, MockPaymentServiceOptions } from './types/mock-payment.type';
 import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/mock-payment.dto';
-import { getCartIdFromContext } from '../libs/fastify/context/context';
+import { getCartIdFromContext, getPaymentInterfaceFromContext } from '../libs/fastify/context/context';
 import { randomUUID } from 'crypto';
 
 export class MockPaymentService extends AbstractPaymentService {
@@ -172,7 +172,7 @@ export class MockPaymentService extends AbstractPaymentService {
         cart: ctCart,
       }),
       paymentMethodInfo: {
-        paymentInterface: 'mock',
+        paymentInterface: getPaymentInterfaceFromContext() || 'mock',
       },
       ...(ctCart.customerId && {
         customer: {

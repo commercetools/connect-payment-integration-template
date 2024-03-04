@@ -33,7 +33,7 @@ export class MockPaymentService extends AbstractPaymentService {
    * @remarks
    * Implementation to provide mocking configuration information
    *
-   * @returns mocking data with object containing configuration information
+   * @returns Promise with mocking object containing configuration information
    */
   public async config(): Promise<ConfigResponse> {
     const config = getConfig();
@@ -49,7 +49,7 @@ export class MockPaymentService extends AbstractPaymentService {
    * @remarks
    * Implementation to provide mocking status of external systems
    *
-   * @returns mocking data with a list of status from different external systems
+   * @returns Promise with mocking data containing a list of status from different external systems
    */
   public async status(): Promise<StatusResponse> {
     const handler = await statusHandler({
@@ -98,7 +98,7 @@ export class MockPaymentService extends AbstractPaymentService {
    * @remarks
    * Implementation to provide the mocking payment components supported by the processor.
    *
-   * @returns mocking data with a list of supported payment components
+   * @returns Promise with mocking data containing a list of supported payment components
    */
   public async getSupportedPaymentComponents(): Promise<SupportedPaymentComponentsSchemaDTO> {
     return {
@@ -117,7 +117,7 @@ export class MockPaymentService extends AbstractPaymentService {
    * Implementation to provide the mocking data for payment capture in external PSPs
    *
    * @param request - contains the amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
-   * @returns mocking data with operation status and PSP reference
+   * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async capturePayment(request: CapturePaymentRequest): Promise<PaymentProviderModificationResponse> {
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
@@ -130,7 +130,7 @@ export class MockPaymentService extends AbstractPaymentService {
    * Implementation to provide the mocking data for payment cancel in external PSPs
    *
    * @param request - contains {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
-   * @returns mocking data with operation status and PSP reference
+   * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async cancelPayment(request: CancelPaymentRequest): Promise<PaymentProviderModificationResponse> {
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
@@ -143,7 +143,7 @@ export class MockPaymentService extends AbstractPaymentService {
    * Implementation to provide the mocking data for payment refund in external PSPs
    *
    * @param request - contains amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
-   * @returns mocking data with operation status and PSP reference
+   * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
@@ -160,7 +160,7 @@ export class MockPaymentService extends AbstractPaymentService {
    * Implementation to provide the mocking data for payment creation in external PSPs
    *
    * @param request - contains amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
-   * @returns mocking data with operation status and PSP reference
+   * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO> {
     const ctCart = await this.ctCartService.getCart({

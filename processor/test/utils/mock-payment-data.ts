@@ -9,6 +9,7 @@ export const mockGetPaymentResult: Payment = {
     centAmount: 120000,
     fractionDigits: 2,
   },
+  interfaceId: '92C12661DS923781G',
   paymentMethodInfo: {
     method: 'Debit Card',
     name: { 'en-US': 'Debit Card', 'en-GB': 'Debit Card' },
@@ -42,6 +43,7 @@ export const mockUpdatePaymentResult: Payment = {
     centAmount: 120000,
     fractionDigits: 2,
   },
+  interfaceId: '92C12661DS923781G',
   paymentMethodInfo: {
     method: 'Debit Card',
     name: { 'en-US': 'Debit Card', 'en-GB': 'Debit Card' },

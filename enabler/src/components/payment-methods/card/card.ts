@@ -7,8 +7,7 @@ import { addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validate
 
 export class Card extends BaseComponent {
   constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
-    super(baseOptions, componentOptions);
-    this.paymentMethod = 'card';
+    super(PaymentMethod.card, baseOptions, componentOptions);
   }
 
   mount(selector: string) {

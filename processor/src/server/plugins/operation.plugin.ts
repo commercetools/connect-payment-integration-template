@@ -9,7 +9,7 @@ export default async function (server: FastifyInstance) {
     paymentService: app.services.paymentService,
     jwtAuthHook: paymentSDK.jwtAuthHookFn,
     oauth2AuthHook: paymentSDK.oauth2AuthHookFn,
-    sessionAuthHook: paymentSDK.sessionAuthHookFn,
+    sessionHeaderAuthHook: paymentSDK.sessionHeaderAuthHookFn,
     authorizationHook: paymentSDK.authorityAuthorizationHookFn,
   });
 }

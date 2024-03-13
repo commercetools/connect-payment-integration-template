@@ -1,4 +1,4 @@
-import { ComponentOptions } from '../../../payment-enabler/payment-enabler';
+import { ComponentOptions, PaymentMethod } from '../../../payment-enabler/payment-enabler';
 import buttonStyles from '../../../style/button.module.scss';
 import inputFieldStyles from '../../../style/inputField.module.scss';
 import styles from '../../../style/style.module.scss';

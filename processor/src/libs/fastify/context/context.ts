@@ -32,6 +32,11 @@ export const updateRequestContext = (ctx: Partial<ContextData>) => {
   });
 };
 
+export const getCtSessionIdFromContext = (): string => {
+  const authentication = getRequestContext().authentication as SessionAuthentication;
+  return authentication?.getCredentials();
+};
+
 export const getCartIdFromContext = (): string => {
   const authentication = getRequestContext().authentication as SessionAuthentication;
   return authentication?.getPrincipal().cartId;
@@ -50,6 +55,11 @@ export const getPaymentInterfaceFromContext = (): string | undefined => {
 export const getProcessorUrlFromContext = (): string => {
   const authentication = getRequestContext().authentication as SessionAuthentication;
   return authentication?.getPrincipal().processorUrl;
+};
+
+export const getMerchantReturnUrlFromContext = (): string | undefined => {
+  const authentication = getRequestContext().authentication as SessionAuthentication;
+  return authentication?.getPrincipal().merchantReturnUrl;
 };
 
 export const requestContextPlugin = fp(async (fastify: FastifyInstance) => {

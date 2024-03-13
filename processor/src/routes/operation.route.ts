@@ -2,7 +2,7 @@ import {
   AuthorityAuthorizationHook,
   JWTAuthenticationHook,
   Oauth2AuthenticationHook,
-  SessionAuthenticationHook,
+  SessionHeaderAuthenticationHook,
 } from '@commercetools/connect-payments-sdk';
 import { Type } from '@sinclair/typebox';
 import { FastifyInstance, FastifyPluginOptions } from 'fastify';
@@ -18,7 +18,7 @@ import { StatusResponseSchema, StatusResponseSchemaDTO } from '../dtos/operation
 import { AbstractPaymentService } from '../services/abstract-payment.service';
 
 type OperationRouteOptions = {
-  sessionAuthHook: SessionAuthenticationHook;
+  sessionHeaderAuthHook: SessionHeaderAuthenticationHook;
   oauth2AuthHook: Oauth2AuthenticationHook;
   jwtAuthHook: JWTAuthenticationHook;
   authorizationHook: AuthorityAuthorizationHook;
@@ -29,7 +29,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
   fastify.get<{ Reply: ConfigResponseSchemaDTO }>(
     '/config',
     {
-      preHandler: [opts.sessionAuthHook.authenticate()],
+      preHandler: [opts.sessionHeaderAuthHook.authenticate()],
       schema: {
         response: {
           200: ConfigResponseSchema,

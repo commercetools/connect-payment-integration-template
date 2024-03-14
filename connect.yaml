@@ -16,6 +16,10 @@ deployAs:
           description: Commercetools API URL
         - key: CTP_SESSION_URL
           description: Session API URL
+        - key: CTP_JWKS_URL
+          description: JWKs url
+        - key: CTP_JWT_ISSUER
+          description: JWT Issuer for jwt validation
       securedConfiguration:
         - key: CTP_CLIENT_SECRET
           description: Commercetools client secret

@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000",
-    "start": "serve dist -l 8080 --cors",
+    "start": "serve public -l 8080 --cors",
     "test": "jest --detectOpenHandles",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "serve": "npm run build && serve dist -l 3000 --cors"
+    "serve": "npm run build && serve public -l 3000 --cors"
   },
   "dependencies": {
     "serve": "14.2.1"

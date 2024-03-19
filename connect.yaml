@@ -24,9 +24,5 @@ deployAs:
         - key: CTP_CLIENT_SECRET
           description: Commercetools client secret
   - name: enabler
-    applicationType: service
+    applicationType: assets
     endpoint: /
-    configuration:
-      standardConfiguration:
-        - key: CTP_REGION
-          description: Region of Commercetools project

@@ -82,7 +82,7 @@ describe('mock-payment.service', () => {
     expect(result?.checks[1]?.details).toBeDefined();
   });
 
-  test('modifyPayment', async () => {
+  test('cancelPayment', async () => {
     const modifyPaymentOpts: ModifyPayment = {
       paymentId: 'dummy-paymentId',
       data: {
@@ -95,6 +95,54 @@ describe('mock-payment.service', () => {
     };
 
     jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockResolvedValue(mockGetPaymentResult);
+    jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockResolvedValue(mockUpdatePaymentResult);
+
+    const result = await paymentService.modifyPayment(modifyPaymentOpts);
+    expect(result?.outcome).toStrictEqual('approved');
+  });
+
+  test('capturePayment', async () => {
+    const modifyPaymentOpts: ModifyPayment = {
+      paymentId: 'dummy-paymentId',
+      data: {
+        actions: [
+          {
+            action: 'capturePayment',
+            amount: {
+              centAmount: 150000,
+              currencyCode: 'USD',
+            },
+          },
+        ],
+      },
+    };
+
+    jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockResolvedValue(mockGetPaymentResult);
+    jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockResolvedValue(mockUpdatePaymentResult);
+    jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockResolvedValue(mockUpdatePaymentResult);
+
+    const result = await paymentService.modifyPayment(modifyPaymentOpts);
+    expect(result?.outcome).toStrictEqual('approved');
+  });
+
+  test('refundPayment', async () => {
+    const modifyPaymentOpts: ModifyPayment = {
+      paymentId: 'dummy-paymentId',
+      data: {
+        actions: [
+          {
+            action: 'refundPayment',
+            amount: {
+              centAmount: 150000,
+              currencyCode: 'USD',
+            },
+          },
+        ],
+      },
+    };
+
+    jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockResolvedValue(mockGetPaymentResult);
+    jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockResolvedValue(mockUpdatePaymentResult);
     jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockResolvedValue(mockUpdatePaymentResult);
 
     const result = await paymentService.modifyPayment(modifyPaymentOpts);

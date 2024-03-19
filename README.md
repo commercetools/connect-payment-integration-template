@@ -76,7 +76,6 @@ deployAs:
           description: Commercetools client secret
   - name: enabler
     applicationType: assets
-    endpoint: /
 ```
 
 Here you can see the details about various variables in configuration

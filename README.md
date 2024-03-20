@@ -54,30 +54,28 @@ deployAs:
     applicationType: service
     endpoint: /
     configuration:
-      securedConfiguration:
+      standardConfiguration:
         - key: CTP_PROJECT_KEY
           description: Commercetools project key
         - key: CTP_CLIENT_ID
           description: Commercetools client ID
-        - key: CTP_CLIENT_SECRET
-          description: Commercetools client secret
         - key: CTP_SCOPE
           description: Commercetools client scope
-        - key: CTP_REGION
-          description: Region of Commercetools project
         - key: CTP_AUTH_URL
           description: Commercetools Auth URL
         - key: CTP_API_URL
           description: Commercetools API URL
         - key: CTP_SESSION_URL
           description: Session API URL
-  - name: enabler
-    applicationType: service
-    endpoint: /enabler
-    configuration:
+        - key: CTP_JWKS_URL
+          description: JWKs url
+        - key: CTP_JWT_ISSUER
+          description: JWT Issuer for jwt validation
       securedConfiguration:
-        - key: CTP_REGION
-          description: Region of Commercetools project
+        - key: CTP_CLIENT_SECRET
+          description: Commercetools client secret
+  - name: enabler
+    applicationType: assets
 ```
 
 Here you can see the details about various variables in configuration
@@ -85,7 +83,8 @@ Here you can see the details about various variables in configuration
 - CTP_CLIENT_ID: The client ID of your commercetools composable commerce user account. It is used in commercetools client to communicate with commercetools composable commerce via SDK.
 - CTP_CLIENT_SECRET: The client secret of commercetools composable commerce user account. It is used in commercetools client to communicate with commercetools composable commerce via SDK.
 - CTP_SCOPE: The scope constrains the endpoints to which the commercetools client has access, as well as the read/write access right to an endpoint.
-- CTP_REGION: As the commercetools composable commerce APIs are provided in six different region, it defines the region which your commercetools composable commerce user account belongs to.
 - CTP_AUTH_URL: The URL for authentication in commercetools platform. It is used to generate OAuth 2.0 token which is required in every API call to commercetools composable commerce. The default value is `https://auth.europe-west1.gcp.commercetools.com`. For details, please refer to documentation [here](https://docs.commercetools.com/tutorials/api-tutorial#authentication).
 - CTP_API_URL: The URL for commercetools composable commerce API. Default value is `https://api.europe-west1.gcp.commercetools.com`.
 - CTP_SESSION_URL: The URL for session creation in commercetools platform. Connectors relies on the session created to be able to share information between enabler and processor. The default value is `https://session.europe-west1.gcp.commercetools.com`.
+- CTP_JWKS_URL: The URL which provides JSON Web Key Set.
+- CTP_JWT_ISSUER: The issuer inside JSON Web Token which is required in JWT validation process.

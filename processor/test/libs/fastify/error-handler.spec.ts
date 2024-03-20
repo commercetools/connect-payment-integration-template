@@ -1,13 +1,15 @@
 import { afterEach, beforeEach, describe, expect, test } from '@jest/globals';
 import Fastify, { type FastifyInstance } from 'fastify';
-import { errorHandler } from './error-handler';
+import { errorHandler } from '../../../src/libs/fastify/error-handler';
 import { Errorx } from '@commercetools/connect-payments-sdk';
+import { requestContextPlugin } from '../../../src/libs/fastify/context/context';
 
 describe('error-handler', () => {
   let fastify: FastifyInstance;
-  beforeEach(() => {
+  beforeEach(async () => {
     fastify = Fastify();
     fastify.setErrorHandler(errorHandler);
+    await fastify.register(requestContextPlugin);
   });
 
   afterEach(async () => {

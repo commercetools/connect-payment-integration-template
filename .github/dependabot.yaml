@@ -2,11 +2,25 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/processor"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10
   - package-ecosystem: "npm"
     directory: "/enabler"
+    groups:
+      dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     schedule:
       interval: "daily"
     open-pull-requests-limit: 10

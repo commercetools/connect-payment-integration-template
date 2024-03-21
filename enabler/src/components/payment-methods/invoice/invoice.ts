@@ -1,6 +1,15 @@
-import { ComponentOptions, PaymentMethod } from '../../../payment-enabler/payment-enabler';
-import styles from '../../../style/style.module.scss';
+import { ComponentOptions, PaymentComponent, PaymentComponentBuilder, PaymentMethod } from '../../../payment-enabler/payment-enabler';
 import { BaseComponent, BaseOptions } from '../../base';
+import styles from '../../../style/style.module.scss';
+
+export class InvoiceBuilder implements PaymentComponentBuilder {
+  constructor(private baseOptions: BaseOptions) {}
+
+  build(config: ComponentOptions): PaymentComponent {
+    const cardComponent = new Invoice(this.baseOptions, config);
+    return cardComponent;
+  }
+}
 
 export class Invoice extends BaseComponent {
   constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {

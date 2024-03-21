@@ -63,16 +63,15 @@
                 },
               });
         
-              enabler.createComponent('card', {
-                config: {},
-              })
-              .then(e => e.mount('#card-component'));
+              enabler
+                .createComponentBuilder('card')
+                .build({})
+                .then(e => e.mount('#card-component'));
 
-              enabler.createComponent('invoice', {
-                config: {},
-              })
-              .then(e => e.mount('#invoice-component'));
-
+              enabler
+                .createComponentBuilder('invoice')
+                .build({})
+                .then(e => e.mount('#invoice-component'));
             });
       
           </script>

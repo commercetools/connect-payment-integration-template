@@ -67,11 +67,18 @@
                 config: {},
               })
               .then(e => e.mount('#card-component'));
+
+              enabler.createComponent('invoice', {
+                config: {},
+              })
+              .then(e => e.mount('#invoice-component'));
+
             });
       
           </script>
       
           <div id="card-component"></div>
+          <div id="invoice-component"></div>
         </div>
       </div>
 

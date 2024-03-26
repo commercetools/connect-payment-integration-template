@@ -10,9 +10,7 @@ export type BaseOptions = {
   processorUrl: string;
   sessionId: string;
   environment: string;
-  config: {
-    showPayButton?: boolean;
-  };
+  locale?: string;
   onComplete: (result: PaymentResult) => void;
   onError: (error?: any) => void;
 }
@@ -26,24 +24,17 @@ export abstract class BaseComponent implements PaymentComponent {
   protected processorUrl: BaseOptions['processorUrl'];
   protected sessionId: BaseOptions['sessionId'];
   protected environment: BaseOptions['environment'];
-  protected config: BaseOptions['config'];
-  protected showPayButton: boolean;
   protected onComplete: (result: PaymentResult) => void;
   protected onError: (error?: any) => void;
 
-  constructor(paymentMethod: PaymentMethod, baseOptions: BaseOptions, componentOptions: ComponentOptions) {
+  constructor(paymentMethod: PaymentMethod, baseOptions: BaseOptions, _componentOptions: ComponentOptions) {
     this.paymentMethod = paymentMethod;
     this.sdk = baseOptions.sdk;
     this.processorUrl = baseOptions.processorUrl;
     this.sessionId = baseOptions.sessionId;
     this.environment = baseOptions.environment;
-    this.config = baseOptions.config;
     this.onComplete = baseOptions.onComplete;
     this.onError = baseOptions.onError;
-    this.showPayButton = 
-      'showPayButton' in componentOptions.config ? !!componentOptions.config.showPayButton :
-        'showPayButton' in baseOptions.config ? !!baseOptions.config.showPayButton :
-          true;
   }
 
   abstract submit(): void;

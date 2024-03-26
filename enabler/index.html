@@ -63,10 +63,9 @@
                 },
               });
         
-              enabler.createComponent('card', {
-                config: {},
-              })
-              .then(e => e.mount('#card-component'));
+              const builder = await enabler.createComponentBuilder('card')
+              const component = builder.build({})
+              component.mount('#card-component')
             });
       
           </script>

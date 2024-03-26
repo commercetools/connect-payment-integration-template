@@ -5,7 +5,7 @@ import {
   PaymentModificationStatus,
 } from '../../dtos/operations/payment-intents.dto';
 import { StatusResponseSchemaDTO } from '../../dtos/operations/status.dto';
-import { Payment } from '@commercetools/platform-sdk';
+import { Payment } from '@commercetools/connect-payments-sdk/dist/commercetools';
 
 export type CapturePaymentRequest = {
   amount: AmountSchemaDTO;

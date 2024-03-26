@@ -85,7 +85,7 @@ export class MockPaymentService extends AbstractPaymentService {
       metadataFn: async () => ({
         name: packageJSON.name,
         description: packageJSON.description,
-        '@commercetools/sdk-client-v2': packageJSON.dependencies['@commercetools/sdk-client-v2'],
+        '@commercetools/connect-payments-sdk': packageJSON.dependencies['@commercetools/connect-payments-sdk'],
       }),
     })();
 

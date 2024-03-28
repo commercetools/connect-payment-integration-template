@@ -16,7 +16,7 @@ export const InvoicePaymentMethodSchema = Type.Object( {
 })
 
 export const PaymentRequestSchema = Type.Object({
-  paymentMethod: Type.Composite([CardPaymentMethodSchema, InvoicePaymentMethodSchema]),
+  paymentMethod: Type.Union([CardPaymentMethodSchema, InvoicePaymentMethodSchema]),
 });
 
 export enum PaymentOutcome {

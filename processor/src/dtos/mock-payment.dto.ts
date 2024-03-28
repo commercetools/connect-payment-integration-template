@@ -11,8 +11,12 @@ export const CardPaymentMethodSchema = Type.Object({
   holderName: Type.Optional(Type.String()),
 });
 
+export const InvoicePaymentMethodSchema = Type.Object( {
+  type: Type.Literal('invoice')
+})
+
 export const PaymentRequestSchema = Type.Object({
-  paymentMethod: Type.Composite([CardPaymentMethodSchema]),
+  paymentMethod: Type.Union([CardPaymentMethodSchema, InvoicePaymentMethodSchema]),
 });
 
 export enum PaymentOutcome {

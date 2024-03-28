@@ -63,7 +63,7 @@ export const getMerchantReturnUrlFromContext = (): string | undefined => {
 };
 
 export const requestContextPlugin = fp(async (fastify: FastifyInstance) => {
-  // Enance the request object with a correlationId property
+  // Enhance the request object with a correlationId property
   fastify.decorateRequest('correlationId', '');
 
   // Propagate the correlationId from the request header to the request object

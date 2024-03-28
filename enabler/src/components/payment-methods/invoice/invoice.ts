@@ -1,5 +1,4 @@
 import { ComponentOptions, PaymentMethod } from '../../../payment-enabler/payment-enabler';
-import buttonStyles from '../../../style/button.module.scss';
 import styles from '../../../style/style.module.scss';
 import { BaseComponent, BaseOptions } from '../../base';
 
@@ -10,12 +9,11 @@ export class Invoice extends BaseComponent {
 
   mount(selector: string) {
     document.querySelector(selector).insertAdjacentHTML("afterbegin", this._getTemplate());
-    if (this.showPayButton) {
-      document.querySelector('#invoiceForm-paymentButton').addEventListener('click', (e) => {
-        e.preventDefault();
-        this.submit();
-      });
-    }
+    document.querySelector('#invoiceForm').addEventListener('onsubmit', (e) => {
+      e.preventDefault();
+      this.submit();
+    });
+
   }
 
   async submit() {
@@ -45,13 +43,12 @@ export class Invoice extends BaseComponent {
   }
 
   private _getTemplate() {
-    const payButton = this.showPayButton ? `<button class="${buttonStyles.button} ${buttonStyles.fullWidth} ${styles.submitButton}" id="invoiceForm-paymentButton">Pay</button>` : '';
-    return `
+  return `
     <div class="${styles.wrapper}">
-      <form class="${styles.paymentForm}">
-        ${payButton}
+      <form id="invoiceForm" class="${styles.paymentForm}">
+      Pay easily with Invoice and transfer the shopping amount within the specified date.
       </form>
-      </div>
+    </div>
     `
   }
 }

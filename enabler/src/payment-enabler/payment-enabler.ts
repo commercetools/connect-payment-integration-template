@@ -13,7 +13,7 @@ export interface PaymentComponent {
 }
 
 export interface PaymentComponentBuilder {
-  componentHasSubmit?: boolean;
+  componentHasSubmit: boolean;
   build(config: ComponentOptions): PaymentComponent;
 }
 

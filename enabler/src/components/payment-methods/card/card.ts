@@ -6,6 +6,8 @@ import { BaseComponent, BaseOptions } from '../../base';
 import { addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validateAllFields } from './utils';
 
 export class CardBuilder implements PaymentComponentBuilder {
+  public componentHasSubmit = true
+
   constructor(private baseOptions: BaseOptions) {}
 
   build(config: ComponentOptions): PaymentComponent {

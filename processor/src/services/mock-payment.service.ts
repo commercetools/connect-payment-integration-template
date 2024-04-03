@@ -56,7 +56,14 @@ export class MockPaymentService extends AbstractPaymentService {
       timeout: getConfig().healthCheckTimeout,
       checks: [
         healthCheckCommercetoolsPermissions({
-          requiredPermissions: ['manage_project'],
+          requiredPermissions: [
+            'manage_payments',
+            'view_sessions',
+            'view_api_clients',
+            'manage_orders',
+            'introspect_oauth_tokens',
+            'manage_checkout_payment_intents',
+          ],
           ctAuthorizationService: paymentSDK.ctAuthorizationService,
           projectKey: getConfig().projectKey,
         }),
@@ -104,10 +111,10 @@ export class MockPaymentService extends AbstractPaymentService {
     return {
       components: [
         {
-          type: 'card'
+          type: 'card',
         },
         {
-          type: 'invoice'
+          type: 'invoice',
         },
       ],
     };
@@ -197,7 +204,7 @@ export class MockPaymentService extends AbstractPaymentService {
 
     let isAuthorized;
 
-    if ( paymentMethod.type === 'invoice') {
+    if (paymentMethod.type === 'invoice') {
       isAuthorized = true;
     } else {
       isAuthorized = this.isCreditCardAllowed(paymentMethod.cardNumber);

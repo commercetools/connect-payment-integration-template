@@ -9,9 +9,4 @@ export enum PaymentOutcome {
   REJECTED = 'Rejected',
 }
 
-export const PaymentResponseSchema = Type.Object({
-  paymentReference: Type.String(),
-});
-
 export type PaymentRequestSchemaDTO = Static<typeof PaymentRequestSchema>;
-export type PaymentResponseSchemaDTO = Static<typeof PaymentResponseSchema>;

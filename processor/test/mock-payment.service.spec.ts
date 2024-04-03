@@ -6,14 +6,13 @@ import { DefaultCartService } from '@commercetools/connect-payments-sdk/dist/com
 import { mockGetPaymentResult, mockUpdatePaymentResult } from './utils/mock-payment-results';
 import { mockGetCartResult } from './utils/mock-cart-data';
 import * as Config from '../src/config/config';
-import { CreatePayment, MockPaymentServiceOptions } from '../src/services/types/mock-payment.type';
+import {CreatePaymentRequest, MockPaymentServiceOptions} from '../src/services/types/mock-payment.type';
 import { AbstractPaymentService } from '../src/services/abstract-payment.service';
 import { MockPaymentService } from '../src/services/mock-payment.service';
 import * as FastifyContext from '../src/libs/fastify/context/context';
 import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
 
 import { HealthCheckResult } from '@commercetools/connect-payments-sdk';
-import { PaymentOutcome } from '../src/dtos/mock-payment.dto';
 
 interface FlexibleConfig {
   [key: string]: string; // Adjust the type according to your config values
@@ -165,16 +164,9 @@ describe('mock-payment.service', () => {
   });
 
   test('create card payment', async () => {
-    const createPaymentOpts: CreatePayment = {
+    const createPaymentOpts: CreatePaymentRequest = {
       data: {
-        paymentMethod: {
-          type: 'card',
-          cardNumber: '4111111111111111',
-          expiryMonth: 12,
-          expiryYear: 2046,
-          cvc: 130,
-          holderName: 'Christopher',
-        },
+        paymentMethod: 'card',
       },
     };
     jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValue(Promise.resolve(mockGetCartResult()));
@@ -184,21 +176,13 @@ describe('mock-payment.service', () => {
     jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
 
     const result = await mockPaymentService.createPayment(createPaymentOpts);
-    expect(result?.outcome).toStrictEqual(PaymentOutcome.AUTHORIZED);
     expect(result?.paymentReference).toStrictEqual('123456');
   });
 
-  test('create card payment with wrong number', async () => {
-    const createPaymentOpts: CreatePayment = {
+  test('create invoice payment', async () => {
+    const createPaymentOpts: CreatePaymentRequest = {
       data: {
-        paymentMethod: {
-          type: 'card',
-          cardNumber: '4000400040004000',
-          expiryMonth: 12,
-          expiryYear: 2046,
-          cvc: 130,
-          holderName: 'Christopher',
-        },
+        paymentMethod: 'invoice',
       },
     };
     jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValue(Promise.resolve(mockGetCartResult()));
@@ -208,7 +192,6 @@ describe('mock-payment.service', () => {
     jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
 
     const result = await mockPaymentService.createPayment(createPaymentOpts);
-    expect(result?.outcome).toStrictEqual(PaymentOutcome.REJECTED);
     expect(result?.paymentReference).toStrictEqual('123456');
   });
 });

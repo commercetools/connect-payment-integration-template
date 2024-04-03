@@ -15,13 +15,12 @@ import packageJSON from '../../package.json';
 import { AbstractPaymentService } from './abstract-payment.service';
 import { getConfig } from '../config/config';
 import { paymentSDK } from '../payment-sdk';
-import { CreatePayment, MockPaymentServiceOptions } from './types/mock-payment.type';
+import {CreatePaymentRequest, MockPaymentServiceOptions} from './types/mock-payment.type';
 import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/mock-payment.dto';
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from '../libs/fastify/context/context';
 import { randomUUID } from 'crypto';
 
 export class MockPaymentService extends AbstractPaymentService {
-  private allowedCreditCards = ['4111111111111111', '5555555555554444', '341925950237632'];
 
   constructor(opts: MockPaymentServiceOptions) {
     super(opts.ctCartService, opts.ctPaymentService);
@@ -159,20 +158,16 @@ export class MockPaymentService extends AbstractPaymentService {
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
   }
 
-  private isCreditCardAllowed(cardNumber: string) {
-    return this.allowedCreditCards.includes(cardNumber);
-  }
-
   /**
    * Create payment
    *
    * @remarks
    * Implementation to provide the mocking data for payment creation in external PSPs
    *
-   * @param request - contains amount and {@link https://docs.commercetools.com/api/projects/payments | Payment } defined in composable commerce
+   * @param request - contains paymentType defined in composable commerce
    * @returns Promise with mocking data containing operation status and PSP reference
    */
-  public async createPayment(opts: CreatePayment): Promise<PaymentResponseSchemaDTO> {
+  public async createPayment(request: CreatePaymentRequest): Promise<PaymentResponseSchemaDTO> {
     const ctCart = await this.ctCartService.getCart({
       id: getCartIdFromContext(),
     });
@@ -200,36 +195,21 @@ export class MockPaymentService extends AbstractPaymentService {
       paymentId: ctPayment.id,
     });
 
-    const paymentMethod = opts.data.paymentMethod;
-
-    let isAuthorized;
-
-    if (paymentMethod.type === 'invoice') {
-      isAuthorized = true;
-    } else {
-      isAuthorized = this.isCreditCardAllowed(paymentMethod.cardNumber);
-    }
-
-    const resultCode = isAuthorized ? PaymentOutcome.AUTHORIZED : PaymentOutcome.REJECTED;
-
     const pspReference = randomUUID().toString();
-
-    const paymentMethodType = paymentMethod.type;
 
     const updatedPayment = await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       pspReference: pspReference,
-      paymentMethod: paymentMethodType,
+      paymentMethod: request.data.paymentMethod,
       transaction: {
         type: 'Authorization',
         amount: ctPayment.amountPlanned,
         interactionId: pspReference,
-        state: this.convertPaymentResultCode(resultCode as PaymentOutcome),
+        state: this.convertPaymentResultCode(PaymentOutcome.AUTHORIZED),
       },
     });
 
     return {
-      outcome: resultCode,
       paymentReference: updatedPayment.id,
     };
   }

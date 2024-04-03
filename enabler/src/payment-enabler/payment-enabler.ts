@@ -17,7 +17,6 @@ export interface PaymentComponentBuilder {
   build(config: ComponentOptions): PaymentComponent;
 }
 
-
 export type EnablerOptions = {
   processorUrl: string;
   sessionId: string;
@@ -26,7 +25,6 @@ export type EnablerOptions = {
   onComplete?: (result: PaymentResult) => void;
   onError?: (error: any) => void;
 };
-
 
 export enum PaymentMethod {
   applepay = "applepay",

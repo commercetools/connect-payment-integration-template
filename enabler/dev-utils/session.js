@@ -39,6 +39,7 @@ const getSessionId = async(cartId) => {
   const accessToken = await fetchAdminToken();
 
   const sessionMetadata = {
+    processorUrl: __VITE_PROCESSOR_URL__,
     allowedPaymentMethods: ['card', 'invoice'], // add here your allowed methods for development purposes
   };
 

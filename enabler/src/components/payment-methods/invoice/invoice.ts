@@ -34,9 +34,7 @@ export class Invoice extends BaseComponent {
     this.sdk.init({ environment: this.environment });
     try {
       const requestData = {
-        paymentMethod: {
-            type: this.paymentMethod,
-        }
+        paymentMethod: this.paymentMethod
       };
       const response = await fetch(this.processorUrl + '/payments', {
         method: 'POST',
@@ -45,11 +43,7 @@ export class Invoice extends BaseComponent {
       });
       const data = await response.json();
 
-      if (data.outcome === 'Authorized' && data.paymentReference) {
-        this.onComplete && this.onComplete({ isSuccess: true, paymentReference: data.paymentReference });
-      } else {
-        this.onComplete && this.onComplete({ isSuccess: false });
-      }
+      this.onComplete && this.onComplete({ isSuccess: true, paymentReference: data.paymentReference });
     } catch(e) {
       this.onError('Some error occurred. Please try again.');
     }

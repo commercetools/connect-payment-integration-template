@@ -1,9 +1,15 @@
-import { ComponentOptions, PaymentComponent, PaymentComponentBuilder, PaymentMethod } from '../../../payment-enabler/payment-enabler';
+import {
+  ComponentOptions,
+  PaymentComponent,
+  PaymentComponentBuilder,
+  PaymentMethod
+} from '../../../payment-enabler/payment-enabler';
 import buttonStyles from '../../../style/button.module.scss';
 import inputFieldStyles from '../../../style/inputField.module.scss';
 import styles from '../../../style/style.module.scss';
-import { BaseComponent, BaseOptions } from '../../base';
-import { addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validateAllFields } from './utils';
+import {BaseComponent, BaseOptions} from '../../base';
+import {addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validateAllFields} from './utils';
+import {PaymentOutcome, PaymentRequestSchemaDTO} from "../../../dtos/mock-payment.dto.ts";
 
 export class CardBuilder implements PaymentComponentBuilder {
   public componentHasSubmit = true
@@ -11,8 +17,7 @@ export class CardBuilder implements PaymentComponentBuilder {
   constructor(private baseOptions: BaseOptions) {}
 
   build(config: ComponentOptions): PaymentComponent {
-    const cardComponent = new Card(this.baseOptions, config);
-    return cardComponent;
+    return new Card(this.baseOptions, config);
   }
 }
 
@@ -44,6 +49,8 @@ export class Card extends BaseComponent {
       return;
     }
     try {
+      // Below is a mock implementation but not recommend and PCI compliant approach,
+      // please use respective PSP iframe capabilities to handle PAN data
       const requestData = {
         paymentMethod: {
             type: this.paymentMethod,
@@ -54,14 +61,23 @@ export class Card extends BaseComponent {
             holderName: getInput(fieldIds.holderName).value,
         }
       };
-      const response = await fetch(this.processorUrl + '/payments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Session-Id': this.sessionId },
-        body: JSON.stringify(requestData),
-      });
-      const data = await response.json();
 
-      if (data.outcome === 'Authorized' && data.paymentReference) {
+      // Mock Validation
+      let isAuthorized = this.isCreditCardAllowed(requestData.paymentMethod.cardNumber);
+
+      const resultCode = isAuthorized ? PaymentOutcome.AUTHORIZED : PaymentOutcome.REJECTED;
+
+      if (resultCode === PaymentOutcome.AUTHORIZED) {
+        const request: PaymentRequestSchemaDTO = {
+          paymentMethod: this.paymentMethod
+        }
+        const response = await fetch(this.processorUrl + '/payments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-Session-Id': this.sessionId },
+          body: JSON.stringify(request),
+        });
+        const data = await response.json();
+
         this.onComplete && this.onComplete({ isSuccess: true, paymentReference: data.paymentReference });
       } else {
         this.onComplete && this.onComplete({ isSuccess: false });
@@ -135,5 +151,10 @@ export class Card extends BaseComponent {
         expiryDate: getInput(fieldIds.expiryDate).value,
       },
     };
+  }
+
+  private isCreditCardAllowed(cardNumber: string) {
+    const allowedCreditCards = ['4111111111111111', '5555555555554444', '341925950237632'];
+    return allowedCreditCards.includes(cardNumber);
   }
 }

@@ -1,13 +1,27 @@
-import { ComponentOptions, PaymentMethod } from '../../../payment-enabler/payment-enabler';
+import { ComponentOptions, PaymentComponent, PaymentComponentBuilder, PaymentMethod } from '../../../payment-enabler/payment-enabler';
 import buttonStyles from '../../../style/button.module.scss';
 import inputFieldStyles from '../../../style/inputField.module.scss';
 import styles from '../../../style/style.module.scss';
 import { BaseComponent, BaseOptions } from '../../base';
 import { addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validateAllFields } from './utils';
 
+export class CardBuilder implements PaymentComponentBuilder {
+  public componentHasSubmit = true
+
+  constructor(private baseOptions: BaseOptions) {}
+
+  build(config: ComponentOptions): PaymentComponent {
+    const cardComponent = new Card(this.baseOptions, config);
+    return cardComponent;
+  }
+}
+
 export class Card extends BaseComponent {
+  private showPayButton: boolean
+  
   constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
     super(PaymentMethod.card, baseOptions, componentOptions);
+    this.showPayButton = componentOptions?.showPayButton ?? false
   }
 
   mount(selector: string) {

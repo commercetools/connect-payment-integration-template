@@ -1,8 +1,8 @@
 import { BaseOptions } from '../components/base';
-import { Card } from '../components/payment-methods/card/card';
+import { CardBuilder } from '../components/payment-methods/card/card';
+import { InvoiceBuilder } from '../components/payment-methods/invoice/invoice';
 import { FakeSdk } from '../fake-sdk';
-import { ComponentOptions, EnablerOptions, PaymentEnabler } from './payment-enabler';
-import {Invoice} from "../components/payment-methods/invoice/invoice.ts";
+import { EnablerOptions, PaymentComponentBuilder, PaymentEnabler } from './payment-enabler';
 
 declare global {
   interface ImportMeta {
@@ -37,23 +37,30 @@ export class MockPaymentEnabler implements PaymentEnabler {
       processorUrl: options.processorUrl,
       sessionId: options.sessionId,
       environment: sdkOptions.environment,
-      config: options.config || {},
       onComplete: options.onComplete || (() => {}),
       onError: options.onError || (() => {}),
      }
     });
   }
 
-  async createComponent(type: string, componentOptions: ComponentOptions) {
+  async createComponentBuilder(
+    type: string
+  ): Promise<PaymentComponentBuilder | never> {
     const { baseOptions } = await this.setupData;
-    const supportedMethods = {
-      card: Card,
-      invoice: Invoice,
-    }
-    if (!Object.keys(supportedMethods).includes(type)) {
-      throw new Error(`Component type not supported: ${type}. Supported types: ${Object.keys(supportedMethods).join(', ')}`);
-    }
-    return new supportedMethods[type](baseOptions, componentOptions);
-  }
 
+    const supportedMethods = {
+      card: CardBuilder,
+      invoice: InvoiceBuilder,
+    };
+
+    if (!Object.keys(supportedMethods).includes(type)) {
+      throw new Error(
+        `Component type not supported: ${type}. Supported types: ${Object.keys(
+          supportedMethods
+        ).join(", ")}`
+      );
+    }
+
+    return new supportedMethods[type](baseOptions);
+  }
 }

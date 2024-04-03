@@ -62,17 +62,22 @@
                   console.log('onComplete', { isSuccess, paymentReference });
                 },
               });
-        
-              enabler.createComponent('card', {
-                config: {},
-              })
-              .then(e => e.mount('#card-component'));
 
-              enabler.createComponent('invoice', {
-                config: {},
-              })
-              .then(e => e.mount('#invoice-component'));
+                enabler.createComponentBuilder('card')
+                    .then(builder => {
+                        const paymentElement = builder.build({
+                            config: {},
+                        });
+                        paymentElement.mount('#card-component')
+                    })
 
+                enabler.createComponentBuilder('invoice')
+                    .then(builder => {
+                        const paymentElement = builder.build({
+                            config: {},
+                        });
+                        paymentElement.mount('#invoice-component')
+                    })
             });
       
           </script>

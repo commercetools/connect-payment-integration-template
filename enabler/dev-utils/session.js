@@ -39,7 +39,7 @@ const getSessionId = async(cartId) => {
   const accessToken = await fetchAdminToken();
 
   const sessionMetadata = {
-    allowedPaymentMethods: ['card'], // add here your allowed methods for development purposes
+    allowedPaymentMethods: ['card', 'invoice'], // add here your allowed methods for development purposes
   };
 
   const url = `${__VITE_CTP_SESSION_URL__}/${projectKey}/sessions`

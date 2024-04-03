@@ -85,7 +85,7 @@ export class MockPaymentService extends AbstractPaymentService {
       metadataFn: async () => ({
         name: packageJSON.name,
         description: packageJSON.description,
-        '@commercetools/sdk-client-v2': packageJSON.dependencies['@commercetools/sdk-client-v2'],
+        '@commercetools/connect-payments-sdk': packageJSON.dependencies['@commercetools/connect-payments-sdk'],
       }),
     })();
 
@@ -104,7 +104,10 @@ export class MockPaymentService extends AbstractPaymentService {
     return {
       components: [
         {
-          type: 'card',
+          type: 'card'
+        },
+        {
+          type: 'invoice'
         },
       ],
     };
@@ -191,7 +194,14 @@ export class MockPaymentService extends AbstractPaymentService {
     });
 
     const paymentMethod = opts.data.paymentMethod;
-    const isAuthorized = this.isCreditCardAllowed(paymentMethod.cardNumber);
+
+    let isAuthorized;
+
+    if ( paymentMethod.type === 'invoice') {
+      isAuthorized = true;
+    } else {
+      isAuthorized = this.isCreditCardAllowed(paymentMethod.cardNumber);
+    }
 
     const resultCode = isAuthorized ? PaymentOutcome.AUTHORIZED : PaymentOutcome.REJECTED;
 

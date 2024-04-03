@@ -57,8 +57,9 @@ describe('mock-payment.service', () => {
 
   test('getSupportedPaymentComponents', async () => {
     const result: ConfigResponse = await paymentService.getSupportedPaymentComponents();
-    expect(result?.components).toHaveLength(1);
+    expect(result?.components).toHaveLength(2);
     expect(result?.components[0]?.type).toStrictEqual('card');
+    expect(result?.components[1]?.type).toStrictEqual('invoice');
   });
 
   test('getStatus', async () => {

@@ -36,6 +36,7 @@ export enum PaymentMethod {
   ideal = "ideal",
   klarna = "klarna",
   paypal = "paypal",
+  invoice= "invoice"
 }
 
 export type PaymentResult = {

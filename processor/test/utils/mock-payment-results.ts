@@ -1,5 +1,4 @@
-import { Payment } from '@commercetools/platform-sdk';
-import { Transaction } from '@commercetools/platform-sdk/dist/declarations/src';
+import { Payment, Transaction } from '@commercetools/connect-payments-sdk';
 export const mockGetPaymentResult: Payment = {
   id: '123456',
   version: 1,

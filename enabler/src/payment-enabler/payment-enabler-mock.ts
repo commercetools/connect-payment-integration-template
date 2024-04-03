@@ -2,6 +2,7 @@ import { BaseOptions } from '../components/base';
 import { CardBuilder } from '../components/payment-methods/card/card';
 import { FakeSdk } from '../fake-sdk';
 import { EnablerOptions, PaymentComponentBuilder, PaymentEnabler } from './payment-enabler';
+import {Invoice} from "../components/payment-methods/invoice/invoice.ts";
 
 declare global {
   interface ImportMeta {
@@ -49,6 +50,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
 
     const supportedMethods = {
       card: CardBuilder,
+      invoice: Invoice,
     };
 
     if (!Object.keys(supportedMethods).includes(type)) {

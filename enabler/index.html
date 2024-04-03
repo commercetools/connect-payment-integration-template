@@ -62,15 +62,28 @@
                   console.log('onComplete', { isSuccess, paymentReference });
                 },
               });
-        
-              const builder = await enabler.createComponentBuilder('card')
-              const component = builder.build({})
-              component.mount('#card-component')
+
+                enabler.createComponentBuilder('card')
+                    .then(builder => {
+                        const paymentElement = builder.build({
+                            config: {},
+                        });
+                        paymentElement.mount('#card-component')
+                    })
+
+                enabler.createComponentBuilder('invoice')
+                    .then(builder => {
+                        const paymentElement = builder.build({
+                            config: {},
+                        });
+                        paymentElement.mount('#invoice-component')
+                    })
             });
       
           </script>
       
           <div id="card-component"></div>
+          <div id="invoice-component"></div>
         </div>
       </div>
 

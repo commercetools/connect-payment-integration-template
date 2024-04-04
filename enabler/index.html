@@ -66,17 +66,15 @@
                 enabler.createComponentBuilder('card')
                     .then(builder => {
                         const paymentElement = builder.build({
-                            config: {},
+                          showPayButton: false,
                         });
                         paymentElement.mount('#card-component')
                     })
 
                 enabler.createComponentBuilder('invoice')
                     .then(builder => {
-                        const paymentElement = builder.build({
-                            config: {},
-                        });
-                        paymentElement.mount('#invoice-component')
+                        const paymentElement = builder.build({});
+                       paymentElement.mount('#invoice-component')
                     })
             });
       
@@ -89,10 +87,5 @@
 
     </main>
 
-
-
-    
-
-    
   </body>
 </html>

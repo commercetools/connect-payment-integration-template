@@ -6,8 +6,11 @@ import {
 } from '../../../payment-enabler/payment-enabler';
 import {BaseComponent, BaseOptions} from '../../base';
 import styles from '../../../style/style.module.scss';
+import buttonStyles from "../../../style/button.module.scss";
+import {addFormFieldsEventListeners} from "../card/utils.ts";
 
 export class InvoiceBuilder implements PaymentComponentBuilder {
+  public componentHasSubmit = true
   constructor(private baseOptions: BaseOptions) {}
 
   build(config: ComponentOptions): PaymentComponent {
@@ -16,17 +19,24 @@ export class InvoiceBuilder implements PaymentComponentBuilder {
 }
 
 export class Invoice extends BaseComponent {
+  private showPayButton: boolean;
+
   constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
     super(PaymentMethod.invoice, baseOptions, componentOptions);
+    this.showPayButton = componentOptions?.showPayButton ?? false;
   }
 
   mount(selector: string) {
     document.querySelector(selector).insertAdjacentHTML("afterbegin", this._getTemplate());
-    document.querySelector('#invoiceForm').addEventListener('onsubmit', (e) => {
-      e.preventDefault();
-      this.submit();
-    });
 
+    if (this.showPayButton) {
+      document.querySelector('#invoiceForm-paymentButton').addEventListener('click', (e) => {
+        e.preventDefault();
+        this.submit();
+      });
+    }
+
+    addFormFieldsEventListeners();
   }
 
   async submit() {
@@ -50,10 +60,12 @@ export class Invoice extends BaseComponent {
   }
 
   private _getTemplate() {
-  return `
+    const payButton = this.showPayButton ? `<button class="${buttonStyles.button} ${buttonStyles.fullWidth} ${styles.submitButton}" id="invoiceForm-paymentButton">Pay</button>` : '';
+    return `
     <div class="${styles.wrapper}">
       <form id="invoiceForm" class="${styles.paymentForm}">
       Pay easily with Invoice and transfer the shopping amount within the specified date.
+      ${payButton}
       </form>
     </div>
     `

@@ -26,7 +26,7 @@ export class Card extends BaseComponent {
   
   constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
     super(PaymentMethod.card, baseOptions, componentOptions);
-    this.showPayButton = componentOptions?.showPayButton ?? false
+    this.showPayButton = componentOptions?.showPayButton ?? false;
   }
 
   mount(selector: string) {

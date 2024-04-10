@@ -3,8 +3,8 @@ import {
   CommercetoolsPaymentService,
   ErrorInvalidJsonInput,
   ErrorInvalidOperation,
-  Payment,
 } from '@commercetools/connect-payments-sdk';
+import { Payment } from '@commercetools/platform-sdk';
 import {
   CancelPaymentRequest,
   CapturePaymentRequest,

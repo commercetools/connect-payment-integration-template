@@ -52,7 +52,13 @@ const isFieldValid = (field: string) => {
   const input = getInput(field);
   switch (field) {
     case 'creditCardForm-cardNumber':
-      return input.value.replace(/\s/g, '').length >= 15;
+      const cardNumber = getInput(fieldIds.cardNumber);
+      const brand = getCardBrand(cardNumber.value);
+      if(brand === 'amex') {
+        return input.value.replace(/\s/g, '').length === 15;
+      } else {
+        return input.value.replace(/\s/g, '').length === 16;
+      }
     case 'creditCardForm-expiryDate':
       return input.value.length === 5;
     case 'creditCardForm-cvv':

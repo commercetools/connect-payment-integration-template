@@ -13,6 +13,7 @@ import * as FastifyContext from '../src/libs/fastify/context/context';
 import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
 
 import { HealthCheckResult } from '@commercetools/connect-payments-sdk';
+import {PaymentOutcome} from "../src/dtos/mock-payment.dto";
 
 interface FlexibleConfig {
   [key: string]: string; // Adjust the type according to your config values
@@ -167,6 +168,7 @@ describe('mock-payment.service', () => {
     const createPaymentOpts: CreatePaymentRequest = {
       data: {
         paymentMethod: 'card',
+        paymentOutcome: PaymentOutcome.AUTHORIZED,
       },
     };
     jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValue(Promise.resolve(mockGetCartResult()));
@@ -183,6 +185,7 @@ describe('mock-payment.service', () => {
     const createPaymentOpts: CreatePaymentRequest = {
       data: {
         paymentMethod: 'invoice',
+        paymentOutcome: PaymentOutcome.AUTHORIZED,
       },
     };
     jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValue(Promise.resolve(mockGetCartResult()));

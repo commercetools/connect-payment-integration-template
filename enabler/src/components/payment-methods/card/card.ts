@@ -64,20 +64,20 @@ export class Card extends BaseComponent {
 
       // Mock Validation
       let isAuthorized = this.isCreditCardAllowed(requestData.paymentMethod.cardNumber);
-
       const resultCode = isAuthorized ? PaymentOutcome.AUTHORIZED : PaymentOutcome.REJECTED;
 
-      if (resultCode === PaymentOutcome.AUTHORIZED) {
-        const request: PaymentRequestSchemaDTO = {
-          paymentMethod: this.paymentMethod
-        }
-        const response = await fetch(this.processorUrl + '/payments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Session-Id': this.sessionId },
-          body: JSON.stringify(request),
-        });
-        const data = await response.json();
+      const request: PaymentRequestSchemaDTO = {
+        paymentMethod: this.paymentMethod,
+        paymentOutcome: resultCode
+      }
+      const response = await fetch(this.processorUrl + '/payments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-Session-Id': this.sessionId },
+        body: JSON.stringify(request),
+      });
+      const data = await response.json();
 
+      if (resultCode === PaymentOutcome.AUTHORIZED) {
         this.onComplete && this.onComplete({ isSuccess: true, paymentReference: data.paymentReference });
       } else {
         this.onComplete && this.onComplete({ isSuccess: false });
@@ -92,6 +92,7 @@ export class Card extends BaseComponent {
     return `
     <div class="${styles.wrapper}">
       <form class="${styles.paymentForm}">
+        <div class="${inputFieldStyles.inputContainer}"> * Required fields for payment by credit card </div>
         <div class="${inputFieldStyles.inputContainer}">
           <label class="${inputFieldStyles.inputLabel}" for="creditCardForm.cardNumber">
             Card number <span aria-hidden="true"> *</span>

@@ -7,6 +7,7 @@ import {
 import {BaseComponent, BaseOptions} from '../../base';
 import styles from '../../../style/style.module.scss';
 import buttonStyles from "../../../style/button.module.scss";
+import { PaymentOutcome } from '../../../dtos/mock-payment.dto';
 
 export class InvoiceBuilder implements PaymentComponentBuilder {
   public componentHasSubmit = true
@@ -41,7 +42,8 @@ export class Invoice extends BaseComponent {
     this.sdk.init({ environment: this.environment });
     try {
       const requestData = {
-        paymentMethod: this.paymentMethod
+        paymentMethod: this.paymentMethod,
+        paymentOutcome: PaymentOutcome.AUTHORIZED,
       };
       const response = await fetch(this.processorUrl + '/payments', {
         method: 'POST',

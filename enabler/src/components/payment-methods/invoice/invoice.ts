@@ -7,7 +7,6 @@ import {
 import {BaseComponent, BaseOptions} from '../../base';
 import styles from '../../../style/style.module.scss';
 import buttonStyles from "../../../style/button.module.scss";
-import {addFormFieldsEventListeners} from "../card/utils.ts";
 
 export class InvoiceBuilder implements PaymentComponentBuilder {
   public componentHasSubmit = true
@@ -35,8 +34,6 @@ export class Invoice extends BaseComponent {
         this.submit();
       });
     }
-
-    addFormFieldsEventListeners();
   }
 
   async submit() {

@@ -52,11 +52,11 @@ const isFieldValid = (field: string) => {
   const input = getInput(field);
   switch (field) {
     case 'creditCardForm-cardNumber':
-      return input.value.replace(/\s/g, '').length === 16;
+      return input.value.replace(/\s/g, '').length >= 15;
     case 'creditCardForm-expiryDate':
       return input.value.length === 5;
     case 'creditCardForm-cvv':
-      return input.value.length === 3;
+      return input.value.length === 3 || input.value.length === 4;
     case 'creditCardForm-holderNameLabel':
       return input.value.length > 0;
     default:
@@ -161,7 +161,12 @@ const addCvvEventListeners = () => {
     if (isNaN(Number(cvv.value))) {
       cvv.value = cvv.value.slice(0, -1);
     }
-    if (cvv.value.length > 3) {
+    const cardNumber = getInput(fieldIds.cardNumber);
+    const brand = getCardBrand(cardNumber.value);
+    if (brand === 'amex' && cvv.value.length > 4) {
+      cvv.value = cvv.value.slice(0, 4);
+    }
+    if (brand !== 'amex' && cvv.value.length > 3) {
       cvv.value = cvv.value.slice(0, 3);
     }
   });

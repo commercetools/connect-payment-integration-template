@@ -103,7 +103,9 @@ describe('mock-payment.service', () => {
       isValid: true,
     };
 
-    jest.spyOn(DefaultPaymentService.prototype, 'validatePaymentRefund').mockReturnValue(mockValidationResult);
+    jest
+      .spyOn(DefaultPaymentService.prototype, 'validatePaymentCancelAuthorization')
+      .mockReturnValue(mockValidationResult);
     jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
     jest
       .spyOn(DefaultPaymentService.prototype, 'updatePayment')
@@ -132,7 +134,7 @@ describe('mock-payment.service', () => {
       isValid: true,
     };
 
-    jest.spyOn(DefaultPaymentService.prototype, 'validatePaymentRefund').mockReturnValue(mockValidationResult);
+    jest.spyOn(DefaultPaymentService.prototype, 'validatePaymentCharge').mockReturnValue(mockValidationResult);
     jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
     jest
       .spyOn(DefaultPaymentService.prototype, 'updatePayment')

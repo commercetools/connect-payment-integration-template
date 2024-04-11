@@ -6,14 +6,15 @@ import { DefaultCartService } from '@commercetools/connect-payments-sdk/dist/com
 import { mockGetPaymentResult, mockUpdatePaymentResult } from './utils/mock-payment-results';
 import { mockGetCartResult } from './utils/mock-cart-data';
 import * as Config from '../src/config/config';
-import {CreatePaymentRequest, MockPaymentServiceOptions} from '../src/services/types/mock-payment.type';
+import { CreatePaymentRequest, MockPaymentServiceOptions } from '../src/services/types/mock-payment.type';
 import { AbstractPaymentService } from '../src/services/abstract-payment.service';
 import { MockPaymentService } from '../src/services/mock-payment.service';
 import * as FastifyContext from '../src/libs/fastify/context/context';
 import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
 
 import { HealthCheckResult } from '@commercetools/connect-payments-sdk';
-import {PaymentOutcome} from "../src/dtos/mock-payment.dto";
+import { PaymentOutcome } from '../src/dtos/mock-payment.dto';
+import { PaymentModificationValidationResult } from '@commercetools/connect-payments-sdk/dist/commercetools/types/payment.type';
 
 interface FlexibleConfig {
   [key: string]: string; // Adjust the type according to your config values
@@ -98,7 +99,13 @@ describe('mock-payment.service', () => {
         ],
       },
     };
+    const mockValidationResult: PaymentModificationValidationResult = {
+      isValid: true,
+    };
 
+    jest
+      .spyOn(DefaultPaymentService.prototype, 'validatePaymentCancelAuthorization')
+      .mockReturnValue(mockValidationResult);
     jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
     jest
       .spyOn(DefaultPaymentService.prototype, 'updatePayment')
@@ -123,7 +130,11 @@ describe('mock-payment.service', () => {
         ],
       },
     };
+    const mockValidationResult: PaymentModificationValidationResult = {
+      isValid: true,
+    };
 
+    jest.spyOn(DefaultPaymentService.prototype, 'validatePaymentCharge').mockReturnValue(mockValidationResult);
     jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
     jest
       .spyOn(DefaultPaymentService.prototype, 'updatePayment')
@@ -151,7 +162,11 @@ describe('mock-payment.service', () => {
         ],
       },
     };
+    const mockValidationResult: PaymentModificationValidationResult = {
+      isValid: true,
+    };
 
+    jest.spyOn(DefaultPaymentService.prototype, 'validatePaymentRefund').mockReturnValue(mockValidationResult);
     jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
     jest
       .spyOn(DefaultPaymentService.prototype, 'updatePayment')

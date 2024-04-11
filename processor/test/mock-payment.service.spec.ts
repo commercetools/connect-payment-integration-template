@@ -14,6 +14,7 @@ import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/han
 
 import { HealthCheckResult } from '@commercetools/connect-payments-sdk';
 import { PaymentOutcome } from '../src/dtos/mock-payment.dto';
+import { PaymentModificationValidationResult } from '@commercetools/connect-payments-sdk/dist/commercetools/types/payment.type';
 
 interface FlexibleConfig {
   [key: string]: string; // Adjust the type according to your config values
@@ -98,7 +99,11 @@ describe('mock-payment.service', () => {
         ],
       },
     };
+    const mockValidationResult: PaymentModificationValidationResult = {
+      isValid: true,
+    };
 
+    jest.spyOn(DefaultPaymentService.prototype, 'validatePaymentRefund').mockReturnValue(mockValidationResult);
     jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
     jest
       .spyOn(DefaultPaymentService.prototype, 'updatePayment')
@@ -123,7 +128,11 @@ describe('mock-payment.service', () => {
         ],
       },
     };
+    const mockValidationResult: PaymentModificationValidationResult = {
+      isValid: true,
+    };
 
+    jest.spyOn(DefaultPaymentService.prototype, 'validatePaymentRefund').mockReturnValue(mockValidationResult);
     jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
     jest
       .spyOn(DefaultPaymentService.prototype, 'updatePayment')
@@ -151,7 +160,11 @@ describe('mock-payment.service', () => {
         ],
       },
     };
+    const mockValidationResult: PaymentModificationValidationResult = {
+      isValid: true,
+    };
 
+    jest.spyOn(DefaultPaymentService.prototype, 'validatePaymentRefund').mockReturnValue(mockValidationResult);
     jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
     jest
       .spyOn(DefaultPaymentService.prototype, 'updatePayment')

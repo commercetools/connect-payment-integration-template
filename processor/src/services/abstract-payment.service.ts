@@ -21,6 +21,7 @@ import {
 } from '../dtos/operations/payment-intents.dto';
 
 import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
+import { log } from '../libs/logger';
 
 export abstract class AbstractPaymentService {
   protected ctCartService: CommercetoolsCartService;
@@ -133,13 +134,25 @@ export abstract class AbstractPaymentService {
         type: transactionType,
         amount: requestAmount,
         interactionId: res.pspReference,
-        state: res.outcome === PaymentModificationStatus.APPROVED ? 'Success' : 'Failure',
+        state: this.convertPaymentModificationOutcomeToState(res.outcome),
       },
     });
 
     return {
       outcome: res.outcome,
     };
+  }
+
+  protected convertPaymentModificationOutcomeToState(
+    outcome: PaymentModificationStatus,
+  ): 'Pending' | 'Success' | 'Failure' {
+    if (outcome === PaymentModificationStatus.RECEIVED) {
+      return 'Pending';
+    } else if (outcome === PaymentModificationStatus.APPROVED) {
+      return 'Success';
+    } else {
+      return 'Failure';
+    }
   }
 
   protected getPaymentTransactionType(action: string): string {
@@ -167,12 +180,33 @@ export abstract class AbstractPaymentService {
   ) {
     switch (transactionType) {
       case 'CancelAuthorization': {
+        const validation = this.ctPaymentService.validatePaymentCancelAuthorization({ payment });
+        if (!validation.isValid) {
+          log.error(`Payment can not be cancelled. ${validation.reason}`, { paymentId: payment.id });
+          throw new ErrorInvalidOperation(validation.reason || 'Payment can not be cancelled.');
+        }
         return await this.cancelPayment({ payment });
       }
       case 'Charge': {
+        const validation = this.ctPaymentService.validatePaymentCharge({ payment, amount: requestAmount });
+        if (!validation.isValid) {
+          log.error(`Payment can not be charged. ${validation.reason}`, {
+            paymentId: payment.id,
+            amount: requestAmount,
+          });
+          throw new ErrorInvalidOperation(validation.reason || 'Payment can not be charged.');
+        }
         return await this.capturePayment({ amount: requestAmount, payment });
       }
       case 'Refund': {
+        const validation = this.ctPaymentService.validatePaymentRefund({ payment, amount: requestAmount });
+        if (!validation.isValid) {
+          log.error(`Payment can not be refunded. ${validation.reason}`, {
+            paymentId: payment.id,
+            amount: requestAmount,
+          });
+          throw new ErrorInvalidOperation(validation.reason || 'Payment can not be refunded.');
+        }
         return await this.refundPayment({ amount: requestAmount, payment });
       }
       default: {

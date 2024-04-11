@@ -15,13 +15,12 @@ import packageJSON from '../../package.json';
 import { AbstractPaymentService } from './abstract-payment.service';
 import { getConfig } from '../config/config';
 import { paymentSDK } from '../payment-sdk';
-import {CreatePaymentRequest, MockPaymentServiceOptions} from './types/mock-payment.type';
+import { CreatePaymentRequest, MockPaymentServiceOptions } from './types/mock-payment.type';
 import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/mock-payment.dto';
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from '../libs/fastify/context/context';
 import { randomUUID } from 'crypto';
 
 export class MockPaymentService extends AbstractPaymentService {
-
   constructor(opts: MockPaymentServiceOptions) {
     super(opts.ctCartService, opts.ctPaymentService);
   }

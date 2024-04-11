@@ -51,22 +51,22 @@ export class Invoice extends BaseComponent {
         body: JSON.stringify(requestData),
       });
       const data = await response.json();
-
-      this.onComplete && this.onComplete({ isSuccess: true, paymentReference: data.paymentReference });
+      if (data.paymentReference) {
+        this.onComplete && this.onComplete({ isSuccess: true, paymentReference: data.paymentReference });
+      } else {
+        this.onError('Some error occurred. Please try again.');
+      }
     } catch(e) {
       this.onError('Some error occurred. Please try again.');
     }
   }
 
   private _getTemplate() {
-    const payButton = this.showPayButton ? `<button class="${buttonStyles.button} ${buttonStyles.fullWidth} ${styles.submitButton}" id="invoiceForm-paymentButton">Pay</button>` : '';
-    return `
+    return this.showPayButton ? `
     <div class="${styles.wrapper}">
-      <form id="invoiceForm" class="${styles.paymentForm}">
-      Pay easily with Invoice and transfer the shopping amount within the specified date.
-      ${payButton}
-      </form>
+      <p>Pay easily with Invoice and transfer the shopping amount within the specified date.</p>
+      <button class="${buttonStyles.button} ${buttonStyles.fullWidth} ${styles.submitButton}" id="invoiceForm-paymentButton">Pay</button>
     </div>
-    `
+    ` : '';
   }
 }

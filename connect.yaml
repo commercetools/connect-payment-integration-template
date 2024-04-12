@@ -12,9 +12,6 @@ deployAs:
         - key: CTP_CLIENT_ID
           description: commercetools client ID
           required: true
-        - key: CTP_SCOPE
-          description: commercetools client scope
-          required: true
         - key: CTP_AUTH_URL
           description: commercetools Auth URL
           required: true

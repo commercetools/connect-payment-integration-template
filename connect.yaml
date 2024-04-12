@@ -1,4 +1,6 @@
 deployAs:
+  - name: enabler
+    applicationType: assets
   - name: processor
     applicationType: service
     endpoint: /
@@ -16,15 +18,19 @@ deployAs:
         - key: CTP_AUTH_URL
           description: Commercetools Auth URL
           required: true
+          default: https://auth.europe-west1.gcp.commercetools.com
         - key: CTP_API_URL
           description: Commercetools API URL
           required: true
+          default: https://api.europe-west1.gcp.commercetools.com
         - key: CTP_SESSION_URL
           description: Session API URL
           required: true
+          default: https://session.europe-west1.gcp.commercetools.com
         - key: CTP_JWKS_URL
           description: JWKs url
           required: true
+          default: https://mc-api.europe-west1.gcp.commercetools.com/.well-known/jwks.json
         - key: CTP_JWT_ISSUER
           description: JWT Issuer for jwt validation
           required: true
@@ -32,5 +38,3 @@ deployAs:
         - key: CTP_CLIENT_SECRET
           description: Commercetools client secret
           required: true
-  - name: enabler
-    applicationType: assets

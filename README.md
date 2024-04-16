@@ -82,6 +82,7 @@ deployAs:
         - key: CTP_JWT_ISSUER
           description: JWT Issuer for jwt validation
           required: true
+          default: https://mc-api.europe-west1.gcp.commercetools.com
       securedConfiguration:
         - key: CTP_CLIENT_SECRET
           description: commercetools client secret
@@ -96,4 +97,4 @@ Here you can see the details about various variables in configuration
 - `CTP_API_URL`: The URL for commercetools composable commerce API. Default value is `https://api.europe-west1.gcp.commercetools.com`.
 - `CTP_SESSION_URL`: The URL for session creation in commercetools platform. Connectors relies on the session created to be able to share information between enabler and processor. The default value is `https://session.europe-west1.gcp.commercetools.com`.
 - `CTP_JWKS_URL`: The URL which provides JSON Web Key Set. Default value is `https://mc-api.europe-west1.gcp.commercetools.com/.well-known/jwks.json`
-- `CTP_JWT_ISSUER`: The issuer inside JSON Web Token which is required in JWT validation process.
+- `CTP_JWT_ISSUER`: The issuer inside JSON Web Token which is required in JWT validation process. Default value is `https://mc-api.europe-west1.gcp.commercetools.com`

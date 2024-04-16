@@ -31,6 +31,7 @@ deployAs:
         - key: CTP_JWT_ISSUER
           description: JWT Issuer for jwt validation
           required: true
+          default: https://mc-api.europe-west1.gcp.commercetools.com
       securedConfiguration:
         - key: CTP_CLIENT_SECRET
           description: commercetools client secret

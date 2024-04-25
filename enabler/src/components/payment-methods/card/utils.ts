@@ -136,11 +136,35 @@ const dateFormatter = (): ((inputValue: string) => string) => {
   };
 };
 
-const addCardNumberEventListeners = () => { 
+function formatCardNumberValue(brand: string, cardNumber: HTMLInputElement) {
+  let tempVal = cardNumber.value.replace(/\s/g, '');
+  let selection = cardNumber.selectionStart;
+  if (brand === 'amex') {
+    cardNumber.value = (tempVal.slice(0, 4).replace(/(.{4})/g, '$1 ') +
+        tempVal.slice(4, 10).replace(/(.{6})/g, '$1 ') +
+        tempVal.slice(10, 15)).trim();
+
+    if (cardNumber.value.length === 6 || cardNumber.value.length === 13) {
+      selection = selection+1
+    }
+
+    cardNumber.selectionStart = selection;
+    cardNumber.selectionEnd = selection;
+   return cardNumber.value;
+  } else {
+    if(cardNumber.value.length > 19) {
+      cardNumber.value = cardNumber.value.slice(0, 19);
+    }
+    return cardNumber.value.replace(/(\d{4}(?!\s))/g, "$1 ").trim();
+  }
+}
+
+const addCardNumberEventListeners = () => {
   const cardNumber = getInput(fieldIds.cardNumber);
   cardNumber.addEventListener('input', () => {
-    cardNumber.value = cardNumber.value.replace(/\D/g,'').replace(/(\d{4})/g, '$1 ').trim();
     const brand = getCardBrand(cardNumber.value);
+    cardNumber.value = formatCardNumberValue(brand, cardNumber);
+
     const cardIcons = document.querySelectorAll(`.${styles.cardIcon}`);
     cardIcons.forEach((icon) => {
       icon.classList.add(styles.hidden);
@@ -169,10 +193,11 @@ const addCvvEventListeners = () => {
     }
     const cardNumber = getInput(fieldIds.cardNumber);
     const brand = getCardBrand(cardNumber.value);
-    if (brand === 'amex' && cvv.value.length > 4) {
-      cvv.value = cvv.value.slice(0, 4);
-    }
-    if (brand !== 'amex' && cvv.value.length > 3) {
+    if (brand === 'amex') {
+      if (cvv.value.length > 4) {
+        cvv.value = cvv.value.slice(0, 4);
+      }
+    } else if (cvv.value.length > 3) {
       cvv.value = cvv.value.slice(0, 3);
     }
   });

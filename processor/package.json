@@ -27,7 +27,7 @@
     "@fastify/request-context": "5.1.0",
     "@fastify/static": "7.0.3",
     "@fastify/type-provider-typebox": "4.0.0",
-    "@sinclair/typebox": "0.32.23",
+    "@sinclair/typebox": "0.32.24",
     "dotenv": "16.4.5",
     "fastify": "4.26.2",
     "fastify-plugin": "4.5.1"

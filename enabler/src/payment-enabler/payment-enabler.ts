@@ -180,7 +180,7 @@ export type ComponentOptions = {
 
   /**
    * A callback function that is called when the pay button is clicked.
-   * @returns A boolean indicating whether the payment should proceed.
+   * @returns A Promise indicating whether the payment should proceed.
    */
-  onClick?: () => boolean;
+  onPayButtonClick?: () => Promise<void>;
 };

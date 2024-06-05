@@ -76,6 +76,12 @@ export interface PaymentComponent {
       expiryDate?: string;
     };
   };
+
+  /**
+   * Checks if the payment component is available for use.
+   * @returns A promise that resolves to a boolean indicating whether the payment component is available.
+   */
+    isAvailable?(): Promise<boolean>;
 }
 
 /**

@@ -50,4 +50,5 @@ export abstract class BaseComponent implements PaymentComponent {
       expiryDate? : string;
     }
   };
+  isAvailable?(): Promise<boolean>;
 }

@@ -154,6 +154,10 @@ export class Card extends BaseComponent {
     };
   }
 
+  isAvailable() {
+    return Promise.resolve(true);
+  }
+
   private isCreditCardAllowed(cardNumber: string) {
     const allowedCreditCards = ['4111111111111111', '5555555555554444', '341925950237632'];
     return allowedCreditCards.includes(cardNumber);

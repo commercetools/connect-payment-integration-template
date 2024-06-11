@@ -10,6 +10,7 @@
     "lint:fix": "prettier --write \"**/**/*.{ts,js,json}\" && eslint --fix --ext .ts src test",
     "build": "rm -rf /dist && tsc",
     "dev": "ts-node src/main.ts",
+    "watch": "nodemon --watch \"src/**\" --ext \"ts,json\" --ignore \"src/**/*.spec.ts\" --exec \"ts-node src/main.ts\"",
     "test": "jest --detectOpenHandles",
     "connector:post-deploy": "node src/connectors/post-deploy.ts",
     "connector:pre-undeploy": "node src/connectors/pre-undeploy.ts"

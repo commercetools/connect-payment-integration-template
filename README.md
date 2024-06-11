@@ -98,3 +98,28 @@ Here you can see the details about various variables in configuration
 - `CTP_SESSION_URL`: The URL for session creation in commercetools platform. Connectors relies on the session created to be able to share information between enabler and processor. The default value is `https://session.europe-west1.gcp.commercetools.com`.
 - `CTP_JWKS_URL`: The URL which provides JSON Web Key Set. Default value is `https://mc-api.europe-west1.gcp.commercetools.com/.well-known/jwks.json`
 - `CTP_JWT_ISSUER`: The issuer inside JSON Web Token which is required in JWT validation process. Default value is `https://mc-api.europe-west1.gcp.commercetools.com`
+
+## Development
+In order to get started developing this connector certain configuration are necessary, most of which involve updating environment variables in both services (enabler, processor).
+
+#### Configuration steps
+
+#### 1. Environment Variable Setup
+
+Navigate to each service directory and duplicate the .env.template file, renaming the copy to .env. Populate the newly created .env file with the appropriate values.
+
+```bash
+cp .env.template .env
+```
+
+#### 2. Spin Up Components via Docker Compose
+With the help of docker compose, you are able to spin up all necessary components required for developing the connector by running the following command from the root directory;
+
+```bash
+docker compose up
+```
+
+This command would start 3 required services, necessary for development
+1. JWT Server
+2. Enabler
+3. Processor

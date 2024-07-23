@@ -1,12 +1,12 @@
 /**
  * Represents the payment enabler. The payment enabler is the entry point for creating the components.
- * 
+ *
  * Usage:
  *    const enabler = new Enabler({
  *      processorUrl: __VITE_PROCESSOR_URL__,
  *      sessionId: sessionId,
  *      config: {
- *        
+ *
  *      },
  *      onComplete: ({ isSuccess, paymentReference }) => {
  *        console.log('onComplete', { isSuccess, paymentReference });
@@ -81,7 +81,7 @@ export interface PaymentComponent {
    * Checks if the payment component is available for use.
    * @returns A promise that resolves to a boolean indicating whether the payment component is available.
    */
-    isAvailable?(): Promise<boolean>;
+  isAvailable?(): Promise<boolean>;
 }
 
 /**
@@ -140,17 +140,33 @@ export type EnablerOptions = {
 };
 
 /**
- * Represents the available payment methods.
+ * Represents the payment method code.
  */
 export enum PaymentMethod {
+  /* Apple Pay */
   applepay = "applepay",
+  /* Bancontact card */
+  bancontactcard = "bcmc",
+  /* Card */
   card = "card",
-  dropin = "dropin",
+  /* EPS */
+  eps = "eps",
+  /* Google Pay */
   googlepay = "googlepay",
+  /* iDeal */
   ideal = "ideal",
-  klarna = "klarna",
-  paypal = "paypal",
+  /* iDeal */
   invoice = "invoice",
+  /* Klarna Pay Later */
+  klarna_pay_later = "klarna",
+  /* Klarna Pay Now */
+  klarna_pay_now = "klarna_paynow",
+  /* Klarna Pay Over Time */
+  klarna_pay_overtime = "klarna_account",
+  /* PayPal */
+  paypal = "paypal",
+  /* TWINT */
+  twint = "twint",
 }
 
 /**

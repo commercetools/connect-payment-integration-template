@@ -14,6 +14,7 @@ export const PaymentOutcomeSchema = Type.Enum(PaymentOutcome);
 export const PaymentRequestSchema = Type.Object({
   paymentMethod: Type.String(),
   paymentOutcome: PaymentOutcomeSchema,
+  pspReference: Type.Optional(Type.String()),
 });
 
 export type PaymentRequestSchemaDTO = Static<typeof PaymentRequestSchema>;

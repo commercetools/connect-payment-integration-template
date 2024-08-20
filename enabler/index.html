@@ -144,7 +144,8 @@
                 });
 
                 if (builder.componentHasSubmit) {
-                  if (selectedValue === 'card') {
+                  const methodsRequireMounting = ['card', 'purchaseorder'];
+                  if (methodsRequireMounting.includes(selectedValue)) {
                     component.mount("#container--external");
                   }
                   

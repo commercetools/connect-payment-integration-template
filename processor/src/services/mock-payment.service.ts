@@ -117,6 +117,9 @@ export class MockPaymentService extends AbstractPaymentService {
         {
           type: 'invoice',
         },
+        {
+          type: 'purchaseorder',
+        },
       ],
     };
   }
@@ -178,6 +181,7 @@ export class MockPaymentService extends AbstractPaymentService {
       amountPlanned: await this.ctCartService.getPaymentAmount({
         cart: ctCart,
       }),
+      interfaceId: request.data.pspReference || undefined,
       paymentMethodInfo: {
         paymentInterface: getPaymentInterfaceFromContext() || 'mock',
       },

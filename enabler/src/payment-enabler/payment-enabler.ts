@@ -167,6 +167,7 @@ export enum PaymentMethod {
   paypal = "paypal",
   /* TWINT */
   twint = "twint",
+  purchaseorder = "purchaseorder",
 }
 
 /**

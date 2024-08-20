@@ -1,6 +1,7 @@
 import { BaseOptions } from '../components/base';
 import { CardBuilder } from '../components/payment-methods/card/card';
 import { InvoiceBuilder } from '../components/payment-methods/invoice/invoice';
+import { PurchaseOrderBuilder } from '../components/payment-methods/purchase-order/purchase-order';
 import { FakeSdk } from '../fake-sdk';
 import { EnablerOptions, PaymentComponentBuilder, PaymentEnabler } from './payment-enabler';
 
@@ -51,6 +52,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
     const supportedMethods = {
       card: CardBuilder,
       invoice: InvoiceBuilder,
+      purchaseorder: PurchaseOrderBuilder,
     };
 
     if (!Object.keys(supportedMethods).includes(type)) {

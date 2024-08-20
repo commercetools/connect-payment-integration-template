@@ -177,11 +177,12 @@ export class MockPaymentService extends AbstractPaymentService {
       id: getCartIdFromContext(),
     });
 
+    const uniqueness = randomUUID().toString();
     const ctPayment = await this.ctPaymentService.createPayment({
       amountPlanned: await this.ctCartService.getPaymentAmount({
         cart: ctCart,
       }),
-      interfaceId: request.data.pspReference || undefined,
+      interfaceId: request.data.pspReference ? `${uniqueness}+${request.data.pspReference}` : undefined,
       paymentMethodInfo: {
         paymentInterface: getPaymentInterfaceFromContext() || 'mock',
       },

@@ -10,7 +10,6 @@ import styles from '../../../style/style.module.scss';
 import {BaseComponent, BaseOptions} from '../../base';
 import {addFormFieldsEventListeners, fieldIds, getInput, validateAllFields} from './utils';
 import {PaymentOutcome, PaymentRequestSchemaDTO} from "../../../dtos/mock-payment.dto.ts";
-import { randomUUID } from 'crypto';
 
 export class PurchaseOrderBuilder implements PaymentComponentBuilder {
   public componentHasSubmit = true
@@ -52,11 +51,10 @@ export class PurchaseOrder extends BaseComponent {
     try {
       const resultCode = PaymentOutcome.AUTHORIZED;
 
-      const uniqueness = randomUUID().toString();
       const request: PaymentRequestSchemaDTO = {
         paymentMethod: this.paymentMethod,
         paymentOutcome: resultCode,
-        pspReference: `${uniqueness}+${getInput(fieldIds.poNumber).value}+${getInput(fieldIds.invoiceMemo).value || ''}`
+        pspReference: `${getInput(fieldIds.poNumber).value}+${getInput(fieldIds.invoiceMemo).value || ''}`
       }
       const response = await fetch(this.processorUrl + '/payments', {
         method: 'POST',
@@ -87,6 +85,12 @@ export class PurchaseOrder extends BaseComponent {
           </label>
           <input class="${inputFieldStyles.inputField}" type="text" id="purchaseOrderForm-poNumber" name="poNumber" value="">
           <span class="${styles.hidden} ${inputFieldStyles.errorField}">Invalid purchase order number</span>
+        </div>
+        <div class="${inputFieldStyles.inputContainer}">
+          <label class="${inputFieldStyles.inputLabel}" for="purchaseOrderForm-invoiceMemo">
+            Invoice Memo <span aria-hidden="true"> (optional)</span>
+          </label>
+          <input class="${inputFieldStyles.inputField}" type="text" id="purchaseOrderForm-invoiceMemo" name="invoiceMemo" value="">
         </div>
         
         ${payButton}

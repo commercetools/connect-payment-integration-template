@@ -56,7 +56,7 @@ export class PurchaseOrder extends BaseComponent {
       const request: PaymentRequestSchemaDTO = {
         paymentMethod: this.paymentMethod,
         paymentOutcome: resultCode,
-        pspReference: `${uniqueness}+${getInput(fieldIds.poNumber).value}`
+        pspReference: `${uniqueness}+${getInput(fieldIds.poNumber).value}+${getInput(fieldIds.invoiceMemo).value || ''}`
       }
       const response = await fetch(this.processorUrl + '/payments', {
         method: 'POST',

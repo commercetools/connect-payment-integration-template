@@ -60,7 +60,7 @@ describe('mock-payment.service', () => {
     expect(result?.components).toHaveLength(3);
     expect(result?.components[0]?.type).toStrictEqual('card');
     expect(result?.components[1]?.type).toStrictEqual('invoice');
-    expect(result?.components[1]?.type).toStrictEqual('purchaseorder');
+    expect(result?.components[2]?.type).toStrictEqual('purchaseorder');
   });
 
   test('getStatus', async () => {
@@ -68,7 +68,7 @@ describe('mock-payment.service', () => {
       const result: HealthCheckResult = {
         name: 'CoCo Permissions',
         status: 'DOWN',
-        message: "CoCo Permissions are not available",
+        message: 'CoCo Permissions are not available',
         details: {},
       };
       return result;

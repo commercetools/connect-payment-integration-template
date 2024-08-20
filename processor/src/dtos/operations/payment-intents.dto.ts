@@ -31,7 +31,7 @@ export const ActionCancelPaymentSchema = Type.Composite([
 
 /**
  * Payment intent request schema.
- * 
+ *
  * Example:
  * {
  *  "actions": [

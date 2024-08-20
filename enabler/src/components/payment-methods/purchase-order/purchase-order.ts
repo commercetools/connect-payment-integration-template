@@ -10,6 +10,7 @@ import styles from '../../../style/style.module.scss';
 import {BaseComponent, BaseOptions} from '../../base';
 import {addFormFieldsEventListeners, fieldIds, getInput, validateAllFields} from './utils';
 import {PaymentOutcome, PaymentRequestSchemaDTO} from "../../../dtos/mock-payment.dto.ts";
+import { randomUUID } from 'crypto';
 
 export class PurchaseOrderBuilder implements PaymentComponentBuilder {
   public componentHasSubmit = true
@@ -51,10 +52,11 @@ export class PurchaseOrder extends BaseComponent {
     try {
       const resultCode = PaymentOutcome.AUTHORIZED;
 
+      const uniqueness = randomUUID().toString();
       const request: PaymentRequestSchemaDTO = {
         paymentMethod: this.paymentMethod,
         paymentOutcome: resultCode,
-        pspReference: getInput(fieldIds.poNumber).value
+        pspReference: `${uniqueness}+${getInput(fieldIds.poNumber).value}`
       }
       const response = await fetch(this.processorUrl + '/payments', {
         method: 'POST',

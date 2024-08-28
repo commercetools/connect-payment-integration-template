@@ -1,13 +1,16 @@
-async function postDeploy(properties: any) {
-  if (properties) {
-    // TODO: Implement postDeploy scripts if any
-  }
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+import { createLaunchpadPurchaseOrderNumberCustomType } from './actions';
+
+async function postDeploy(_properties: Map<string, unknown>) {
+  await createLaunchpadPurchaseOrderNumberCustomType();
 }
 
 async function runPostDeployScripts() {
   try {
     const properties = new Map(Object.entries(process.env));
-    await postDeploy(properties);
+    await await postDeploy(properties);
   } catch (error) {
     if (error instanceof Error) {
       process.stderr.write(`Post-deploy failed: ${error.message}\n`);

@@ -165,6 +165,8 @@ export enum PaymentMethod {
   klarna_pay_overtime = "klarna_account",
   /* PayPal */
   paypal = "paypal",
+  /* Purchase Order */
+  purchaseorder = "purchaseorder",
   /* TWINT */
   twint = "twint",
 }

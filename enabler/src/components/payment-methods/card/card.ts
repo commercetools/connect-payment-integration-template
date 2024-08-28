@@ -67,9 +67,11 @@ export class Card extends BaseComponent {
       const resultCode = isAuthorized ? PaymentOutcome.AUTHORIZED : PaymentOutcome.REJECTED;
 
       const request: PaymentRequestSchemaDTO = {
-        paymentMethod: this.paymentMethod,
-        paymentOutcome: resultCode
-      }
+        paymentMethod: {
+          type: this.paymentMethod,
+        },
+        paymentOutcome: resultCode,
+      };
       const response = await fetch(this.processorUrl + '/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Session-Id': this.sessionId },

@@ -13,7 +13,7 @@ import * as FastifyContext from '../src/libs/fastify/context/context';
 import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
 
 import { HealthCheckResult } from '@commercetools/connect-payments-sdk';
-import { PaymentOutcome } from '../src/dtos/mock-payment.dto';
+import { PaymentMethodType, PaymentOutcome } from '../src/dtos/mock-payment.dto';
 
 interface FlexibleConfig {
   [key: string]: string; // Adjust the type according to your config values
@@ -57,9 +57,10 @@ describe('mock-payment.service', () => {
 
   test('getSupportedPaymentComponents', async () => {
     const result: ConfigResponse = await paymentService.getSupportedPaymentComponents();
-    expect(result?.components).toHaveLength(2);
+    expect(result?.components).toHaveLength(3);
     expect(result?.components[0]?.type).toStrictEqual('card');
     expect(result?.components[1]?.type).toStrictEqual('invoice');
+    expect(result?.components[2]?.type).toStrictEqual('purchaseorder');
   });
 
   test('getStatus', async () => {
@@ -167,7 +168,9 @@ describe('mock-payment.service', () => {
   test('create card payment', async () => {
     const createPaymentOpts: CreatePaymentRequest = {
       data: {
-        paymentMethod: 'card',
+        paymentMethod: {
+          type: PaymentMethodType.CARD,
+        },
         paymentOutcome: PaymentOutcome.AUTHORIZED,
       },
     };
@@ -184,7 +187,9 @@ describe('mock-payment.service', () => {
   test('create invoice payment', async () => {
     const createPaymentOpts: CreatePaymentRequest = {
       data: {
-        paymentMethod: 'invoice',
+        paymentMethod: {
+          type: PaymentMethodType.INVOICE,
+        },
         paymentOutcome: PaymentOutcome.AUTHORIZED,
       },
     };
@@ -196,5 +201,45 @@ describe('mock-payment.service', () => {
 
     const result = await mockPaymentService.createPayment(createPaymentOpts);
     expect(result?.paymentReference).toStrictEqual('123456');
+  });
+
+  test('create purchaseorder payment successfully', async () => {
+    const createPaymentOpts: CreatePaymentRequest = {
+      data: {
+        paymentMethod: {
+          type: PaymentMethodType.PURCHASE_ORDER,
+          poNumber: '123456',
+          invoiceMemo: 'This is a test invoice',
+        },
+        paymentOutcome: PaymentOutcome.AUTHORIZED,
+      },
+    };
+    jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValue(Promise.resolve(mockGetCartResult()));
+    jest.spyOn(DefaultPaymentService.prototype, 'createPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
+    jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValue(Promise.resolve(mockGetCartResult()));
+    jest.spyOn(FastifyContext, 'getProcessorUrlFromContext').mockReturnValue('http://127.0.0.1');
+    jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
+
+    const result = await mockPaymentService.createPayment(createPaymentOpts);
+    expect(result?.paymentReference).toStrictEqual('123456');
+  });
+
+  test('create purchaseorder payment returns an error when PO number is not received', async () => {
+    const createPaymentOpts: CreatePaymentRequest = {
+      data: {
+        paymentMethod: {
+          type: PaymentMethodType.PURCHASE_ORDER,
+        },
+        paymentOutcome: PaymentOutcome.AUTHORIZED,
+      },
+    };
+    jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValue(Promise.resolve(mockGetCartResult()));
+    jest.spyOn(DefaultPaymentService.prototype, 'createPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
+    jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValue(Promise.resolve(mockGetCartResult()));
+    jest.spyOn(FastifyContext, 'getProcessorUrlFromContext').mockReturnValue('http://127.0.0.1');
+
+    const resultPromise = mockPaymentService.createPayment(createPaymentOpts);
+
+    await expect(resultPromise).rejects.toThrow('A value is required for field poNumber.');
   });
 });

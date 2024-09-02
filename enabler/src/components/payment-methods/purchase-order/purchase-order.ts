@@ -4,7 +4,7 @@ import {
   PaymentComponentBuilder,
   PaymentMethod,
 } from "../../../payment-enabler/payment-enabler";
-import { BaseComponent, BaseOptions } from "../../base";
+import { BaseComponent } from "../../base";
 import inputFieldStyles from "../../../style/inputField.module.scss";
 import styles from "../../../style/style.module.scss";
 import buttonStyles from "../../../style/button.module.scss";
@@ -12,6 +12,7 @@ import {
   PaymentOutcome,
   PaymentRequestSchemaDTO,
 } from "../../../dtos/mock-payment.dto";
+import { BaseOptions } from "../../../payment-enabler/payment-enabler-mock";
 
 export class PurchaseOrderBuilder implements PaymentComponentBuilder {
   public componentHasSubmit = true;

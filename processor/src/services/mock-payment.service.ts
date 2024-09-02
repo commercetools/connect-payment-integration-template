@@ -1,4 +1,8 @@
-import { statusHandler, healthCheckCommercetoolsPermissions } from '@commercetools/connect-payments-sdk';
+import {
+  statusHandler,
+  healthCheckCommercetoolsPermissions,
+  ErrorRequiredField,
+} from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
   CapturePaymentRequest,
@@ -16,9 +20,10 @@ import { AbstractPaymentService } from './abstract-payment.service';
 import { getConfig } from '../config/config';
 import { appLogger, paymentSDK } from '../payment-sdk';
 import { CreatePaymentRequest, MockPaymentServiceOptions } from './types/mock-payment.type';
-import { PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/mock-payment.dto';
+import { PaymentMethodType, PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/mock-payment.dto';
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from '../libs/fastify/context/context';
 import { randomUUID } from 'crypto';
+import { launchpadPurchaseOrderCustomType } from '../custom-types/custom-types';
 
 export class MockPaymentService extends AbstractPaymentService {
   constructor(opts: MockPaymentServiceOptions) {
@@ -112,10 +117,13 @@ export class MockPaymentService extends AbstractPaymentService {
     return {
       components: [
         {
-          type: 'card',
+          type: PaymentMethodType.CARD,
         },
         {
-          type: 'invoice',
+          type: PaymentMethodType.INVOICE,
+        },
+        {
+          type: PaymentMethodType.PURCHASE_ORDER,
         },
       ],
     };
@@ -170,6 +178,8 @@ export class MockPaymentService extends AbstractPaymentService {
    * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async createPayment(request: CreatePaymentRequest): Promise<PaymentResponseSchemaDTO> {
+    this.validatePaymentMethod(request);
+
     const ctCart = await this.ctCartService.getCart({
       id: getCartIdFromContext(),
     });
@@ -206,13 +216,22 @@ export class MockPaymentService extends AbstractPaymentService {
     const updatedPayment = await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       pspReference: pspReference,
-      paymentMethod: request.data.paymentMethod,
+      paymentMethod: request.data.paymentMethod.type,
       transaction: {
         type: 'Authorization',
         amount: ctPayment.amountPlanned,
         interactionId: pspReference,
         state: this.convertPaymentResultCode(request.data.paymentOutcome),
       },
+      ...(request.data.paymentMethod.type === PaymentMethodType.PURCHASE_ORDER && {
+        customFields: {
+          typeKey: launchpadPurchaseOrderCustomType.key,
+          fields: {
+            [launchpadPurchaseOrderCustomType.purchaseOrderNumber]: request.data.paymentMethod.poNumber,
+            [launchpadPurchaseOrderCustomType.invoiceMemo]: request.data.paymentMethod.invoiceMemo,
+          },
+        },
+      }),
     });
 
     return {
@@ -228,6 +247,14 @@ export class MockPaymentService extends AbstractPaymentService {
         return 'Failure';
       default:
         return 'Initial';
+    }
+  }
+
+  private validatePaymentMethod(request: CreatePaymentRequest): void {
+    const { paymentMethod } = request.data;
+
+    if (paymentMethod.type === PaymentMethodType.PURCHASE_ORDER && !paymentMethod.poNumber) {
+      throw new ErrorRequiredField('poNumber');
     }
   }
 }

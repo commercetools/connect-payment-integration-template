@@ -5,6 +5,12 @@ export enum PaymentOutcome {
   REJECTED = 'Rejected',
 }
 
+export enum PaymentMethodType {
+  CARD = 'card',
+  INVOICE = 'invoice',
+  PURCHASE_ORDER = 'purchaseorder',
+}
+
 export const PaymentResponseSchema = Type.Object({
   paymentReference: Type.String(),
 });
@@ -12,7 +18,11 @@ export const PaymentResponseSchema = Type.Object({
 export const PaymentOutcomeSchema = Type.Enum(PaymentOutcome);
 
 export const PaymentRequestSchema = Type.Object({
-  paymentMethod: Type.String(),
+  paymentMethod: Type.Object({
+    type: Type.Enum(PaymentMethodType),
+    poNumber: Type.Optional(Type.String()),
+    invoiceMemo: Type.Optional(Type.String()),
+  }),
   paymentOutcome: PaymentOutcomeSchema,
 });
 

@@ -40,6 +40,9 @@ export const validateAllFields = () => {
 const handleFieldValidation = (field: string) => {
   const input = getInput(field);
   input.addEventListener('input', () => {
+    input.value.length > 0
+      ? input.parentElement.classList.add(inputFieldStyles.containValue)
+      : input.parentElement.classList.remove(inputFieldStyles.containValue);
     hideErrorIfValid(field);
   });
   input.addEventListener('focusout', () => {

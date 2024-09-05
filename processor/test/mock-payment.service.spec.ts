@@ -61,6 +61,7 @@ describe('mock-payment.service', () => {
     expect(result?.components[0]?.type).toStrictEqual('card');
     expect(result?.components[1]?.type).toStrictEqual('invoice');
     expect(result?.components[2]?.type).toStrictEqual('purchaseorder');
+    expect(result?.dropins).toHaveLength(0);
   });
 
   test('getStatus', async () => {

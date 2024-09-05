@@ -7,9 +7,10 @@ import {
 import buttonStyles from '../../../style/button.module.scss';
 import inputFieldStyles from '../../../style/inputField.module.scss';
 import styles from '../../../style/style.module.scss';
-import {BaseComponent, BaseOptions} from '../../base';
+import { BaseComponent } from "../../base";
 import {addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validateAllFields} from './utils';
 import {PaymentOutcome, PaymentRequestSchemaDTO} from "../../../dtos/mock-payment.dto.ts";
+import { BaseOptions } from "../../../payment-enabler/payment-enabler-mock.ts";
 
 export class CardBuilder implements PaymentComponentBuilder {
   public componentHasSubmit = true

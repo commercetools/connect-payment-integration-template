@@ -128,6 +128,7 @@ export class PurchaseOrder extends BaseComponent {
 
   private addFormFieldsEventListeners = () => {
     this.handleFieldValidation(this.poNumberId);
+    this.handleFieldFocusOut(this.invoiceMemoId);
   };
 
   private getInput(field: string): HTMLInputElement {
@@ -172,13 +173,25 @@ export class PurchaseOrder extends BaseComponent {
   private handleFieldValidation(field: string) {
     const input = this.getInput(field);
     input.addEventListener("input", () => {
+      this.manageLabelClass(input);
       this.hideErrorIfValid(field);
     });
     input.addEventListener("focusout", () => {
       this.showErrorIfInvalid(field);
-      input.value.length > 0
-        ? input.parentElement.classList.add(inputFieldStyles.containValue)
-        : input.parentElement.classList.remove(inputFieldStyles.containValue);
+      this.manageLabelClass(input);
     });
   }
+
+  private handleFieldFocusOut(field: string) {
+    const input = this.getInput(field);
+    input.addEventListener("focusout", () => {
+      this.manageLabelClass(input);
+    });
+  }
+
+  private manageLabelClass = (input: HTMLInputElement) => {
+    input.value.length > 0
+      ? input.parentElement.classList.add(inputFieldStyles.containValue)
+      : input.parentElement.classList.remove(inputFieldStyles.containValue);
+  };
 }

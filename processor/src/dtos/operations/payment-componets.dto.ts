@@ -3,7 +3,6 @@ import { Static, Type } from '@sinclair/typebox';
 const DropinType = Type.Enum({
   EMBEDDED: 'embedded',
   HPP: 'hpp',
-  EXPRESS: 'express',
 });
 
 export const SupportedPaymentDropinsData = Type.Object({

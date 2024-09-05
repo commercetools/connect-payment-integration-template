@@ -231,10 +231,6 @@ export enum DropinType {
    * The hosted payment page (HPP) drop-in type which redirects the user to a hosted payment page.
    */
   hpp = "hpp",
-  /*
-   * The express drop-in type which is rendered within the page.
-   */
-  express = "express",
 }
 
 /**

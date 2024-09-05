@@ -94,7 +94,6 @@ export class MockPaymentEnabler implements PaymentEnabler {
     const supportedMethods = {
       embedded: DropinEmbeddedBuilder,
       // hpp: DropinHppBuilder,
-      // express: DropinExpressBuilder,
     };
 
     if (!Object.keys(supportedMethods).includes(type)) {

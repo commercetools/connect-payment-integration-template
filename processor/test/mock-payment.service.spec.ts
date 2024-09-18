@@ -70,7 +70,7 @@ describe('mock-payment.service', () => {
       const result: HealthCheckResult = {
         name: 'CoCo Permissions',
         status: 'DOWN',
-        message: "CoCo Permissions are not available",
+        message: 'CoCo Permissions are not available',
         details: {},
       };
       return result;

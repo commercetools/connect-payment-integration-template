@@ -25,6 +25,7 @@ function setupMockConfig(keysAndValues: Record<string, string>) {
     mockConfig[key] = keysAndValues[key];
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   jest.spyOn(Config, 'getConfig').mockReturnValue(mockConfig as any);
 }
 

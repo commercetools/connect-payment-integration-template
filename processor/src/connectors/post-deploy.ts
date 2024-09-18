@@ -3,6 +3,7 @@ dotenv.config();
 
 import { createLaunchpadPurchaseOrderNumberCustomType } from './actions';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function postDeploy(_properties: Map<string, unknown>) {
   await createLaunchpadPurchaseOrderNumberCustomType();
 }

@@ -2,7 +2,7 @@ import { Static, Type } from '@sinclair/typebox';
 
 /**
  * Status response schema.
- * 
+ *
  * Example:
  * {
  *    "status": "OK",
@@ -24,8 +24,8 @@ import { Static, Type } from '@sinclair/typebox';
  *        }
  *    ]
  *  }
- * 
- * 
+ *
+ *
  */
 export const StatusResponseSchema = Type.Object({
   status: Type.String(),

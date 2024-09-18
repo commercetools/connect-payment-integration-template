@@ -77,7 +77,7 @@ export class MockPaymentService extends AbstractPaymentService {
             return {
               name: 'Mock Payment API',
               status: 'UP',
-              message: "Mock api is working",
+              message: 'Mock api is working',
               details: {
                 paymentMethods,
               },
@@ -86,7 +86,7 @@ export class MockPaymentService extends AbstractPaymentService {
             return {
               name: 'Mock Payment API',
               status: 'DOWN',
-              message: "The mock paymentAPI is down for some reason. Please check the logs for more details.",
+              message: 'The mock paymentAPI is down for some reason. Please check the logs for more details.',
               details: {
                 // TODO do not expose the error
                 error: e,

@@ -1,9 +1,6 @@
 name: Bump Version and Create PR
 
 on:
-  push:
-    branches:
-      - ddeliziact/bump-workflow
   workflow_dispatch:
     inputs:
       BUMP_TYPE:
@@ -31,12 +28,10 @@ jobs:
       - name: Install modules
         run: |
           npm ci --prefix enabler
-          # npm version --prefix enabler ${{ inputs.BUMP_TYPE }}
-          npm version --prefix enabler patch
+          npm version --prefix enabler ${{ inputs.BUMP_TYPE }}
 
           npm ci --prefix processor
-          # npm version --prefix processor ${{ inputs.BUMP_TYPE }}
-          npm version --prefix processor patch
+          npm version --prefix processor ${{ inputs.BUMP_TYPE }}
 
       - name: Commit changes
         run: |

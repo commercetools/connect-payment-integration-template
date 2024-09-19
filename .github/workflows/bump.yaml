@@ -8,9 +8,9 @@ on:
         required: true
         type: choice
         options:
-          - development
-          - staging
-          - production
+          - path
+          - minor
+          - major
 
 jobs:
   bump-version:

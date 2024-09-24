@@ -67,6 +67,7 @@ export class MockPaymentService extends AbstractPaymentService {
             'manage_orders',
             'introspect_oauth_tokens',
             'manage_checkout_payment_intents',
+            'manage_types',
           ],
           ctAuthorizationService: paymentSDK.ctAuthorizationService,
           projectKey: getConfig().projectKey,

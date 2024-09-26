@@ -74,7 +74,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
     },
   );
 
-  fastify.post<{ Body: PaymentIntentRequestSchemaDTO; Reply: PaymentIntentResponseSchemaDTO; Params: { $id: string } }>(
+  fastify.post<{ Body: PaymentIntentRequestSchemaDTO; Reply: PaymentIntentResponseSchemaDTO; Params: { id: string } }>(
     '/payment-intents/:id',
     {
       preHandler: [
@@ -97,9 +97,9 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
       },
     },
     async (request, reply) => {
-      const { $id } = request.params;
+      const { id } = request.params;
       const resp = await opts.paymentService.modifyPayment({
-        paymentId: $id,
+        paymentId: id,
         data: request.body,
       });
 

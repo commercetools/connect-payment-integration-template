@@ -4,6 +4,8 @@ import {
   ErrorInvalidJsonInput,
   ErrorInvalidOperation,
   Payment,
+  TransactionState,
+  TransactionType,
 } from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
@@ -21,6 +23,7 @@ import {
 } from '../dtos/operations/payment-intents.dto';
 
 import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
+import { TransactionDraftSchemaDTO } from '../dtos/operations/transaction.dto';
 
 export abstract class AbstractPaymentService {
   protected ctCartService: CommercetoolsCartService;
@@ -139,6 +142,56 @@ export abstract class AbstractPaymentService {
 
     return {
       outcome: res.outcome,
+    };
+  }
+
+  public async handleTransaction(
+    transactionDraft: TransactionDraftSchemaDTO,
+  ): Promise<{ payment: Payment; isSuccess: boolean }> {
+    const TRANSACTION_AUTHORIZATION_TYPE: TransactionType = 'Authorization';
+    const TRANSACTION_STATE_SUCCESS: TransactionState = 'Success';
+    const TRANSACTION_STATE_FAILURE: TransactionState = 'Failure';
+
+    const maxCentAmountIfSuccess = 10000;
+
+    const ctCart = await this.ctCartService.getCart({ id: transactionDraft.cartId });
+
+    let amountPlanned = transactionDraft.amount;
+    if (!amountPlanned) {
+      amountPlanned = await this.ctCartService.getPaymentAmount({ cart: ctCart });
+    }
+
+    const isBelowSuccessStateThreshold = amountPlanned.centAmount < maxCentAmountIfSuccess;
+
+    const transactionState: TransactionState = isBelowSuccessStateThreshold
+      ? TRANSACTION_STATE_SUCCESS
+      : TRANSACTION_STATE_FAILURE;
+
+    const newlyCreatedPayment = await this.ctPaymentService.createPayment({
+      amountPlanned,
+      paymentMethodInfo: {
+        paymentInterface: transactionDraft.paymentInterface,
+      },
+      transactions: [
+        {
+          amount: amountPlanned,
+          type: TRANSACTION_AUTHORIZATION_TYPE,
+          state: transactionState,
+        },
+      ],
+    });
+
+    await this.ctCartService.addPayment({
+      resource: {
+        id: ctCart.id,
+        version: ctCart.version,
+      },
+      paymentId: newlyCreatedPayment.id,
+    });
+
+    return {
+      payment: newlyCreatedPayment,
+      isSuccess: isBelowSuccessStateThreshold,
     };
   }
 

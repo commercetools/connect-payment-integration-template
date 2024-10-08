@@ -16,6 +16,12 @@ import {
 } from '../dtos/operations/payment-intents.dto';
 import { StatusResponseSchema, StatusResponseSchemaDTO } from '../dtos/operations/status.dto';
 import { AbstractPaymentService } from '../services/abstract-payment.service';
+import {
+  TransactionDraft,
+  TransactionDraftSchemaDTO,
+  TransactionResponse,
+  TransactionResponseSchemaDTO,
+} from '../dtos/operations/transaction.dto';
 
 type OperationRouteOptions = {
   sessionHeaderAuthHook: SessionHeaderAuthenticationHook;
@@ -36,7 +42,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
         },
       },
     },
-    async (request, reply) => {
+    async (_, reply) => {
       const config = await opts.paymentService.config();
       reply.code(200).send(config);
     },
@@ -52,7 +58,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
         },
       },
     },
-    async (request, reply) => {
+    async (_, reply) => {
       const status = await opts.paymentService.status();
       reply.code(200).send(status);
     },
@@ -68,7 +74,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
         },
       },
     },
-    async (request, reply) => {
+    async (_, reply) => {
       const result = await opts.paymentService.getSupportedPaymentComponents();
       reply.code(200).send(result);
     },
@@ -104,6 +110,48 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
       });
 
       return reply.status(200).send(resp);
+    },
+  );
+
+  // Create transaction
+  fastify.post<{ Body: TransactionDraftSchemaDTO; Reply: TransactionResponseSchemaDTO }>(
+    '/transactions',
+    {
+      preHandler: [
+        opts.oauth2AuthHook.authenticate(),
+        opts.authorizationHook.authorize('manage_project', 'manage_checkout_transactions'),
+      ],
+      schema: {
+        body: TransactionDraft,
+        response: {
+          200: TransactionResponse,
+        },
+      },
+    },
+    async (request, reply) => {
+      const result = await opts.paymentService.handleTransaction(request.body);
+
+      // TODO: SCC-2580: find a nicer solution to the isSuccess flows
+      if (result.isSuccess) {
+        return reply.status(201).send({
+          transactionStatus: {
+            errors: [],
+            state: 'Pending',
+          },
+        });
+      } else {
+        return reply.status(201).send({
+          transactionStatus: {
+            errors: [
+              {
+                code: 'PaymentRejected',
+                message: `Payment '${result.payment.id}' has been rejected.`,
+              },
+            ],
+            state: 'Failed',
+          },
+        });
+      }
     },
   );
 };

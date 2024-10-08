@@ -244,4 +244,6 @@ describe('mock-payment.service', () => {
 
     await expect(resultPromise).rejects.toThrow('A value is required for field poNumber.');
   });
+
+  // TODO: SCC-2580: write tests for the handleTransactions payment-service function
 });

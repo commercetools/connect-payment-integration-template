@@ -23,7 +23,7 @@ import {
 } from '../dtos/operations/payment-intents.dto';
 
 import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
-import { TransactionDraftSchemaDTO } from '../dtos/operations/transaction.dto';
+import { TransactionDraftSchemaDTO, TransactionResponseSchemaDTO } from '../dtos/operations/transaction.dto';
 
 export abstract class AbstractPaymentService {
   protected ctCartService: CommercetoolsCartService;
@@ -145,9 +145,16 @@ export abstract class AbstractPaymentService {
     };
   }
 
-  public async handleTransaction(
-    transactionDraft: TransactionDraftSchemaDTO,
-  ): Promise<{ payment: Payment; isSuccess: boolean }> {
+  /**
+   * Handle the payment transaction request. It will create a new Payment in CoCo and associate it with the provided cartId. If no amount is given it will use the full cart amount.
+   *
+   * @remarks
+   * Abstract method to handle payment transaction requests. The actual invocation to PSPs should be implemented in subclasses
+   *
+   * @param transactionDraft the incoming request payload
+   * @returns Promise with the created Payment and whether or not it was a success or not
+   */
+  public async handleTransaction(transactionDraft: TransactionDraftSchemaDTO): Promise<TransactionResponseSchemaDTO> {
     const TRANSACTION_AUTHORIZATION_TYPE: TransactionType = 'Authorization';
     const TRANSACTION_STATE_SUCCESS: TransactionState = 'Success';
     const TRANSACTION_STATE_FAILURE: TransactionState = 'Failure';
@@ -189,10 +196,26 @@ export abstract class AbstractPaymentService {
       paymentId: newlyCreatedPayment.id,
     });
 
-    return {
-      payment: newlyCreatedPayment,
-      isSuccess: isBelowSuccessStateThreshold,
-    };
+    if (isBelowSuccessStateThreshold) {
+      return {
+        transactionStatus: {
+          errors: [],
+          state: 'Pending',
+        },
+      };
+    } else {
+      return {
+        transactionStatus: {
+          errors: [
+            {
+              code: 'PaymentRejected',
+              message: `Payment '${newlyCreatedPayment.id}' has been rejected.`,
+            },
+          ],
+          state: 'Failed',
+        },
+      };
+    }
   }
 
   protected convertPaymentModificationOutcomeToState(

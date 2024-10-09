@@ -130,28 +130,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
     },
     async (request, reply) => {
       const result = await opts.paymentService.handleTransaction(request.body);
-
-      // TODO: SCC-2580: find a nicer solution to the isSuccess flows
-      if (result.isSuccess) {
-        return reply.status(201).send({
-          transactionStatus: {
-            errors: [],
-            state: 'Pending',
-          },
-        });
-      } else {
-        return reply.status(201).send({
-          transactionStatus: {
-            errors: [
-              {
-                code: 'PaymentRejected',
-                message: `Payment '${result.payment.id}' has been rejected.`,
-              },
-            ],
-            state: 'Failed',
-          },
-        });
-      }
+      return reply.status(201).send(result);
     },
   );
 };

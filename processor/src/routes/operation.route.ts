@@ -124,7 +124,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
       schema: {
         body: TransactionDraft,
         response: {
-          200: TransactionResponse,
+          201: TransactionResponse,
         },
       },
     },

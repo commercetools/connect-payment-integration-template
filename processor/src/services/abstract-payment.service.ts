@@ -4,8 +4,6 @@ import {
   ErrorInvalidJsonInput,
   ErrorInvalidOperation,
   Payment,
-  TransactionState,
-  TransactionType,
 } from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
@@ -98,6 +96,17 @@ export abstract class AbstractPaymentService {
   abstract refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse>;
 
   /**
+   * Handle the payment transaction request. It will create a new Payment in CoCo and associate it with the provided cartId. If no amount is given it will use the full cart amount.
+   *
+   * @remarks
+   * Abstract method to handle payment transaction requests. The actual invocation to PSPs should be implemented in subclasses
+   *
+   * @param transactionDraft the incoming request payload
+   * @returns Promise with the created Payment and whether or not it was a success or not
+   */
+  abstract handleTransaction(transactionDraft: TransactionDraftSchemaDTO): Promise<TransactionResponseSchemaDTO>;
+
+  /**
    * Modify payment
    *
    * @remarks
@@ -143,79 +152,6 @@ export abstract class AbstractPaymentService {
     return {
       outcome: res.outcome,
     };
-  }
-
-  /**
-   * Handle the payment transaction request. It will create a new Payment in CoCo and associate it with the provided cartId. If no amount is given it will use the full cart amount.
-   *
-   * @remarks
-   * Abstract method to handle payment transaction requests. The actual invocation to PSPs should be implemented in subclasses
-   *
-   * @param transactionDraft the incoming request payload
-   * @returns Promise with the created Payment and whether or not it was a success or not
-   */
-  public async handleTransaction(transactionDraft: TransactionDraftSchemaDTO): Promise<TransactionResponseSchemaDTO> {
-    const TRANSACTION_AUTHORIZATION_TYPE: TransactionType = 'Authorization';
-    const TRANSACTION_STATE_SUCCESS: TransactionState = 'Success';
-    const TRANSACTION_STATE_FAILURE: TransactionState = 'Failure';
-
-    const maxCentAmountIfSuccess = 10000;
-
-    const ctCart = await this.ctCartService.getCart({ id: transactionDraft.cartId });
-
-    let amountPlanned = transactionDraft.amount;
-    if (!amountPlanned) {
-      amountPlanned = await this.ctCartService.getPaymentAmount({ cart: ctCart });
-    }
-
-    const isBelowSuccessStateThreshold = amountPlanned.centAmount < maxCentAmountIfSuccess;
-
-    const transactionState: TransactionState = isBelowSuccessStateThreshold
-      ? TRANSACTION_STATE_SUCCESS
-      : TRANSACTION_STATE_FAILURE;
-
-    const newlyCreatedPayment = await this.ctPaymentService.createPayment({
-      amountPlanned,
-      paymentMethodInfo: {
-        paymentInterface: transactionDraft.paymentInterface,
-      },
-      transactions: [
-        {
-          amount: amountPlanned,
-          type: TRANSACTION_AUTHORIZATION_TYPE,
-          state: transactionState,
-        },
-      ],
-    });
-
-    await this.ctCartService.addPayment({
-      resource: {
-        id: ctCart.id,
-        version: ctCart.version,
-      },
-      paymentId: newlyCreatedPayment.id,
-    });
-
-    if (isBelowSuccessStateThreshold) {
-      return {
-        transactionStatus: {
-          errors: [],
-          state: 'Pending',
-        },
-      };
-    } else {
-      return {
-        transactionStatus: {
-          errors: [
-            {
-              code: 'PaymentRejected',
-              message: `Payment '${newlyCreatedPayment.id}' has been rejected.`,
-            },
-          ],
-          state: 'Failed',
-        },
-      };
-    }
   }
 
   protected convertPaymentModificationOutcomeToState(

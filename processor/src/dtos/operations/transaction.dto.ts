@@ -19,7 +19,7 @@ const TransactionStateFailed = Type.Literal('Failed', {
   description: "Any error that occured for which the system can't recover automatically from.",
 });
 
-const TransactionStateComplete = Type.Literal('Complete', {
+const TransactionStateComplete = Type.Literal('Completed', {
   description: 'If there is a successful authorization/capture on the payment-transaction.',
 });
 

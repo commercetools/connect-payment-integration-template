@@ -18,9 +18,9 @@ import { StatusResponseSchema, StatusResponseSchemaDTO } from '../dtos/operation
 import { AbstractPaymentService } from '../services/abstract-payment.service';
 import {
   TransactionDraft,
-  TransactionDraftSchemaDTO,
+  TransactionDraftDTO,
   TransactionResponse,
-  TransactionResponseSchemaDTO,
+  TransactionResponseDTO,
 } from '../dtos/operations/transaction.dto';
 
 type OperationRouteOptions = {
@@ -114,7 +114,7 @@ export const operationsRoute = async (fastify: FastifyInstance, opts: FastifyPlu
   );
 
   // Create transaction
-  fastify.post<{ Body: TransactionDraftSchemaDTO; Reply: TransactionResponseSchemaDTO }>(
+  fastify.post<{ Body: TransactionDraftDTO; Reply: TransactionResponseDTO }>(
     '/transactions',
     {
       preHandler: [

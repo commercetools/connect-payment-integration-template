@@ -26,7 +26,7 @@ import { PaymentMethodType, PaymentOutcome, PaymentResponseSchemaDTO } from '../
 import { getCartIdFromContext, getPaymentInterfaceFromContext } from '../libs/fastify/context/context';
 import { randomUUID } from 'crypto';
 import { launchpadPurchaseOrderCustomType } from '../custom-types/custom-types';
-import { TransactionDraftSchemaDTO, TransactionResponseSchemaDTO } from '../dtos/operations/transaction.dto';
+import { TransactionDraftDTO, TransactionResponseDTO } from '../dtos/operations/transaction.dto';
 
 export class MockPaymentService extends AbstractPaymentService {
   constructor(opts: MockPaymentServiceOptions) {
@@ -244,7 +244,7 @@ export class MockPaymentService extends AbstractPaymentService {
     };
   }
 
-  public async handleTransaction(transactionDraft: TransactionDraftSchemaDTO): Promise<TransactionResponseSchemaDTO> {
+  public async handleTransaction(transactionDraft: TransactionDraftDTO): Promise<TransactionResponseDTO> {
     const TRANSACTION_AUTHORIZATION_TYPE: TransactionType = 'Authorization';
     const TRANSACTION_STATE_SUCCESS: TransactionState = 'Success';
     const TRANSACTION_STATE_FAILURE: TransactionState = 'Failure';

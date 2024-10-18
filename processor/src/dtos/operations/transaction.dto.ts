@@ -41,5 +41,5 @@ export const TransactionResponse = Type.Object({
   }),
 });
 
-export type TransactionDraftSchemaDTO = Static<typeof TransactionDraft>;
-export type TransactionResponseSchemaDTO = Static<typeof TransactionResponse>;
+export type TransactionDraftDTO = Static<typeof TransactionDraft>;
+export type TransactionResponseDTO = Static<typeof TransactionResponse>;

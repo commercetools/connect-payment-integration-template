@@ -21,7 +21,7 @@ import {
 } from '../dtos/operations/payment-intents.dto';
 
 import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
-import { TransactionDraftSchemaDTO, TransactionResponseSchemaDTO } from '../dtos/operations/transaction.dto';
+import { TransactionDraftDTO, TransactionResponseDTO } from '../dtos/operations/transaction.dto';
 
 export abstract class AbstractPaymentService {
   protected ctCartService: CommercetoolsCartService;
@@ -104,7 +104,7 @@ export abstract class AbstractPaymentService {
    * @param transactionDraft the incoming request payload
    * @returns Promise with the created Payment and whether or not it was a success or not
    */
-  abstract handleTransaction(transactionDraft: TransactionDraftSchemaDTO): Promise<TransactionResponseSchemaDTO>;
+  abstract handleTransaction(transactionDraft: TransactionDraftDTO): Promise<TransactionResponseDTO>;
 
   /**
    * Modify payment

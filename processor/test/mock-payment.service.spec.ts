@@ -14,6 +14,7 @@ import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/han
 
 import { HealthCheckResult } from '@commercetools/connect-payments-sdk';
 import { PaymentMethodType, PaymentOutcome } from '../src/dtos/mock-payment.dto';
+import { TransactionDraftDTO } from '../src/dtos/operations/transaction.dto';
 
 interface FlexibleConfig {
   [key: string]: string; // Adjust the type according to your config values
@@ -243,5 +244,63 @@ describe('mock-payment.service', () => {
     const resultPromise = mockPaymentService.createPayment(createPaymentOpts);
 
     await expect(resultPromise).rejects.toThrow('A value is required for field poNumber.');
+  });
+
+  describe('handleTransaction', () => {
+    test('should create the payment in CoCo and return it with a success state', async () => {
+      const createPaymentOpts: TransactionDraftDTO = {
+        cartId: 'dd4b7669-698c-4175-8e4c-bed178abfed3',
+        paymentInterface: '42251cfc-0660-4ab3-80f6-c32829aa7a8b',
+        amount: {
+          centAmount: 1000,
+          currencyCode: 'EUR',
+        },
+      };
+
+      jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
+      jest
+        .spyOn(DefaultPaymentService.prototype, 'createPayment')
+        .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
+      jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
+
+      const resultPromise = mockPaymentService.handleTransaction(createPaymentOpts);
+      expect(resultPromise).resolves.toStrictEqual({
+        transactionStatus: {
+          errors: [],
+          state: 'Pending',
+        },
+      });
+    });
+
+    test('should create the payment in CoCo and return it with a failed state', async () => {
+      const createPaymentOpts: TransactionDraftDTO = {
+        cartId: 'dd4b7669-698c-4175-8e4c-bed178abfed3',
+        paymentInterface: '42251cfc-0660-4ab3-80f6-c32829aa7a8b',
+        amount: {
+          centAmount: 10000,
+          currencyCode: 'EUR',
+        },
+      };
+
+      jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
+      jest
+        .spyOn(DefaultPaymentService.prototype, 'createPayment')
+        .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
+      jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
+
+      const resultPromise = mockPaymentService.handleTransaction(createPaymentOpts);
+
+      expect(resultPromise).resolves.toStrictEqual({
+        transactionStatus: {
+          errors: [
+            {
+              code: 'PaymentRejected',
+              message: `Payment '${mockGetPaymentResult.id}' has been rejected.`,
+            },
+          ],
+          state: 'Failed',
+        },
+      });
+    });
   });
 });

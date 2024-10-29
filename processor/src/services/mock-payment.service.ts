@@ -279,12 +279,16 @@ export class MockPaymentService extends AbstractPaymentService {
       ? TRANSACTION_STATE_SUCCESS
       : TRANSACTION_STATE_FAILURE;
 
+    const pspReference = randomUUID().toString();
+
     await this.ctPaymentService.updatePayment({
       id: newlyCreatedPayment.id,
+      pspReference: pspReference,
       transaction: {
         amount: amountPlanned,
         type: TRANSACTION_AUTHORIZATION_TYPE,
         state: transactionState,
+        interactionId: pspReference,
       },
     });
 

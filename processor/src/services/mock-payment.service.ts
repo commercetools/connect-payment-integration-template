@@ -260,7 +260,7 @@ export class MockPaymentService extends AbstractPaymentService {
 
     const isBelowSuccessStateThreshold = amountPlanned.centAmount < maxCentAmountIfSuccess;
 
-    const newCtPayment = await this.ctPaymentService.createPayment({
+    const newlyCreatedPayment = await this.ctPaymentService.createPayment({
       amountPlanned,
       paymentMethodInfo: {
         paymentInterface: transactionDraft.paymentInterface,
@@ -272,7 +272,7 @@ export class MockPaymentService extends AbstractPaymentService {
         id: ctCart.id,
         version: ctCart.version,
       },
-      paymentId: newCtPayment.id,
+      paymentId: newlyCreatedPayment.id,
     });
 
     const transactionState: TransactionState = isBelowSuccessStateThreshold
@@ -280,7 +280,7 @@ export class MockPaymentService extends AbstractPaymentService {
       : TRANSACTION_STATE_FAILURE;
 
     await this.ctPaymentService.updatePayment({
-      id: newCtPayment.id,
+      id: newlyCreatedPayment.id,
       transaction: {
         amount: amountPlanned,
         type: TRANSACTION_AUTHORIZATION_TYPE,
@@ -301,7 +301,7 @@ export class MockPaymentService extends AbstractPaymentService {
           errors: [
             {
               code: 'PaymentRejected',
-              message: `Payment '${newCtPayment.id}' has been rejected.`,
+              message: `Payment '${newlyCreatedPayment.id}' has been rejected.`,
             },
           ],
           state: 'Failed',

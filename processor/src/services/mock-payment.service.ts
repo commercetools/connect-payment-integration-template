@@ -265,16 +265,6 @@ export class MockPaymentService extends AbstractPaymentService {
       paymentMethodInfo: {
         paymentInterface: transactionDraft.paymentInterface,
       },
-      ...(ctCart.customerId && {
-        customer: {
-          typeId: 'customer',
-          id: ctCart.customerId,
-        },
-      }),
-      ...(!ctCart.customerId &&
-        ctCart.anonymousId && {
-          anonymousId: ctCart.anonymousId,
-        }),
     });
 
     await this.ctCartService.addPayment({

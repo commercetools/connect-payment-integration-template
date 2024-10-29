@@ -260,22 +260,21 @@ export class MockPaymentService extends AbstractPaymentService {
 
     const isBelowSuccessStateThreshold = amountPlanned.centAmount < maxCentAmountIfSuccess;
 
-    const transactionState: TransactionState = isBelowSuccessStateThreshold
-      ? TRANSACTION_STATE_SUCCESS
-      : TRANSACTION_STATE_FAILURE;
-
-    const newlyCreatedPayment = await this.ctPaymentService.createPayment({
+    const newCtPayment = await this.ctPaymentService.createPayment({
       amountPlanned,
       paymentMethodInfo: {
         paymentInterface: transactionDraft.paymentInterface,
       },
-      transactions: [
-        {
-          amount: amountPlanned,
-          type: TRANSACTION_AUTHORIZATION_TYPE,
-          state: transactionState,
+      ...(ctCart.customerId && {
+        customer: {
+          typeId: 'customer',
+          id: ctCart.customerId,
         },
-      ],
+      }),
+      ...(!ctCart.customerId &&
+        ctCart.anonymousId && {
+          anonymousId: ctCart.anonymousId,
+        }),
     });
 
     await this.ctCartService.addPayment({
@@ -283,7 +282,20 @@ export class MockPaymentService extends AbstractPaymentService {
         id: ctCart.id,
         version: ctCart.version,
       },
-      paymentId: newlyCreatedPayment.id,
+      paymentId: newCtPayment.id,
+    });
+
+    const transactionState: TransactionState = isBelowSuccessStateThreshold
+      ? TRANSACTION_STATE_SUCCESS
+      : TRANSACTION_STATE_FAILURE;
+
+    await this.ctPaymentService.updatePayment({
+      id: newCtPayment.id,
+      transaction: {
+        amount: amountPlanned,
+        type: TRANSACTION_AUTHORIZATION_TYPE,
+        state: transactionState,
+      },
     });
 
     if (isBelowSuccessStateThreshold) {
@@ -299,7 +311,7 @@ export class MockPaymentService extends AbstractPaymentService {
           errors: [
             {
               code: 'PaymentRejected',
-              message: `Payment '${newlyCreatedPayment.id}' has been rejected.`,
+              message: `Payment '${newCtPayment.id}' has been rejected.`,
             },
           ],
           state: 'Failed',

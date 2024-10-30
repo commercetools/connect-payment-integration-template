@@ -260,22 +260,11 @@ export class MockPaymentService extends AbstractPaymentService {
 
     const isBelowSuccessStateThreshold = amountPlanned.centAmount < maxCentAmountIfSuccess;
 
-    const transactionState: TransactionState = isBelowSuccessStateThreshold
-      ? TRANSACTION_STATE_SUCCESS
-      : TRANSACTION_STATE_FAILURE;
-
     const newlyCreatedPayment = await this.ctPaymentService.createPayment({
       amountPlanned,
       paymentMethodInfo: {
         paymentInterface: transactionDraft.paymentInterface,
       },
-      transactions: [
-        {
-          amount: amountPlanned,
-          type: TRANSACTION_AUTHORIZATION_TYPE,
-          state: transactionState,
-        },
-      ],
     });
 
     await this.ctCartService.addPayment({
@@ -284,6 +273,23 @@ export class MockPaymentService extends AbstractPaymentService {
         version: ctCart.version,
       },
       paymentId: newlyCreatedPayment.id,
+    });
+
+    const transactionState: TransactionState = isBelowSuccessStateThreshold
+      ? TRANSACTION_STATE_SUCCESS
+      : TRANSACTION_STATE_FAILURE;
+
+    const pspReference = randomUUID().toString();
+
+    await this.ctPaymentService.updatePayment({
+      id: newlyCreatedPayment.id,
+      pspReference: pspReference,
+      transaction: {
+        amount: amountPlanned,
+        type: TRANSACTION_AUTHORIZATION_TYPE,
+        state: transactionState,
+        interactionId: pspReference,
+      },
     });
 
     if (isBelowSuccessStateThreshold) {

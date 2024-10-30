@@ -262,6 +262,9 @@ describe('mock-payment.service', () => {
         .spyOn(DefaultPaymentService.prototype, 'createPayment')
         .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
       jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
+      jest
+        .spyOn(DefaultPaymentService.prototype, 'updatePayment')
+        .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
 
       const resultPromise = mockPaymentService.handleTransaction(createPaymentOpts);
       expect(resultPromise).resolves.toStrictEqual({
@@ -287,6 +290,9 @@ describe('mock-payment.service', () => {
         .spyOn(DefaultPaymentService.prototype, 'createPayment')
         .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
       jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
+      jest
+        .spyOn(DefaultPaymentService.prototype, 'updatePayment')
+        .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
 
       const resultPromise = mockPaymentService.handleTransaction(createPaymentOpts);
 

@@ -30,24 +30,7 @@ jobs:
           CKO_CLIENT_SECRET: ${{ secrets.CKO_CLIENT_SECRET }}
           CKO_CONNECTOR_KEY: ${{ secrets.CKO_CONNECTOR_KEY }}
         run: |
-          echo Updating connector to tag $GITHUB_REF_NAME
+          npm install -g @commercetools/cli
+          commercetools auth login --client-credentials --client-id $CKO_CLIENT_ID --client-secret $CKO_CLIENT_SECRET --region europe-west1.gcp
+          commercetools connect connectorstaged update --key $CKO_CONNECTOR_KEY --repository-tag $GITHUB_REF_NAME
           
-          echo Authenticating with commercetools
-
-          OAUTH_RESPONSE=$(curl --silent --show-error --location --request POST 'https://auth.europe-west1.gcp.commercetools.com/oauth/token?grant_type=client_credentials' -u $CKO_CLIENT_ID:$CKO_CLIENT_SECRET)
-          
-          ACCESS_TOKEN=$(echo $OAUTH_RESPONSE | jq -r '.access_token')
-          echo Access token retrieved
-          
-          CONNECTOR_DETAILS=$(curl --silent --show-error --location "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CKO_CONNECTOR_KEY" \
-              --header 'Content-Type: application/json' \
-              --header "Authorization: Bearer $ACCESS_TOKEN")
-          
-          VERSION=$(echo $CONNECTOR_DETAILS | jq -r '.version')
-
-          echo Updating version $VERSION
-          
-          curl --fail-with-body --silent --location POST "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CKO_CONNECTOR_KEY" \
-              --header 'Content-Type: application/json' \
-              --header "Authorization: Bearer $ACCESS_TOKEN" \
-              --data-raw "{\"version\": $VERSION, \"actions\": [{\"action\": \"setRepository\",\"url\": \"git@github.com:commercetools/connect-payment-integration-template.git\",\"tag\": \"$GITHUB_REF_NAME\"},{\"action\": \"updatePreviewable\"}]}"

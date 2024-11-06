@@ -1,0 +1,29 @@
+name: Request certification
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Publish for commercetools Checkout 
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install
+        env:
+          PUBLIC_CONNECTOR_CLIENT_ID: ${{ secrets.PUBLIC_CONNECTOR_CLIENT_ID }}
+          PUBLIC_CONNECTOR_CLIENT_SECRET: ${{ secrets.PUBLIC_CONNECTOR_CLIENT_SECRET }}
+          PUBLIC_CONNECTOR_PROJECT_KEY: ${{ secrets.PUBLIC_CONNECTOR_PROJECT_KEY }}
+          PUBLIC_CONNECTOR_CONNECTOR_KEY: ${{ secrets.PUBLIC_CONNECTOR_CONNECTOR_KEY }}
+        run: |
+          npm install -g @commercetools/cli
+          commercetools auth login --client-credentials --client-id $PUBLIC_CONNECTOR_CLIENT_ID --client-secret $PUBLIC_CONNECTOR_CLIENT_SECRET --region europe-west1.gcp --project-key $PUBLIC_CONNECTOR_PROJECT_KEY
+          commercetools connect connectorstaged certify --id $PUBLIC_CONNECTOR_CONNECTOR_KEY
+          

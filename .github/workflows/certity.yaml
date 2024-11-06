@@ -1,6 +1,12 @@
 name: Request certification
 
 on:
+  push:
+    tags:
+      # Release tags v1.0.0, v1.0.1, v1.0.2, etc.
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      # Pre-release tags v1.0.0-alpha.0, v1.0.0-beta.0, etc.
+      - 'v[0-9]+.[0-9]+.[0-9]+-[a-z]+.[0-9]+'
   workflow_dispatch:
 
 jobs:
@@ -25,5 +31,6 @@ jobs:
         run: |
           npm install -g @commercetools/cli
           commercetools auth login --client-credentials --client-id $PUBLIC_CONNECTOR_CLIENT_ID --client-secret $PUBLIC_CONNECTOR_CLIENT_SECRET --region europe-west1.gcp --project-key $PUBLIC_CONNECTOR_PROJECT_KEY
-          commercetools connect connectorstaged certify --id $PUBLIC_CONNECTOR_CONNECTOR_KEY
+          commercetools connect connectorstaged update --key $PUBLIC_CONNECTOR_CONNECTOR_KEY --repository-tag $GITHUB_REF_NAME
+          commercetools connect connectorstaged certify --key $PUBLIC_CONNECTOR_CONNECTOR_KEY
           

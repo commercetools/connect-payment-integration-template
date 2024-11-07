@@ -9,6 +9,7 @@ export const TransactionDraft = Type.Object({
       currencyCode: Type.String(),
     }),
   ),
+  futureOrderNumber: Type.Optional(Type.String()),
 });
 
 const TransactionStatePending = Type.Literal('Pending', {

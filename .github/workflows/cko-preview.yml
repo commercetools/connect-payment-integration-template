@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install
+      - name: Make previewable
         env:
           CLIENT_ID: ${{ secrets.CKO_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CKO_CLIENT_SECRET }}

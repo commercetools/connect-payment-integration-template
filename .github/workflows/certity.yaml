@@ -11,19 +11,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  publish:
+  certify:
     name: Certify connector
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repo
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v3
         with:
-          node-version: 20
+          node-version: '20.x'
 
-      - name: Install
+      - name: Certify
         env:
           CLIENT_ID: ${{ secrets.PUBLIC_CONNECTOR_CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.PUBLIC_CONNECTOR_CLIENT_SECRET }}

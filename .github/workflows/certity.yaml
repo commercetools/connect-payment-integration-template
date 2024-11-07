@@ -30,7 +30,7 @@ jobs:
           CONNECTOR_KEY: ${{ secrets.PUBLIC_CONNECTOR_CONNECTOR_KEY }}
         run: |
           npm install -g @commercetools/cli
-          commercetools auth login
+          commercetools auth login --client-credentials --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --region europe-west1.gcp
           commercetools connect connectorstaged update --key $CONNECTOR_KEY --repository-tag $GITHUB_REF_NAME
           commercetools connect connectorstaged certify --key $CONNECTOR_KEY
           

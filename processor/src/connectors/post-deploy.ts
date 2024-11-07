@@ -11,7 +11,7 @@ async function postDeploy(_properties: Map<string, unknown>) {
 async function runPostDeployScripts() {
   try {
     const properties = new Map(Object.entries(process.env));
-    await await postDeploy(properties);
+    await postDeploy(properties);
   } catch (error) {
     if (error instanceof Error) {
       process.stderr.write(`Post-deploy failed: ${error.message}\n`);

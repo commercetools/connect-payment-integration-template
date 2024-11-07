@@ -1,0 +1,107 @@
+name: Preview
+
+on:
+  push:
+    tags:
+      # Release tags v1.0.0, v1.0.1, v1.0.2, etc.
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      # Pre-release tags v1.0.0-alpha.0, v1.0.0-beta.0, etc.
+      - 'v[0-9]+.[0-9]+.[0-9]+-[a-z]+.[0-9]+'
+      - latest
+  workflow_dispatch:
+
+jobs:
+  publish:
+    name: Preview Connector
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Make previewable
+        env:
+          CLIENT_ID: ${{ secrets.CKO_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CKO_CLIENT_SECRET }}
+          CONNECTOR_KEY: ${{ secrets.CKO_CONNECTOR_KEY }}
+        run: |
+          TIMEOUT=600 # 10 minutes
+          START_TIME=$(date +%s)
+          
+          echo "Updating connector to tag $GITHUB_REF_NAME"
+        
+          echo "********************************"
+          echo Authenticating with commercetools
+          echo "********************************"
+
+          OAUTH_RESPONSE=$(curl --silent --show-error --location --request POST 'https://auth.europe-west1.gcp.commercetools.com/oauth/token?grant_type=client_credentials' -u $CLIENT_ID:$CLIENT_SECRET)
+            
+          ACCESS_TOKEN=$(echo $OAUTH_RESPONSE | jq -r '.access_token')
+          echo Access token retrieved
+
+          echo "********************************"
+          echo Updating connector
+          echo "********************************"
+          
+          CONNECTOR_DETAILS=$(curl --silent --show-error --location "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+              --header 'Content-Type: application/json' \
+              --header "Authorization: Bearer $ACCESS_TOKEN")
+          
+          VERSION=$(echo $CONNECTOR_DETAILS | jq -r '.version')
+          IS_PREVIWABLE=$(echo $CONNECTOR_DETAILS | jq -r '.isPreviewable')
+
+          echo "Updating connector version: $VERSION isPreviewable: $IS_PREVIWABLE"
+          
+          curl --fail-with-body --silent --location POST "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+              --header 'Content-Type: application/json' \
+              --header "Authorization: Bearer $ACCESS_TOKEN" \
+              --data-raw "{\"version\": $VERSION, \"actions\": [{\"action\": \"setRepository\",\"url\": \"git@github.com:$GITHUB_REPOSITORY.git\",\"tag\": \"$GITHUB_REF_NAME\"},{\"action\": \"updatePreviewable\"}]}"
+
+          # Validate when the `isPreviewable` is done
+          while true; do
+            # Calculate elapsed time
+            ELAPSED_TIME=$(($(date +%s) - START_TIME))
+
+            # Check if we've exceeded the timeout
+            if [ "$ELAPSED_TIME" -ge "$TIMEOUT" ]; then
+              echo "Timeout reached. Exiting with failure."
+              exit 1
+            fi
+            
+            # Execute the curl request and capture the response
+            RESPONSE=$(curl --silent --show-error --location "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+              --header 'Content-Type: application/json' \
+              --header "Authorization: Bearer $ACCESS_TOKEN")
+            
+            STATUS=$(echo "$RESPONSE" | jq -r '.isPreviewable')
+            CURRENT_VERSION=$(echo "$RESPONSE" | jq -r '.version')
+
+            # Check if the `isPreviewable` is still "pending"
+            if [ "$STATUS" != "pending" ]; then
+              # If it has changed, set it as an environment variable
+              export PREVIEW_STATUS="$STATUS"
+              export VERSION="$CURRENT_VERSION"
+              export PREVIEW_RESPONSE="$RESPONSE"
+              break
+            fi
+            
+            # Optional: add a delay to avoid spamming the server with requests
+            echo "Connector isPreviewable is still $STATUS. Waiting 5 seconds..."
+            sleep 5
+          done
+
+          echo "isPreviewable has changed to: $PREVIEW_STATUS"
+          
+          # Check if `PREVIEW_STATUS` is "true"
+          if [ "$PREVIEW_STATUS" != "true" ]; then
+            echo "Error: isPreviable is not 'true'. Exiting with failure." 
+            echo $PREVIEW_RESPONSE
+            exit 1  # Exit with a non-zero status to indicate failure
+          fi
+
+          

@@ -3,50 +3,26 @@ name: CI
 on: [push]
 
 jobs:
-  build-enabler:
-    name: Build the application for enabler
+  validate:
+    name: Validate the applications
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: enabler
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Use Node.js 18.x
+      - name: Use Node.js 20.x
         uses: actions/setup-node@v3
         with:
-          node-version: '18.x'
+          node-version: '20.x'
 
-      - name: Install modules
-        run: npm ci
-
-      - name: Compile typescript
-        run: npm run build
-
-      - name: Execute tests
-        run: npm run test
-
-  build-processor:
-    name: Build the application for processor
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: processor
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Use Node.js 18.x
-        uses: actions/setup-node@v3
+      - name: Validate
+        run: |
+          npm install -g @commercetools/cli
+          commercetools connect validate --skip analysis
+          
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
         with:
-          node-version: '18.x'
-
-      - name: Install modules
-        run: npm ci
-
-      - name: Compile typescript
-        run: npm run build
-
-      - name: Execute tests
-        run: npm run test
+          name: validation-results
+          path: |
+            .connect

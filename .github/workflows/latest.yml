@@ -25,5 +25,5 @@ jobs:
         run: git tag -f -- "latest" && git push -f origin "latest"
 
       - name: Trigger publish workflow
-        run: gh workflow run publish.yml --ref latest
+        run: gh workflow run cko-preview.yml --ref latest
 

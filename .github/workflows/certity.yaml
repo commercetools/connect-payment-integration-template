@@ -1,0 +1,36 @@
+name: Request certification
+
+on:
+  push:
+    tags:
+      # Release tags v1.0.0, v1.0.1, v1.0.2, etc.
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      # Pre-release tags v1.0.0-alpha.0, v1.0.0-beta.0, etc.
+      - 'v[0-9]+.[0-9]+.[0-9]+-[a-z]+.[0-9]+'
+  workflow_dispatch:
+
+jobs:
+  certify:
+    name: Certify connector
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      - name: Certify
+        env:
+          CLIENT_ID: ${{ secrets.PUBLIC_CONNECTOR_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.PUBLIC_CONNECTOR_CLIENT_SECRET }}
+          CONNECTOR_KEY: ${{ secrets.PUBLIC_CONNECTOR_CONNECTOR_KEY }}
+          PROJECT_KEY: ${{ secrets.PUBLIC_CONNECTOR_PROJECT_KEY }}
+        run: |
+          npm install -g @commercetools/cli
+          commercetools auth login --client-credentials --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --project-key $PROJECT_KEY --region europe-west1.gcp
+          commercetools connect connectorstaged update --key $CONNECTOR_KEY --repository-tag $GITHUB_REF_NAME
+          commercetools connect connectorstaged certify --key $CONNECTOR_KEY
+          

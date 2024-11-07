@@ -71,7 +71,7 @@ jobs:
             fi
             
             # Optional: add a delay to avoid spamming the server with requests
-            echo "Connector $CKO_CONNECTOR_KEY isPreviewable is still $PREVIEW_STATUS. Waiting 5 seconds..."
+            echo "Connector $CKO_CONNECTOR_KEY isPreviewable is still $STATUS. Waiting 5 seconds..."
             sleep 5
           done
 

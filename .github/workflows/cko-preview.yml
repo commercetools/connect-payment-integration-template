@@ -78,13 +78,9 @@ jobs:
           echo "isPreviewable has changed to: $PREVIEW_STATUS"
           
           # Check if `PREVIEW_STATUS` is "true"
-          if [ "$PREVIEW_STATUS" != "true" ]; then
+          if [ "$PREVIEW_STATUS" != "false" ]; then
             echo "Error: isPreviable is not 'true'. Exiting with failure."
             exit 1  # Exit with a non-zero status to indicate failure
           fi
 
-          # npm install -g @commercetools/cli
-          # commercetools auth login --client-credentials --client-id $CKO_CLIENT_ID --client-secret $CKO_CLIENT_SECRET --region europe-west1.gcp
-          # commercetools connect connectorstaged update --key $CKO_CONNECTOR_KEY --repository-tag $GITHUB_REF_NAME
-          # commercetools connect connectorstaged update --key $CKO_CONNECTOR_KEY
           

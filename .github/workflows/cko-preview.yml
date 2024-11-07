@@ -8,6 +8,7 @@ on:
       # Pre-release tags v1.0.0-alpha.0, v1.0.0-beta.0, etc.
       - 'v[0-9]+.[0-9]+.[0-9]+-[a-z]+.[0-9]+'
       - latest
+      - ddelizia-test
   workflow_dispatch:
 
 jobs:
@@ -51,6 +52,34 @@ jobs:
               --header 'Content-Type: application/json' \
               --header "Authorization: Bearer $ACCESS_TOKEN" \
               --data-raw "{\"version\": $VERSION, \"actions\": [{\"action\": \"setRepository\",\"url\": \"git@github.com:commercetools/connect-payment-integration-adyen.git\",\"tag\": \"$GITHUB_REF_NAME\"},{\"action\": \"updatePreviewable\"}]}"
+
+          # Validate when the `isPreviewable` is done
+          while true; do
+            # Execute the curl request and capture the response
+            RESPONSE=$(curl --silent --show-error --location "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CKO_CONNECTOR_KEY" \
+              --header 'Content-Type: application/json' \
+              --header "Authorization: Bearer $ACCESS_TOKEN")
+            
+            STATUS=$(echo "$RESPONSE" | jq -r '.isPreviewable')
+  
+            # Check if the `isPreviewable` is still "pending"
+            if [ "$STATUS" != "pending" ]; then
+              # If it has changed, set it as an environment variable
+              export PREVIEW_STATUS="$STATUS"
+              break
+            fi
+            
+            # Optional: add a delay to avoid spamming the server with requests
+            sleep 5
+          done
+
+          echo "isPreviewable has changed to: $PREVIEW_STATUS"
+          
+          # Check if `PREVIEW_STATUS` is "true"
+          if [ "$PREVIEW_STATUS" != "true" ]; then
+            echo "Error: isPreviable is not 'true'. Exiting with failure."
+            exit 1  # Exit with a non-zero status to indicate failure
+          fi
 
           # npm install -g @commercetools/cli
           # commercetools auth login --client-credentials --client-id $CKO_CLIENT_ID --client-secret $CKO_CLIENT_SECRET --region europe-west1.gcp

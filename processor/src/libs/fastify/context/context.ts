@@ -64,6 +64,11 @@ export const getMerchantReturnUrlFromContext = (): string | undefined => {
   return authentication?.getPrincipal().merchantReturnUrl;
 };
 
+export const getFutureOrderNumberFromContext = (): string | undefined => {
+  const authentication = getRequestContext().authentication as SessionAuthentication;
+  return authentication?.getPrincipal().futureOrderNumber;
+};
+
 export const requestContextPlugin = fp(async (fastify: FastifyInstance) => {
   // Enhance the request object with a correlationId property
   fastify.decorateRequest('correlationId', '');

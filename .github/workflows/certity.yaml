@@ -11,7 +11,7 @@ on:
 
 jobs:
   publish:
-    name: Publish for commercetools Checkout 
+    name: Certify connector
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
@@ -24,13 +24,77 @@ jobs:
 
       - name: Install
         env:
-          PUBLIC_CONNECTOR_CLIENT_ID: ${{ secrets.PUBLIC_CONNECTOR_CLIENT_ID }}
-          PUBLIC_CONNECTOR_CLIENT_SECRET: ${{ secrets.PUBLIC_CONNECTOR_CLIENT_SECRET }}
-          PUBLIC_CONNECTOR_PROJECT_KEY: ${{ secrets.PUBLIC_CONNECTOR_PROJECT_KEY }}
-          PUBLIC_CONNECTOR_CONNECTOR_KEY: ${{ secrets.PUBLIC_CONNECTOR_CONNECTOR_KEY }}
+          CLIENT_ID: ${{ secrets.PUBLIC_CONNECTOR_CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.PUBLIC_CONNECTOR_CLIENT_SECRET }}
+          CONNECTOR_KEY: ${{ secrets.PUBLIC_CONNECTOR_CONNECTOR_KEY }}
         run: |
-          npm install -g @commercetools/cli
-          commercetools auth login --client-credentials --client-id $PUBLIC_CONNECTOR_CLIENT_ID --client-secret $PUBLIC_CONNECTOR_CLIENT_SECRET --region europe-west1.gcp --project-key $PUBLIC_CONNECTOR_PROJECT_KEY
-          commercetools connect connectorstaged update --key $PUBLIC_CONNECTOR_CONNECTOR_KEY --repository-tag $GITHUB_REF_NAME
-          commercetools connect connectorstaged certify --key $PUBLIC_CONNECTOR_CONNECTOR_KEY
+          echo "Updating connector to tag $GITHUB_REF_NAME"
           
+          echo "********************************"
+          echo Authenticating with commercetools
+          echo "********************************"
+
+          OAUTH_RESPONSE=$(curl --silent --show-error --location --request POST 'https://auth.europe-west1.gcp.commercetools.com/oauth/token?grant_type=client_credentials' -u $CLIENT_ID:$CLIENT_SECRET)
+            
+          ACCESS_TOKEN=$(echo $OAUTH_RESPONSE | jq -r '.access_token')
+          echo Access token retrieved
+
+          echo "********************************"
+          echo Updating connector
+          echo "********************************"
+          
+          CONNECTOR_DETAILS=$(curl --silent --show-error --location "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+              --header 'Content-Type: application/json' \
+              --header "Authorization: Bearer $ACCESS_TOKEN")
+          
+          VERSION=$(echo $CONNECTOR_DETAILS | jq -r '.version')
+          IS_PREVIWABLE=$(echo $CONNECTOR_DETAILS | jq -r '.isPreviewable')
+
+          echo "Updating connector version: $VERSION isPreviewable: $IS_PREVIWABLE"
+          
+          curl --fail-with-body --silent --location POST "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+              --header 'Content-Type: application/json' \
+              --header "Authorization: Bearer $ACCESS_TOKEN" \
+              --data-raw "{\"version\": $VERSION, \"actions\": [{\"action\": \"setRepository\",\"url\": \"git@github.com:$GITHUB_REPOSITORY.git\",\"tag\": \"$GITHUB_REF_NAME\"},{\"action\": \"updatePreviewable\"}]}"
+
+          # Validate when the `isPreviewable` is done
+          while true; do
+            # Execute the curl request and capture the response
+            RESPONSE=$(curl --silent --show-error --location "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+              --header 'Content-Type: application/json' \
+              --header "Authorization: Bearer $ACCESS_TOKEN")
+            
+            STATUS=$(echo "$RESPONSE" | jq -r '.isPreviewable')
+            CURRENT_VERSION=$(echo "$RESPONSE" | jq -r '.version')
+
+            # Check if the `isPreviewable` is still "pending"
+            if [ "$STATUS" != "pending" ]; then
+              # If it has changed, set it as an environment variable
+              export PREVIEW_STATUS="$STATUS"
+              export VERSION="$CURRENT_VERSION"
+              export PREVIEW_RESPONSE="$RESPONSE"
+              break
+            fi
+            
+            # Optional: add a delay to avoid spamming the server with requests
+            echo "Connector isPreviewable is still $STATUS. Waiting 5 seconds..."
+            sleep 5
+          done
+
+          echo "isPreviewable has changed to: $PREVIEW_STATUS"
+          
+          # Check if `PREVIEW_STATUS` is "true"
+          if [ "$PREVIEW_STATUS" != "true" ]; then
+            echo "Error: isPreviable is not 'true'. Exiting with failure." 
+            echo $PREVIEW_RESPONSE
+            exit 1  # Exit with a non-zero status to indicate failure
+          fi
+
+          echo "********************************"
+          echo Certify connector
+          echo "********************************"
+
+          curl --fail-with-body --silent --location POST "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+              --header 'Content-Type: application/json' \
+              --header "Authorization: Bearer $ACCESS_TOKEN" \
+              --data-raw "{\"version\": $VERSION, \"actions\": [{\"action\": \"publish\",\"certification\": true}]}"

@@ -70,6 +70,7 @@ jobs:
             fi
             
             # Optional: add a delay to avoid spamming the server with requests
+            echo "isPreviewable is still $PREVIEW_STATUS. Waiting 5 seconds..."
             sleep 5
           done
 

@@ -57,10 +57,17 @@ jobs:
 
           echo "Updating connector version: $VERSION isPreviewable: $IS_PREVIWABLE"
           
-          curl --fail-with-body --silent --location POST "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+          CONNECTOR_DETAILS=$(curl --fail-with-body --silent --location POST "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
               --header 'Content-Type: application/json' \
               --header "Authorization: Bearer $ACCESS_TOKEN" \
-              --data-raw "{\"version\": $VERSION, \"actions\": [{\"action\": \"setRepository\",\"url\": \"git@github.com:$GITHUB_REPOSITORY.git\",\"tag\": \"$GITHUB_REF_NAME\"},{\"action\": \"updatePreviewable\"}]}"
+              --data-raw "{\"version\": $VERSION, \"actions\": [{\"action\": \"setRepository\",\"url\": \"git@github.com:$GITHUB_REPOSITORY.git\",\"tag\": \"$GITHUB_REF_NAME\"}]}")
+
+          VERSION=$(echo $CONNECTOR_DETAILS | jq -r '.version')
+
+          CONNECTOR_DETAILS=$(curl --fail-with-body --silent --location POST "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+              --header 'Content-Type: application/json' \
+              --header "Authorization: Bearer $ACCESS_TOKEN" \
+              --data-raw "{\"version\": $VERSION, \"actions\": [{\"action\": \"updatePreviewable\"}]}")
 
           # Validate when the `isPreviewable` is done
           while true; do

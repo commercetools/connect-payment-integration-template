@@ -12,6 +12,8 @@ export default defineConfig({
         try {
           if (typeof document != "undefined") {
             var elementStyle = document.createElement("style");
+            // checkout will look for this attribute to remove the style tag
+            // when the checkout is closed for cleanup purposes
             elementStyle.setAttribute("data-ctc-connector-styles", "");
             for (const attribute in options.attributes) {
               elementStyle.setAttribute(

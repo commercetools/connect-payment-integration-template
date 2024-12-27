@@ -39,6 +39,8 @@ This means that for the currency `EUR` the minor units will be expressed with fr
 
 It's important to note that individual PSP could differ from this standard. So it's important to convert properly on the input and output layer when interacting with PSP.
 
+commercetools provides the library [connect-payments-sdk](https://github.com/commercetools/connect-payments-sdk) which includes various utility function to help with this.
+
 - [Development of Processor](./processor/README.md)
 
 #### 1. Develop your specific needs

@@ -33,13 +33,13 @@ Regarding the development of processor module, please refer to the following doc
 
 ### Currencies
 
-A special note regarding the usage of currencies and passing them around. commercetools provides monetary values in fraction digits according to the <https://en.wikipedia.org/wiki/ISO_4217> standard.
+A special note regarding the usage of currencies and working with them. commercetools provides monetary values in cent amounts which adheres to the <https://en.wikipedia.org/wiki/ISO_4217> standard.
 
-This means that for the currency `EUR` the minor units will be expressed with fraction digits of two. I.e. a value of 1 euro and 50 cents will be expressed as `150`. While some currencies, have different fraction digits.
+This means that for the currency `EUR` the minor units will be expressed with fraction digits of 2. I.e. a value of 1 euro and 50 cents will be expressed as `150`. Some currencies have 0 or even 4 fraction digits.
 
-It's important to note that individual PSP could differ from this standard. So it's important to convert properly on the input and output layer when interacting with PSP.
+It's important to note that individual PSP could differ from this standard and/or require special attention when passing data between the connector and psp. So it's important to convert properly on the input and output layer when interacting with PSP.
 
-commercetools provides the library [connect-payments-sdk](https://github.com/commercetools/connect-payments-sdk) which includes various utility function to help with this.
+commercetools provides the library [connect-payments-sdk](https://github.com/commercetools/connect-payments-sdk) which includes various utility function to help with these conversions.
 
 - [Development of Processor](./processor/README.md)
 

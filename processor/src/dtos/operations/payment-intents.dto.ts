@@ -11,6 +11,7 @@ export const ActionCapturePaymentSchema = Type.Composite([
   }),
   Type.Object({
     amount: AmountSchema,
+    merchantReference: Type.Optional(Type.String()),
   }),
 ]);
 
@@ -20,12 +21,14 @@ export const ActionRefundPaymentSchema = Type.Composite([
   }),
   Type.Object({
     amount: AmountSchema,
+    merchantReference: Type.Optional(Type.String()),
   }),
 ]);
 
 export const ActionCancelPaymentSchema = Type.Composite([
   Type.Object({
     action: Type.Literal('cancelPayment'),
+    merchantReference: Type.Optional(Type.String()),
   }),
 ]);
 

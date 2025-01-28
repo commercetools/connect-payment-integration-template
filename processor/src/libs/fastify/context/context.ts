@@ -1,4 +1,4 @@
-import { Authentication, SessionAuthentication } from '@commercetools/connect-payments-sdk';
+import * as paymentSdk from '@commercetools/connect-payments-sdk';
 import { fastifyRequestContext, requestContext } from '@fastify/request-context';
 import { randomUUID } from 'crypto';
 import { FastifyInstance, FastifyRequest } from 'fastify';
@@ -15,7 +15,7 @@ export type ContextData = {
   query?: any;
   correlationId: string;
   requestId: string;
-  authentication?: Authentication;
+  authentication?: paymentSdk.Authentication;
 };
 
 export const getRequestContext = (): Partial<ContextData> => {
@@ -35,38 +35,38 @@ export const updateRequestContext = (ctx: Partial<ContextData>) => {
 };
 
 export const getCtSessionIdFromContext = (): string => {
-  const authentication = getRequestContext().authentication as SessionAuthentication;
-  return authentication?.getCredentials();
+  const contextData = getRequestContext() as ContextData;
+  return paymentSdk.getCtSessionIdFromContext(contextData) as string;
 };
 
 export const getCartIdFromContext = (): string => {
-  const authentication = getRequestContext().authentication as SessionAuthentication;
-  return authentication?.getPrincipal().cartId;
+  const contextData = getRequestContext() as ContextData;
+  return paymentSdk.getCartIdFromContext(contextData) as string;
 };
 
 export const getAllowedPaymentMethodsFromContext = (): string[] => {
-  const authentication = getRequestContext().authentication as SessionAuthentication;
-  return authentication?.getPrincipal().allowedPaymentMethods;
+  const contextData = getRequestContext() as ContextData;
+  return paymentSdk.getAllowedPaymentMethodsFromContext(contextData) as string[];
 };
 
 export const getPaymentInterfaceFromContext = (): string | undefined => {
-  const authentication = getRequestContext().authentication as SessionAuthentication;
-  return authentication?.getPrincipal().paymentInterface;
+  const contextData = getRequestContext() as ContextData;
+  return paymentSdk.getPaymentInterfaceFromContext(contextData);
 };
 
 export const getProcessorUrlFromContext = (): string => {
-  const authentication = getRequestContext().authentication as SessionAuthentication;
-  return authentication?.getPrincipal().processorUrl;
+  const contextData = getRequestContext() as ContextData;
+  return paymentSdk.getProcessorUrlFromContext(contextData) as string;
 };
 
 export const getMerchantReturnUrlFromContext = (): string | undefined => {
-  const authentication = getRequestContext().authentication as SessionAuthentication;
-  return authentication?.getPrincipal().merchantReturnUrl;
+  const contextData = getRequestContext() as ContextData;
+  return paymentSdk.getMerchantReturnUrlFromContext(contextData);
 };
 
 export const getFutureOrderNumberFromContext = (): string | undefined => {
-  const authentication = getRequestContext().authentication as SessionAuthentication;
-  return authentication?.getPrincipal().futureOrderNumber;
+  const contextData = getRequestContext() as ContextData;
+  return paymentSdk.getFutureOrderNumberFromContext(contextData);
 };
 
 export const requestContextPlugin = fp(async (fastify: FastifyInstance) => {

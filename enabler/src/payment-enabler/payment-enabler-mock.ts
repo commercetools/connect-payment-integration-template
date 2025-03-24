@@ -25,7 +25,7 @@ export type BaseOptions = {
   environment: string;
   locale?: string;
   onComplete: (result: PaymentResult) => void;
-  onError: (error: any, payload?: { paymentReference?: string }) => void;
+  onError: (error: any, context?: { paymentReference?: string }) => void;
 };
 
 export class MockPaymentEnabler implements PaymentEnabler {

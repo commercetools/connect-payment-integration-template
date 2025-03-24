@@ -149,7 +149,7 @@ export type EnablerOptions = {
    */
   onError?: (
     error: any,
-    payload?: { paymentReference?: string }
+    context?: { paymentReference?: string }
   ) => void;
 };
 

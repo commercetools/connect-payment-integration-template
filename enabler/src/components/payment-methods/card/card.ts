@@ -79,12 +79,9 @@ export class Card extends BaseComponent {
         body: JSON.stringify(request),
       });
       const data = await response.json();
+      const isSuccess = resultCode === PaymentOutcome.AUTHORIZED;
 
-      if (resultCode === PaymentOutcome.AUTHORIZED) {
-        this.onComplete && this.onComplete({ isSuccess: true, paymentReference: data.paymentReference });
-      } else {
-        this.onComplete && this.onComplete({ isSuccess: false });
-      }
+      this.onComplete && this.onComplete({ isSuccess, paymentReference: data.paymentReference });
     } catch(e) {
       this.onError('Some error occurred. Please try again.');
     }

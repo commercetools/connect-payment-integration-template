@@ -4,6 +4,7 @@ import {
   ErrorInvalidJsonInput,
   ErrorInvalidOperation,
   Payment,
+  Transaction,
 } from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
@@ -122,13 +123,13 @@ export abstract class AbstractPaymentService {
     const request = opts.data.actions[0];
 
     let requestAmount!: AmountSchemaDTO;
-    if (request.action != 'cancelPayment') {
+    if (request.action != 'cancelPayment' && request.action !== 'reversePayment') {
       requestAmount = request.amount;
     } else {
       requestAmount = ctPayment.amountPlanned;
     }
 
-    const transactionType = this.getPaymentTransactionType(request.action);
+    const transactionType = this.getPaymentTransactionType(ctPayment, request.action);
     const updatedPayment = await this.ctPaymentService.updatePayment({
       id: ctPayment.id,
       transaction: {
@@ -137,6 +138,7 @@ export abstract class AbstractPaymentService {
         state: 'Initial',
       },
     });
+
     const res = await this.processPaymentModification(
       updatedPayment,
       transactionType,
@@ -171,7 +173,30 @@ export abstract class AbstractPaymentService {
     }
   }
 
-  protected getPaymentTransactionType(action: string): string {
+  protected getPaymentTransactionType(payment: Payment, action: string): string {
+    if (action === 'reversePayment') {
+      const hasCharge = payment.transactions.some(
+        (tx: Transaction) => tx.type === 'Charge' && (tx.state === 'Success' || tx.state === 'Pending'),
+      );
+      const wasPaymentReverted = payment.transactions.some(
+        (tx: Transaction) =>
+          (tx.type === 'CancelAuthorization' || tx.type === 'Refund') &&
+          (tx.state === 'Success' || tx.state === 'Pending'),
+      );
+
+      // TODO: test scenario
+      if (hasCharge && !wasPaymentReverted) {
+        return 'Refund';
+      }
+
+      const hasAuthorization = payment.transactions.some(
+        (tx: Transaction) => tx.type === 'Authorization' && (tx.state === 'Success' || tx.state === 'Pending'),
+      );
+      if (hasAuthorization && !wasPaymentReverted) {
+        return 'CancelAuthorization';
+      }
+    }
+
     switch (action) {
       case 'cancelPayment': {
         return 'CancelAuthorization';

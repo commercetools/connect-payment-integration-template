@@ -4,6 +4,8 @@ import {
   ErrorRequiredField,
   TransactionType,
   TransactionState,
+  Transaction,
+  ErrorGeneral,
 } from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
@@ -11,6 +13,7 @@ import {
   ConfigResponse,
   PaymentProviderModificationResponse,
   RefundPaymentRequest,
+  ReversePaymentRequest,
   StatusResponse,
 } from './types/operation.type';
 
@@ -144,6 +147,14 @@ export class MockPaymentService extends AbstractPaymentService {
    * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async capturePayment(request: CapturePaymentRequest): Promise<PaymentProviderModificationResponse> {
+    await this.ctPaymentService.updatePayment({
+      id: request.payment.id,
+      transaction: {
+        type: 'Charge',
+        amount: request.amount,
+        state: 'Success',
+      },
+    });
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
   }
 
@@ -157,6 +168,14 @@ export class MockPaymentService extends AbstractPaymentService {
    * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async cancelPayment(request: CancelPaymentRequest): Promise<PaymentProviderModificationResponse> {
+    await this.ctPaymentService.updatePayment({
+      id: request.payment.id,
+      transaction: {
+        type: 'CancelAuthorization',
+        amount: request.payment.amountPlanned,
+        state: 'Success',
+      },
+    });
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
   }
 
@@ -170,7 +189,48 @@ export class MockPaymentService extends AbstractPaymentService {
    * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
+    await this.ctPaymentService.updatePayment({
+      id: request.payment.id,
+      transaction: {
+        type: 'Refund',
+        amount: request.amount,
+        state: 'Success',
+      },
+    });
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
+  }
+
+  /**
+   * Reverse payment
+   *
+   * @remarks
+   * Abstract method to execute payment reversals in support of automated reversals to be triggered by checkout api. The actual invocation to PSPs should be implemented in subclasses
+   *
+   * @param request
+   * @returns Promise with outcome containing operation status and PSP reference
+   */
+  public async reversePayment(request: ReversePaymentRequest): Promise<PaymentProviderModificationResponse> {
+    const hasCharge = request.payment.transactions.some(
+      (tx: Transaction) => tx.type === 'Charge' && (tx.state === 'Success' || tx.state === 'Pending'),
+    );
+    const wasPaymentReverted = request.payment.transactions.some(
+      (tx: Transaction) =>
+        (tx.type === 'CancelAuthorization' || tx.type === 'Refund') &&
+        (tx.state === 'Success' || tx.state === 'Pending'),
+    );
+
+    if (hasCharge && !wasPaymentReverted) {
+      return this.refundPayment(request);
+    }
+
+    const hasAuthorization = request.payment.transactions.some(
+      (tx: Transaction) => tx.type === 'Authorization' && (tx.state === 'Success' || tx.state === 'Pending'),
+    );
+    if (hasAuthorization && !wasPaymentReverted) {
+      return this.cancelPayment({ payment: request.payment });
+    }
+
+    throw new ErrorGeneral('No payment found to revert');
   }
 
   /**

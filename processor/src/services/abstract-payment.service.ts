@@ -13,11 +13,7 @@ import {
   ReversePaymentRequest,
   StatusResponse,
 } from './types/operation.type';
-import {
-  AmountSchemaDTO,
-  PaymentIntentResponseSchemaDTO,
-  PaymentModificationStatus,
-} from '../dtos/operations/payment-intents.dto';
+import { AmountSchemaDTO, PaymentIntentResponseSchemaDTO } from '../dtos/operations/payment-intents.dto';
 
 import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
 import { TransactionDraftDTO, TransactionResponseDTO } from '../dtos/operations/transaction.dto';
@@ -132,7 +128,7 @@ export abstract class AbstractPaymentService {
     const request = opts.data.actions[0];
 
     let requestAmount!: AmountSchemaDTO;
-    if (request.action != 'cancelPayment' && request.action !== 'reversePayment') {
+    if (request.action !== 'cancelPayment' && request.action !== 'reversePayment') {
       requestAmount = request.amount;
     } else {
       requestAmount = ctPayment.amountPlanned;
@@ -166,18 +162,6 @@ export abstract class AbstractPaymentService {
       default: {
         throw new ErrorInvalidOperation(`Operation ${request.action} not supported.`);
       }
-    }
-  }
-
-  protected convertPaymentModificationOutcomeToState(
-    outcome: PaymentModificationStatus,
-  ): 'Pending' | 'Success' | 'Failure' {
-    if (outcome === PaymentModificationStatus.RECEIVED) {
-      return 'Pending';
-    } else if (outcome === PaymentModificationStatus.APPROVED) {
-      return 'Success';
-    } else {
-      return 'Failure';
     }
   }
 }

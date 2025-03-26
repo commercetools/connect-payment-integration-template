@@ -13,7 +13,7 @@ import {
   ReversePaymentRequest,
   StatusResponse,
 } from './types/operation.type';
-import { AmountSchemaDTO, PaymentIntentResponseSchemaDTO } from '../dtos/operations/payment-intents.dto';
+import { PaymentIntentResponseSchemaDTO } from '../dtos/operations/payment-intents.dto';
 
 import { SupportedPaymentComponentsSchemaDTO } from '../dtos/operations/payment-componets.dto';
 import { TransactionDraftDTO, TransactionResponseDTO } from '../dtos/operations/transaction.dto';
@@ -127,14 +127,7 @@ export abstract class AbstractPaymentService {
     });
     const request = opts.data.actions[0];
 
-    let requestAmount!: AmountSchemaDTO;
-    if (request.action !== 'cancelPayment' && request.action !== 'reversePayment') {
-      requestAmount = request.amount;
-    } else {
-      requestAmount = ctPayment.amountPlanned;
-    }
-
-    switch (request.action as string) {
+    switch (request.action) {
       case 'cancelPayment': {
         return await this.cancelPayment({ payment: ctPayment, merchantReference: request.merchantReference });
       }
@@ -142,12 +135,12 @@ export abstract class AbstractPaymentService {
         return await this.capturePayment({
           payment: ctPayment,
           merchantReference: request.merchantReference,
-          amount: requestAmount,
+          amount: request.amount,
         });
       }
       case 'refundPayment': {
         return await this.refundPayment({
-          amount: requestAmount,
+          amount: request.amount,
           payment: ctPayment,
           merchantReference: request.merchantReference,
         });
@@ -155,12 +148,11 @@ export abstract class AbstractPaymentService {
       case 'reversePayment': {
         return await this.reversePayment({
           payment: ctPayment,
-          amount: requestAmount,
           merchantReference: request.merchantReference,
         });
       }
       default: {
-        throw new ErrorInvalidOperation(`Operation ${request.action} not supported.`);
+        throw new ErrorInvalidOperation(`Operation not supported.`);
       }
     }
   }

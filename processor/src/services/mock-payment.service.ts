@@ -211,7 +211,7 @@ export class MockPaymentService extends AbstractPaymentService {
    */
   public async reversePayment(request: ReversePaymentRequest): Promise<PaymentProviderModificationResponse> {
     const hasCharge = request.payment.transactions.some(
-      (tx: Transaction) => tx.type === 'Charge' && (tx.state === 'Success' || tx.state === 'Pending'),
+      (tx: Transaction) => tx.type === 'Charge' && tx.state === 'Success',
     );
     const wasPaymentReverted = request.payment.transactions.some(
       (tx: Transaction) =>
@@ -220,11 +220,15 @@ export class MockPaymentService extends AbstractPaymentService {
     );
 
     if (hasCharge && !wasPaymentReverted) {
-      return this.refundPayment(request);
+      return this.refundPayment({
+        payment: request.payment,
+        merchantReference: request.merchantReference,
+        amount: request.payment.amountPlanned,
+      });
     }
 
     const hasAuthorization = request.payment.transactions.some(
-      (tx: Transaction) => tx.type === 'Authorization' && (tx.state === 'Success' || tx.state === 'Pending'),
+      (tx: Transaction) => tx.type === 'Authorization' && tx.state === 'Success',
     );
     if (hasAuthorization && !wasPaymentReverted) {
       return this.cancelPayment({ payment: request.payment });

@@ -145,8 +145,12 @@ export type EnablerOptions = {
   /**
    * A callback function that is called when an error occurs during the payment process.
    * @param error - The error that occurred.
+   * @param paymentReference - The payment reference.
    */
-  onError?: (error: any) => void;
+  onError?: (
+    error: any,
+    context?: { paymentReference?: string }
+  ) => void;
 };
 
 /**
@@ -201,6 +205,11 @@ export type PaymentResult =
        * Indicates whether the payment was unsuccessful.
        */
       isSuccess: false;
+
+      /**
+       * The payment reference.
+       */
+      paymentReference?: string;
     };
 
 /**

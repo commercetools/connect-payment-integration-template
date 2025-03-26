@@ -18,7 +18,7 @@ export abstract class BaseComponent implements PaymentComponent {
   protected sessionId: BaseOptions['sessionId'];
   protected environment: BaseOptions['environment'];
   protected onComplete: (result: PaymentResult) => void;
-  protected onError: (error?: any) => void;
+  protected onError: (error: any, context?: { paymentReference?: string }) => void;
 
   constructor(paymentMethod: PaymentMethod, baseOptions: BaseOptions, _componentOptions: ComponentOptions) {
     this.paymentMethod = paymentMethod;

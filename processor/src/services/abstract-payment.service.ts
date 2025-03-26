@@ -140,7 +140,7 @@ export abstract class AbstractPaymentService {
 
     switch (request.action as string) {
       case 'cancelPayment': {
-        return await this.cancelPayment({ payment: ctPayment });
+        return await this.cancelPayment({ payment: ctPayment, merchantReference: request.merchantReference });
       }
       case 'capturePayment': {
         return await this.capturePayment({
@@ -150,10 +150,18 @@ export abstract class AbstractPaymentService {
         });
       }
       case 'refundPayment': {
-        return await this.refundPayment({ amount: requestAmount, payment: ctPayment });
+        return await this.refundPayment({
+          amount: requestAmount,
+          payment: ctPayment,
+          merchantReference: request.merchantReference,
+        });
       }
       case 'reversePayment': {
-        return await this.reversePayment({ payment: ctPayment, amount: requestAmount });
+        return await this.reversePayment({
+          payment: ctPayment,
+          amount: requestAmount,
+          merchantReference: request.merchantReference,
+        });
       }
       default: {
         throw new ErrorInvalidOperation(`Operation ${request.action} not supported.`);

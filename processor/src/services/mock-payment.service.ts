@@ -230,7 +230,7 @@ export class MockPaymentService extends AbstractPaymentService {
       return this.cancelPayment({ payment: request.payment });
     }
 
-    throw new ErrorGeneral('No payment found to revert');
+    throw new ErrorGeneral('No payment found to revert.');
   }
 
   /**

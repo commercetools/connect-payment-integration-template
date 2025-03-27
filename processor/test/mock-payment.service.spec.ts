@@ -338,7 +338,7 @@ describe('mock-payment.service', () => {
         .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
 
       const result = paymentService.modifyPayment(modifyPaymentOpts);
-      await expect(result).rejects.toThrow('No payment found to revert.');
+      await expect(result).rejects.toThrow('There is no successful payment transaction to reverse.');
     });
 
     test('it should successfully revert transaction', async () => {

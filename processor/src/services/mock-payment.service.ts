@@ -5,7 +5,7 @@ import {
   TransactionType,
   TransactionState,
   Transaction,
-  ErrorGeneral,
+  ErrorInvalidOperation,
 } from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
@@ -234,7 +234,7 @@ export class MockPaymentService extends AbstractPaymentService {
       return this.cancelPayment({ payment: request.payment });
     }
 
-    throw new ErrorGeneral('No payment found to revert.');
+    throw new ErrorInvalidOperation('There is no successful payment transaction to reverse.');
   }
 
   /**

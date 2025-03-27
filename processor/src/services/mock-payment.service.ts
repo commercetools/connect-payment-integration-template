@@ -4,7 +4,6 @@ import {
   ErrorRequiredField,
   TransactionType,
   TransactionState,
-  Transaction,
   ErrorInvalidOperation,
 } from '@commercetools/connect-payments-sdk';
 import {
@@ -210,14 +209,23 @@ export class MockPaymentService extends AbstractPaymentService {
    * @returns Promise with outcome containing operation status and PSP reference
    */
   public async reversePayment(request: ReversePaymentRequest): Promise<PaymentProviderModificationResponse> {
-    const hasCharge = request.payment.transactions.some(
-      (tx: Transaction) => tx.type === 'Charge' && tx.state === 'Success',
-    );
-    const wasPaymentReverted = request.payment.transactions.some(
-      (tx: Transaction) =>
-        (tx.type === 'CancelAuthorization' || tx.type === 'Refund') &&
-        (tx.state === 'Success' || tx.state === 'Pending'),
-    );
+    const hasCharge = this.ctPaymentService.hasTransactionInState({
+      payment: request.payment,
+      transactionType: 'Charge',
+      states: ['Success'],
+    });
+    const hasRefund = this.ctPaymentService.hasTransactionInState({
+      payment: request.payment,
+      transactionType: 'Refund',
+      states: ['Success', 'Pending'],
+    });
+    const hasCancelAuthorization = this.ctPaymentService.hasTransactionInState({
+      payment: request.payment,
+      transactionType: 'CancelAuthorization',
+      states: ['Success', 'Pending'],
+    });
+
+    const wasPaymentReverted = hasRefund || hasCancelAuthorization;
 
     if (hasCharge && !wasPaymentReverted) {
       return this.refundPayment({
@@ -227,9 +235,11 @@ export class MockPaymentService extends AbstractPaymentService {
       });
     }
 
-    const hasAuthorization = request.payment.transactions.some(
-      (tx: Transaction) => tx.type === 'Authorization' && tx.state === 'Success',
-    );
+    const hasAuthorization = this.ctPaymentService.hasTransactionInState({
+      payment: request.payment,
+      transactionType: 'Authorization',
+      states: ['Success'],
+    });
     if (hasAuthorization && !wasPaymentReverted) {
       return this.cancelPayment({ payment: request.payment });
     }
@@ -294,7 +304,10 @@ export class MockPaymentService extends AbstractPaymentService {
       },
       ...(request.data.paymentMethod.type === PaymentMethodType.PURCHASE_ORDER && {
         customFields: {
-          typeKey: launchpadPurchaseOrderCustomType.key,
+          type: {
+            key: launchpadPurchaseOrderCustomType.key,
+            typeId: 'type',
+          },
           fields: {
             [launchpadPurchaseOrderCustomType.purchaseOrderNumber]: request.data.paymentMethod.poNumber,
             [launchpadPurchaseOrderCustomType.invoiceMemo]: request.data.paymentMethod.invoiceMemo,

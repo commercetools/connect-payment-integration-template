@@ -3,7 +3,12 @@ import { ConfigResponse, ModifyPayment, StatusResponse } from '../src/services/t
 import { paymentSDK } from '../src/payment-sdk';
 import { DefaultPaymentService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service';
 import { DefaultCartService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-cart.service';
-import { mockGetPaymentResult, mockUpdatePaymentResult } from './utils/mock-payment-results';
+import {
+  mockGetPaymentResult,
+  mockGetPaymentResultWithoutTransactions,
+  mockUpdatePaymentResult,
+  mockUpdatePaymentResultWithRefundTransaction,
+} from './utils/mock-payment-results';
 import { mockGetCartResult } from './utils/mock-cart-data';
 import * as Config from '../src/config/config';
 import { CreatePaymentRequest, MockPaymentServiceOptions } from '../src/services/types/mock-payment.type';
@@ -307,6 +312,53 @@ describe('mock-payment.service', () => {
           state: 'Failed',
         },
       });
+    });
+  });
+
+  describe('reversePayment', () => {
+    test('it should fail because there are no transactions to revert', async () => {
+      const modifyPaymentOpts: ModifyPayment = {
+        paymentId: 'dummy-paymentId',
+        data: {
+          actions: [
+            {
+              action: 'reversePayment',
+            },
+          ],
+        },
+      };
+      jest
+        .spyOn(DefaultPaymentService.prototype, 'getPayment')
+        .mockReturnValue(Promise.resolve(mockGetPaymentResultWithoutTransactions));
+      jest
+        .spyOn(DefaultPaymentService.prototype, 'updatePayment')
+        .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
+      jest
+        .spyOn(DefaultPaymentService.prototype, 'updatePayment')
+        .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
+
+      const result = paymentService.modifyPayment(modifyPaymentOpts);
+      await expect(result).rejects.toThrow('There is no successful payment transaction to reverse.');
+    });
+
+    test('it should successfully revert transaction', async () => {
+      const modifyPaymentOpts: ModifyPayment = {
+        paymentId: 'dummy-paymentId',
+        data: {
+          actions: [
+            {
+              action: 'reversePayment',
+            },
+          ],
+        },
+      };
+      jest.spyOn(DefaultPaymentService.prototype, 'getPayment').mockReturnValue(Promise.resolve(mockGetPaymentResult));
+      jest
+        .spyOn(DefaultPaymentService.prototype, 'updatePayment')
+        .mockReturnValue(Promise.resolve(mockUpdatePaymentResultWithRefundTransaction));
+
+      const result = await paymentService.modifyPayment(modifyPaymentOpts);
+      expect(result?.outcome).toStrictEqual('approved');
     });
   });
 });

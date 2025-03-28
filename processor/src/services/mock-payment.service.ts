@@ -4,6 +4,7 @@ import {
   ErrorRequiredField,
   TransactionType,
   TransactionState,
+  ErrorInvalidOperation,
 } from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
@@ -11,6 +12,7 @@ import {
   ConfigResponse,
   PaymentProviderModificationResponse,
   RefundPaymentRequest,
+  ReversePaymentRequest,
   StatusResponse,
 } from './types/operation.type';
 
@@ -144,6 +146,14 @@ export class MockPaymentService extends AbstractPaymentService {
    * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async capturePayment(request: CapturePaymentRequest): Promise<PaymentProviderModificationResponse> {
+    await this.ctPaymentService.updatePayment({
+      id: request.payment.id,
+      transaction: {
+        type: 'Charge',
+        amount: request.amount,
+        state: 'Success',
+      },
+    });
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
   }
 
@@ -157,6 +167,14 @@ export class MockPaymentService extends AbstractPaymentService {
    * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async cancelPayment(request: CancelPaymentRequest): Promise<PaymentProviderModificationResponse> {
+    await this.ctPaymentService.updatePayment({
+      id: request.payment.id,
+      transaction: {
+        type: 'CancelAuthorization',
+        amount: request.payment.amountPlanned,
+        state: 'Success',
+      },
+    });
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
   }
 
@@ -170,7 +188,63 @@ export class MockPaymentService extends AbstractPaymentService {
    * @returns Promise with mocking data containing operation status and PSP reference
    */
   public async refundPayment(request: RefundPaymentRequest): Promise<PaymentProviderModificationResponse> {
+    await this.ctPaymentService.updatePayment({
+      id: request.payment.id,
+      transaction: {
+        type: 'Refund',
+        amount: request.amount,
+        state: 'Success',
+      },
+    });
     return { outcome: PaymentModificationStatus.APPROVED, pspReference: request.payment.interfaceId as string };
+  }
+
+  /**
+   * Reverse payment
+   *
+   * @remarks
+   * Abstract method to execute payment reversals in support of automated reversals to be triggered by checkout api. The actual invocation to PSPs should be implemented in subclasses
+   *
+   * @param request
+   * @returns Promise with outcome containing operation status and PSP reference
+   */
+  public async reversePayment(request: ReversePaymentRequest): Promise<PaymentProviderModificationResponse> {
+    const hasCharge = this.ctPaymentService.hasTransactionInState({
+      payment: request.payment,
+      transactionType: 'Charge',
+      states: ['Success'],
+    });
+    const hasRefund = this.ctPaymentService.hasTransactionInState({
+      payment: request.payment,
+      transactionType: 'Refund',
+      states: ['Success', 'Pending'],
+    });
+    const hasCancelAuthorization = this.ctPaymentService.hasTransactionInState({
+      payment: request.payment,
+      transactionType: 'CancelAuthorization',
+      states: ['Success', 'Pending'],
+    });
+
+    const wasPaymentReverted = hasRefund || hasCancelAuthorization;
+
+    if (hasCharge && !wasPaymentReverted) {
+      return this.refundPayment({
+        payment: request.payment,
+        merchantReference: request.merchantReference,
+        amount: request.payment.amountPlanned,
+      });
+    }
+
+    const hasAuthorization = this.ctPaymentService.hasTransactionInState({
+      payment: request.payment,
+      transactionType: 'Authorization',
+      states: ['Success'],
+    });
+    if (hasAuthorization && !wasPaymentReverted) {
+      return this.cancelPayment({ payment: request.payment });
+    }
+
+    throw new ErrorInvalidOperation('There is no successful payment transaction to reverse.');
   }
 
   /**
@@ -230,7 +304,10 @@ export class MockPaymentService extends AbstractPaymentService {
       },
       ...(request.data.paymentMethod.type === PaymentMethodType.PURCHASE_ORDER && {
         customFields: {
-          typeKey: launchpadPurchaseOrderCustomType.key,
+          type: {
+            key: launchpadPurchaseOrderCustomType.key,
+            typeId: 'type',
+          },
           fields: {
             [launchpadPurchaseOrderCustomType.purchaseOrderNumber]: request.data.paymentMethod.poNumber,
             [launchpadPurchaseOrderCustomType.invoiceMemo]: request.data.paymentMethod.invoiceMemo,

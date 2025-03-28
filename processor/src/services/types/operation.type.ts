@@ -24,6 +24,11 @@ export type RefundPaymentRequest = {
   merchantReference?: string;
 };
 
+export type ReversePaymentRequest = {
+  payment: Payment;
+  merchantReference?: string;
+};
+
 export type PaymentProviderModificationResponse = {
   outcome: PaymentModificationStatus;
   pspReference: string;

@@ -151,6 +151,7 @@ export class MockPaymentService extends AbstractPaymentService {
       transaction: {
         type: 'Charge',
         amount: request.amount,
+        interactionId: request.payment.interfaceId,
         state: 'Success',
       },
     });
@@ -172,6 +173,7 @@ export class MockPaymentService extends AbstractPaymentService {
       transaction: {
         type: 'CancelAuthorization',
         amount: request.payment.amountPlanned,
+        interactionId: request.payment.interfaceId,
         state: 'Success',
       },
     });
@@ -193,6 +195,7 @@ export class MockPaymentService extends AbstractPaymentService {
       transaction: {
         type: 'Refund',
         amount: request.amount,
+        interactionId: request.payment.interfaceId,
         state: 'Success',
       },
     });

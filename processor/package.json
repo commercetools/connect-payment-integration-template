@@ -31,7 +31,7 @@
     "@fastify/type-provider-typebox": "5.1.0",
     "@sinclair/typebox": "0.33.22",
     "dotenv": "16.5.0",
-    "fastify": "5.2.2",
+    "fastify": "5.3.0",
     "fastify-plugin": "5.0.1"
   },
   "devDependencies": {
@@ -40,7 +40,7 @@
     "@eslint/js": "^9.24.0",
     "@jest/globals": "29.7.0",
     "@types/jest": "29.5.14",
-    "@types/node": "22.14.0",
+    "@types/node": "22.14.1",
     "@typescript-eslint/eslint-plugin": "8.29.1",
     "@typescript-eslint/parser": "8.29.1",
     "eslint": "9.24.0",
@@ -50,11 +50,11 @@
     "eslint-plugin-unused-imports": "4.1.4",
     "globals": "^16.0.0",
     "jest": "29.7.0",
-    "msw": "2.7.3",
+    "msw": "2.7.4",
     "node-fetch": "3.3.2",
     "nodemon": "3.1.9",
     "prettier": "3.5.3",
-    "ts-jest": "29.3.1",
+    "ts-jest": "29.3.2",
     "ts-node": "10.9.2",
     "typescript": "5.8.3"
   },

@@ -7,6 +7,7 @@ export enum PaymentOutcome {
 
 export enum PaymentMethodType {
   CARD = 'card',
+  CUSTOM_TEST_METHOD = 'customtestmethod',
   INVOICE = 'invoice',
   PURCHASE_ORDER = 'purchaseorder',
 }

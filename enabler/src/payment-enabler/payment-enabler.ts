@@ -163,6 +163,8 @@ export enum PaymentMethod {
   bancontactcard = "bcmc",
   /* Card */
   card = "card",
+  /* Custom method */
+  customtestmethod = "customtestmethod",
   /* EPS */
   eps = "eps",
   /* Google Pay */

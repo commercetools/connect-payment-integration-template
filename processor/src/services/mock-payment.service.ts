@@ -127,6 +127,9 @@ export class MockPaymentService extends AbstractPaymentService {
           type: PaymentMethodType.CARD,
         },
         {
+          type: PaymentMethodType.CUSTOM_TEST_METHOD,
+        },
+        {
           type: PaymentMethodType.INVOICE,
         },
         {

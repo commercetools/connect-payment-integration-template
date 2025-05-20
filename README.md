@@ -151,3 +151,16 @@ This command would start 3 required services, necessary for development
 1. JWT Server
 2. Enabler
 3. Processor
+
+## Included components
+
+This project includes sample code for four types of payment methods:
+
+- Card
+- Invoice
+- Purchase Order
+- Custom Test Method
+
+All of them contain example code only and should not be used in production, but rather as a guide for developing your own payment methods. Some of them, such as "card," "invoice," or "purchase-order," are standard types supported by Checkout. This means that their name, logo, and default description will automatically appear in the checkout component and can later be customized in the Merchant Center. 
+
+The "customtestmethod" is not a standard type, and to be used, it requires this information to be configured in the Merchant Center. 

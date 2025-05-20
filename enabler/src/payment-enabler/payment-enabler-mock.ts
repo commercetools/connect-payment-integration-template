@@ -11,6 +11,7 @@ import {
   PaymentResult,
 } from "./payment-enabler";
 import { DropinEmbeddedBuilder } from "../dropin/dropin-embedded";
+import { CustomTestMethodBuilder } from "../components/payment-methods/custom-test-method/custom-test-method";
 
 declare global {
   interface ImportMeta {
@@ -73,6 +74,7 @@ export class MockPaymentEnabler implements PaymentEnabler {
       card: CardBuilder,
       invoice: InvoiceBuilder,
       purchaseorder: PurchaseOrderBuilder,
+      customtestmethod: CustomTestMethodBuilder,
     };
 
     if (!Object.keys(supportedMethods).includes(type)) {

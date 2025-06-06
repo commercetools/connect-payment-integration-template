@@ -76,14 +76,14 @@
                 }),
               });
 
-              const accessToken = await response.json();
+              const jsonWebToken = await response.json();
 
               const res = await fetch(
                 `${__VITE_PROCESSOR_URL__}/operations/payment-components`,
                 {
                   method: "GET",
                   headers: {
-                    Authorization: `Bearer ${accessToken.token}`,
+                    Authorization: `Bearer ${jsonWebToken.token}`,
                   },
                 }
               );

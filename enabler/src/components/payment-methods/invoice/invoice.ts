@@ -30,7 +30,7 @@ export class Invoice extends BaseComponent {
     this.showPayButton = componentOptions?.showPayButton ?? false;
   }
 
-  mount(selector: string) {
+  async mount(selector: string) {
     document
       .querySelector(selector)
       .insertAdjacentHTML("afterbegin", this._getTemplate());

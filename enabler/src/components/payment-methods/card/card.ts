@@ -30,7 +30,7 @@ export class Card extends BaseComponent {
     this.showPayButton = componentOptions?.showPayButton ?? false;
   }
 
-  mount(selector: string) {
+  async mount(selector: string) {
     document.querySelector(selector).insertAdjacentHTML("afterbegin", this._getTemplate());
     if (this.showPayButton) {
       document.querySelector('#creditCardForm-paymentButton').addEventListener('click', (e) => {
@@ -136,15 +136,15 @@ export class Card extends BaseComponent {
     `
   }
 
-  showValidation() {
+  async showValidation() {
     validateAllFields();
   }
 
-  isValid() {
+  async isValid() {
     return validateAllFields();
   }
 
-  getState() {
+  async getState() {
     return {
       card: {
         endDigits: getInput(fieldIds.cardNumber).value.slice(-4),

@@ -52,40 +52,42 @@ export interface PaymentEnabler {
 /**
  * Represents the interface for a payment component.
  */
+export type PaymentComponentState = {
+  card?: {
+    endDigits?: string;
+    brand?: string;
+    expiryDate?: string;
+  };
+}
+
 export interface PaymentComponent {
   /**
    * Mounts the payment component to the specified selector.
    * @param selector - The selector where the component will be mounted.
    */
-  mount(selector: string): Promise<void> | void;
+  mount(selector: string): Promise<void>;
 
   /**
    * Submits the payment.
    */
-  submit(): Promise<void> | void;
+  submit(): Promise<void>;
 
   /**
    * Shows the validation for the payment component.
    */
-  showValidation?(): Promise<void> | void;
+  showValidation?(): Promise<void>;
 
   /**
    * Checks if the payment component is valid.
    * @returns A boolean indicating whether the payment component is valid.
    */
-  isValid?(): boolean;
+  isValid?(): Promise<boolean>;
 
   /**
    * Gets the state of the payment component.
    * @returns An object representing the state of the payment component.
    */
-  getState?(): {
-    card?: {
-      endDigits?: string;
-      brand?: string;
-      expiryDate?: string;
-    };
-  };
+  getState?(): Promise<PaymentComponentState>;
 
   /**
    * Checks if the payment component is available for use.
@@ -192,27 +194,27 @@ export enum PaymentMethod {
  */
 export type PaymentResult =
   | {
-      /**
-       * Indicates whether the payment was successful.
-       */
-      isSuccess: true;
+    /**
+     * Indicates whether the payment was successful.
+     */
+    isSuccess: true;
 
-      /**
-       * The payment reference.
-       */
-      paymentReference: string;
-    }
+    /**
+     * The payment reference.
+     */
+    paymentReference: string;
+  }
   | {
-      /**
-       * Indicates whether the payment was unsuccessful.
-       */
-      isSuccess: false;
+    /**
+     * Indicates whether the payment was unsuccessful.
+     */
+    isSuccess: false;
 
-      /**
-       * The payment reference.
-       */
-      paymentReference?: string;
-    };
+    /**
+     * The payment reference.
+     */
+    paymentReference?: string;
+  };
 
 /**
  * Represents the options for a payment component.
@@ -251,13 +253,13 @@ export interface DropinComponent {
   /**
    * Submits the drop-in component.
    */
-  submit(): Promise<void> | void;
+  submit(): Promise<void>;
 
   /**
    * Mounts the drop-in component to the specified selector.
    * @param selector - The selector where the drop-in component will be mounted.
    */
-  mount(selector: string): Promise<void> | void;
+  mount(selector: string): Promise<void>;
 }
 
 /**

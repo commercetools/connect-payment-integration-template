@@ -57,17 +57,17 @@ export interface PaymentComponent {
    * Mounts the payment component to the specified selector.
    * @param selector - The selector where the component will be mounted.
    */
-  mount(selector: string): void;
+  mount(selector: string): Promise<void> | void;
 
   /**
    * Submits the payment.
    */
-  submit(): void;
+  submit(): Promise<void> | void;
 
   /**
    * Shows the validation for the payment component.
    */
-  showValidation?(): void;
+  showValidation?(): Promise<void> | void;
 
   /**
    * Checks if the payment component is valid.
@@ -251,13 +251,13 @@ export interface DropinComponent {
   /**
    * Submits the drop-in component.
    */
-  submit(): void;
+  submit(): Promise<void> | void;
 
   /**
    * Mounts the drop-in component to the specified selector.
    * @param selector - The selector where the drop-in component will be mounted.
    */
-  mount(selector: string): void;
+  mount(selector: string): Promise<void> | void;
 }
 
 /**

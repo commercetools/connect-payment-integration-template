@@ -33,9 +33,9 @@ export class Card extends BaseComponent {
   async mount(selector: string) {
     document.querySelector(selector).insertAdjacentHTML("afterbegin", this._getTemplate());
     if (this.showPayButton) {
-      document.querySelector('#creditCardForm-paymentButton').addEventListener('click', (e) => {
+      document.querySelector('#creditCardForm-paymentButton').addEventListener('click', async (e) => {
         e.preventDefault();
-        this.submit();
+        await this.submit();
       });
     }
 

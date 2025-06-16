@@ -41,9 +41,9 @@ export class PurchaseOrder extends BaseComponent {
     if (this.showPayButton) {
       document
         .querySelector("#purchaseOrderForm-paymentButton")
-        .addEventListener("click", (e) => {
+        .addEventListener("click", async (e) => {
           e.preventDefault();
-          this.submit();
+          await this.submit();
         });
     }
 

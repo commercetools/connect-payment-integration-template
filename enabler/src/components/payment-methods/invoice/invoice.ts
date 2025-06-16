@@ -38,9 +38,9 @@ export class Invoice extends BaseComponent {
     if (this.showPayButton) {
       document
         .querySelector("#invoiceForm-paymentButton")
-        .addEventListener("click", (e) => {
+        .addEventListener("click", async (e) => {
           e.preventDefault();
-          this.submit();
+          await this.submit();
         });
     }
   }

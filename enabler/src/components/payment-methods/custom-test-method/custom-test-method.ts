@@ -38,9 +38,9 @@ export class CustomTestMethod extends BaseComponent {
     if (this.showPayButton) {
       document
         .querySelector("#customTestMethod-paymentButton")
-        .addEventListener("click", (e) => {
+        .addEventListener("click", async (e) => {
           e.preventDefault();
-          this.submit();
+          await this.submit();
         });
     }
   }

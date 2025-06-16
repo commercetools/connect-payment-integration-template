@@ -1,5 +1,5 @@
 import { FakeSdk } from '../fake-sdk';
-import { ComponentOptions, PaymentComponent, PaymentMethod, PaymentResult } from '../payment-enabler/payment-enabler';
+import { ComponentOptions, PaymentComponent, PaymentComponentState, PaymentMethod, PaymentResult } from '../payment-enabler/payment-enabler';
 import { BaseOptions } from "../payment-enabler/payment-enabler-mock";
 
 export type ElementOptions = {
@@ -30,18 +30,12 @@ export abstract class BaseComponent implements PaymentComponent {
     this.onError = baseOptions.onError;
   }
 
-  abstract submit(): void;
+  abstract submit(): Promise<void>;
 
-  abstract mount(selector: string): void ;
+  abstract mount(selector: string): Promise<void> ;
 
-  showValidation?(): void;
-  isValid?(): boolean;
-  getState?(): {
-    card?: {
-      endDigits?: string;
-      brand?: string;
-      expiryDate? : string;
-    }
-  };
+  showValidation?(): Promise<void>;
+  isValid?(): Promise<boolean>;
+  getState?(): Promise<PaymentComponentState>;
   isAvailable?(): Promise<boolean>;
 }

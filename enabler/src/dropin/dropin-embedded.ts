@@ -31,13 +31,13 @@ export class DropinComponents implements DropinComponent {
     this.dropinOptions.onDropinReady?.();
   }
 
-  mount(selector: string) {
+  async mount(selector: string) {
     document
       .querySelector(selector)
       .insertAdjacentHTML("afterbegin", "Dropin Embedded");
   }
 
-  submit(): void {
+  async submit(): Promise<void> {
     throw new Error("Implementation not provided");
   }
 }

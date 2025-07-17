@@ -92,7 +92,9 @@ export class Card extends BaseComponent {
     return `
     <div class="${styles.wrapper}">
       <form class="${styles.paymentForm}">
-        <div class="${inputFieldStyles.inputContainer}"> * Required fields for payment by credit card </div>
+        <div class="${inputFieldStyles.inputContainer}"> 
+          <p class="${inputFieldStyles.helperText}">* Required fields for payment by credit card <p>
+        </div>
         <div class="${inputFieldStyles.inputContainer}">
           <label class="${inputFieldStyles.inputLabel}" for="creditCardForm-cardNumber">
             Card number <span aria-hidden="true"> *</span>

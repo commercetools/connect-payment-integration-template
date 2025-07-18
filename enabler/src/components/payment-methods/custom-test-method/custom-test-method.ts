@@ -30,7 +30,7 @@ export class CustomTestMethod extends BaseComponent {
     this.showPayButton = componentOptions?.showPayButton ?? false;
   }
 
-  mount(selector: string) {
+  async mount(selector: string) {
     document
       .querySelector(selector)
       .insertAdjacentHTML("afterbegin", this._getTemplate());
@@ -38,9 +38,9 @@ export class CustomTestMethod extends BaseComponent {
     if (this.showPayButton) {
       document
         .querySelector("#customTestMethod-paymentButton")
-        .addEventListener("click", (e) => {
+        .addEventListener("click", async (e) => {
           e.preventDefault();
-          this.submit();
+          await this.submit();
         });
     }
   }

@@ -22,6 +22,7 @@ export const ActionRefundPaymentSchema = Type.Composite([
   Type.Object({
     amount: AmountSchema,
     merchantReference: Type.Optional(Type.String()),
+    transactionId: Type.Optional(Type.String()),
   }),
 ]);
 

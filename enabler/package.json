@@ -19,7 +19,7 @@
     "jest": "30.0.5",
     "sass": "1.89.2",
     "ts-jest": "^29.4.0",
-    "typescript": "5.8.3",
+    "typescript": "5.9.2",
     "vite": "7.0.6",
     "vite-plugin-css-injected-by-js": "3.5.2"
   },

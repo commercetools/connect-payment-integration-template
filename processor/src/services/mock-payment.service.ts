@@ -403,14 +403,6 @@ export class MockPaymentService extends AbstractPaymentService {
       return {};
     }
 
-    console.log(
-      'handleStoredPaymentMethod',
-      request.data.paymentMethod.storePaymentMethod,
-      storePaymentMethodFirstTime,
-      request.data.paymentMethod.storedPaymentMethodId,
-      payWithExistingStoredPaymentMethod,
-    );
-
     if (storePaymentMethodFirstTime) {
       // The user has indicated that it wants to tokenise the payment. Forward this intent to the PSP.
 

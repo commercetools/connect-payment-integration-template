@@ -424,7 +424,10 @@ export class MockPaymentService extends AbstractPaymentService {
 
     if (payWithExistingStoredPaymentMethod) {
       // The user has selected a existing stored-payment-method to pay with from the enabler/UI.
-      // Depending on how the PSP specific integration works between the enabler and processor it's possible to retrieve the CT payment-method via the ID or token value.
+
+      // It's important to verify if the given payment-method id from the enabler request actually belongs to the `customerId` that is set on the `card`.
+      // This can be achieved by fetching the payment-method from CT using the payment-methods service from the connect-payments-sdk.
+
       const paymentMethod = await this.ctPaymentMethodService.get({
         customerId: ctCart.customerId,
         paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
@@ -432,17 +435,30 @@ export class MockPaymentService extends AbstractPaymentService {
         id: storedPaymentMethodId,
       });
 
-      return { token: paymentMethod.token?.value };
-
+      // Due note that it could be that the PSP integration can only work by sending the actual token value from the enabler components.
+      // In order to retrieve/verify that the token is both known and belongs to the `customerId` that is set on the `card` one of the two following approaches can be used:
       // const paymentMethod = await this.ctPaymentMethodService.getByTokenValue({
       //   customerId: ctCart.customerId,
       //   paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
       //   interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
-      //   tokenValue: '<value from the request>',
+      //   tokenValue: '<value from the incoming request body>',
       // });
-      // By fetching the payment-method from CT using the payment-methods service from the connect-payments-sdk it inherintly validates that the given ID exists and belongs to the customerId.
-      // There is also the possibility to use the this.ctPaymentMethodService.doesTokenBelongsToCustomer(): Promise<boolean> to validate it.
+      //
+      // ### OR
+      //
+      // const belongsToCustomer = await this.ctPaymentMethodService.doesTokenBelongsToCustomer({
+      //   customerId: ctCart.customerId,
+      //   paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
+      //   interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
+      //   tokenValue: '<value from the request body>',
+      // });
+      //
+      // if (!belongsToCustomer) {
+      //   // Take appropiate action
+      // }
+
       // Send the "paymentMethod.token.value" attribute to the PSP in order to pay with an tokenised payment method
+      return { token: paymentMethod.token?.value };
     }
 
     return {};
@@ -487,6 +503,7 @@ export class MockPaymentService extends AbstractPaymentService {
       interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
     });
 
+    // Map over the payment methods and include displayable friendly data for Checkout to use.
     return {
       storedPaymentMethods: storedPaymentMethods.results.map((spm) => {
         const res: StoredPaymentMethod = {
@@ -496,7 +513,7 @@ export class MockPaymentService extends AbstractPaymentService {
           token: spm.token?.value || '',
           type: spm.method || '',
           // The displayOptions is optional but will be used for displaying this data in the UI. Must be enhanced from with data from the PSP since that is not (yet) stored on the payment-methods in CT.
-          // Due to the fact that this template connector does not have a actual PSP attached we return some dummy static data.
+          // Due to the fact that this template connector does not have a actual PSP attached it's not possible to now these values from just the CT payment-methods. For now return some dummy static data.
           displayOptions: {
             brand: {
               key: 'visa',

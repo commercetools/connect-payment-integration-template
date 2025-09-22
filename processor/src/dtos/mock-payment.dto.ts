@@ -23,6 +23,14 @@ export const PaymentRequestSchema = Type.Object({
     type: Type.Enum(PaymentMethodType),
     poNumber: Type.Optional(Type.String()),
     invoiceMemo: Type.Optional(Type.String()),
+    storedPaymentMethodId: Type.Optional(
+      Type.String({ description: 'The ID of the stored-payment-method used to pay with.' }),
+    ),
+    storePaymentMethod: Type.Optional(
+      Type.Boolean({
+        description: 'True if the user has given consent to storing/tokenising the payment method.',
+      }),
+    ),
   }),
   paymentOutcome: PaymentOutcomeSchema,
 });

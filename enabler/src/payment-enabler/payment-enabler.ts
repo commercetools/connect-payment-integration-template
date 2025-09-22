@@ -35,7 +35,7 @@ export interface PaymentEnabler {
    * @throws {Error} If the payment component builder cannot be created.
    */
   createComponentBuilder: (
-    type: string
+    type: string,
   ) => Promise<PaymentComponentBuilder | never>;
 
   /**
@@ -45,8 +45,43 @@ export interface PaymentEnabler {
    * @throws {Error} If the payment drop-in builder cannot be created.
    */
   createDropinBuilder: (
-    type: DropinType
+    type: DropinType,
   ) => Promise<PaymentDropinBuilder | never>;
+
+  /**
+   * Creates a stored payment method builder of the specified type.
+   * @param type - The type of the stored payment method builder.
+   * @returns A promise that resolves to the stored payment method builder.
+   * @throws {Error} If the stored payment method builder cannot be created.
+   */
+  createStoredPaymentMethodBuilder: (
+    type: string,
+  ) => Promise<StoredComponentBuilder | never>;
+
+  /**
+   * Indicates if the stored payment methods is enabled. The actual value should not be determined in the enabled but instead must come from the processor.
+   * @returns A promise that resolves to a boolean value
+   */
+  isStoredPaymentMethodsEnabled: () => Promise<boolean>;
+
+  /**
+   * Returns a list of stored payment methods that are available for the current session. The list comes from the processor.
+   * @param allowedMethodTypes - A list of allowed types
+   * @returns A promise that resolves to a optional list of available stored payment methods.
+   */
+  getStoredPaymentMethods: ({
+    allowedMethodTypes,
+  }: {
+    allowedMethodTypes: string[];
+  }) => Promise<{
+    storedPaymentMethods?: StoredPaymentMethod[];
+  }>;
+
+  /**
+   * If this function is called with "true" then it will indicate to the processor that the user wants to tokenise the payment method. "false" if not.
+   * @param type - Boolean value to indicate if the payment method details should be stored or not.
+   */
+  setStorePaymentDetails(enabled: boolean): void;
 }
 
 /**
@@ -58,7 +93,7 @@ export type PaymentComponentState = {
     brand?: string;
     expiryDate?: string;
   };
-}
+};
 
 export interface PaymentComponent {
   /**
@@ -70,7 +105,11 @@ export interface PaymentComponent {
   /**
    * Submits the payment.
    */
-  submit(): Promise<void>;
+  submit({
+    storePaymentDetails,
+  }: {
+    storePaymentDetails?: boolean;
+  }): Promise<void>;
 
   /**
    * Shows the validation for the payment component.
@@ -149,10 +188,7 @@ export type EnablerOptions = {
    * @param error - The error that occurred.
    * @param paymentReference - The payment reference.
    */
-  onError?: (
-    error: any,
-    context?: { paymentReference?: string }
-  ) => void;
+  onError?: (error: any, context?: { paymentReference?: string }) => void;
 };
 
 /**
@@ -194,27 +230,27 @@ export enum PaymentMethod {
  */
 export type PaymentResult =
   | {
-    /**
-     * Indicates whether the payment was successful.
-     */
-    isSuccess: true;
+      /**
+       * Indicates whether the payment was successful.
+       */
+      isSuccess: true;
 
-    /**
-     * The payment reference.
-     */
-    paymentReference: string;
-  }
+      /**
+       * The payment reference.
+       */
+      paymentReference: string;
+    }
   | {
-    /**
-     * Indicates whether the payment was unsuccessful.
-     */
-    isSuccess: false;
+      /**
+       * Indicates whether the payment was unsuccessful.
+       */
+      isSuccess: false;
 
-    /**
-     * The payment reference.
-     */
-    paymentReference?: string;
-  };
+      /**
+       * The payment reference.
+       */
+      paymentReference?: string;
+    };
 
 /**
  * Represents the options for a payment component.
@@ -229,7 +265,61 @@ export type ComponentOptions = {
    * A callback function that is called when the pay button is clicked.
    * @returns A Promise indicating whether the payment should proceed.
    */
+  onPayButtonClick?: () => Promise<{ storePaymentDetails?: boolean }>;
+};
+
+export interface StoredComponent {
+  submit(): Promise<void>;
+  mount(selector: string): Promise<void>;
+  showValidation?(): Promise<void>;
+  isValid?(): Promise<boolean>;
+  isAvailable?(): Promise<boolean>;
+  remove(): Promise<void>;
+}
+
+export interface StoredComponentBuilder {
+  componentHasSubmit: boolean;
+  build(config: StoredComponentOptions): StoredComponent;
+}
+
+export type StoredComponentOptions = {
+  showPayButton?: boolean;
   onPayButtonClick?: () => Promise<void>;
+  id: string;
+  brands: string[];
+};
+
+type BaseStoredDisplayOptions = {
+  logoUrl?: string;
+  [key: string]: unknown;
+};
+
+type BaseStoredPaymentMethod = {
+  id: string;
+  type: string;
+  createdAt: string; // ISO date string
+  isDefault: boolean;
+  displayOptions: BaseStoredDisplayOptions;
+};
+
+type StoredCardPaymentMethod = BaseStoredPaymentMethod & {
+  type: "card";
+  displayOptions: BaseStoredDisplayOptions & {
+    endDigits?: string;
+    brand?: {
+      key: string;
+    };
+    expiryMonth?: number;
+    expiryYear?: number;
+  };
+};
+
+export type StoredPaymentMethod =
+  | BaseStoredPaymentMethod
+  | StoredCardPaymentMethod;
+
+export type CocoStoredPaymentMethod = StoredPaymentMethod & {
+  token: string;
 };
 
 /**

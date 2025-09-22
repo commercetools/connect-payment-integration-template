@@ -2,18 +2,27 @@ import {
   ComponentOptions,
   PaymentComponent,
   PaymentComponentBuilder,
-  PaymentMethod
-} from '../../../payment-enabler/payment-enabler';
-import buttonStyles from '../../../style/button.module.scss';
-import inputFieldStyles from '../../../style/inputField.module.scss';
-import styles from '../../../style/style.module.scss';
+  PaymentMethod,
+} from "../../../payment-enabler/payment-enabler";
+import buttonStyles from "../../../style/button.module.scss";
+import inputFieldStyles from "../../../style/inputField.module.scss";
+import styles from "../../../style/style.module.scss";
 import { BaseComponent } from "../../base";
-import {addFormFieldsEventListeners, fieldIds, getCardBrand, getInput, validateAllFields} from './utils';
-import {PaymentOutcome, PaymentRequestSchemaDTO} from "../../../dtos/mock-payment.dto.ts";
+import {
+  addFormFieldsEventListeners,
+  fieldIds,
+  getCardBrand,
+  getInput,
+  validateAllFields,
+} from "./utils";
+import {
+  PaymentOutcome,
+  PaymentRequestSchemaDTO,
+} from "../../../dtos/mock-payment.dto.ts";
 import { BaseOptions } from "../../../payment-enabler/payment-enabler-mock.ts";
 
 export class CardBuilder implements PaymentComponentBuilder {
-  public componentHasSubmit = true
+  public componentHasSubmit = true;
 
   constructor(private baseOptions: BaseOptions) {}
 
@@ -23,26 +32,40 @@ export class CardBuilder implements PaymentComponentBuilder {
 }
 
 export class Card extends BaseComponent {
-  private showPayButton: boolean
-  
+  private showPayButton: boolean;
+
   constructor(baseOptions: BaseOptions, componentOptions: ComponentOptions) {
     super(PaymentMethod.card, baseOptions, componentOptions);
     this.showPayButton = componentOptions?.showPayButton ?? false;
   }
 
   async mount(selector: string) {
-    document.querySelector(selector).insertAdjacentHTML("afterbegin", this._getTemplate());
+    document
+      .querySelector(selector)
+      .insertAdjacentHTML("afterbegin", this._getTemplate());
     if (this.showPayButton) {
-      document.querySelector('#creditCardForm-paymentButton').addEventListener('click', async (e) => {
-        e.preventDefault();
-        await this.submit();
-      });
+      document
+        .querySelector("#creditCardForm-paymentButton")
+        .addEventListener("click", async (e) => {
+          e.preventDefault();
+          if (this.getStorePaymentDetails()) {
+            await this.submit({
+              storePaymentDetails: this.getStorePaymentDetails(),
+            });
+          } else {
+            await this.submit({});
+          }
+        });
     }
 
     addFormFieldsEventListeners();
   }
 
-  async submit() {
+  async submit({
+    storePaymentDetails = false,
+  }: {
+    storePaymentDetails?: boolean;
+  }) {
     // here we would call the SDK to submit the payment
     this.sdk.init({ environment: this.environment });
     const isFormValid = validateAllFields();
@@ -54,41 +77,52 @@ export class Card extends BaseComponent {
       // please use respective PSP iframe capabilities to handle PAN data
       const requestData = {
         paymentMethod: {
-            type: this.paymentMethod,
-            cardNumber: getInput(fieldIds.cardNumber).value.replace(/\s/g, ''),
-            expiryMonth: getInput(fieldIds.expiryDate).value.split('/')[0],
-            expiryYear: getInput(fieldIds.expiryDate).value.split('/')[1],
-            cvc: getInput(fieldIds.cvv).value,
-            holderName: getInput(fieldIds.holderName).value,
-        }
+          type: this.paymentMethod,
+          cardNumber: getInput(fieldIds.cardNumber).value.replace(/\s/g, ""),
+          expiryMonth: getInput(fieldIds.expiryDate).value.split("/")[0],
+          expiryYear: getInput(fieldIds.expiryDate).value.split("/")[1],
+          cvc: getInput(fieldIds.cvv).value,
+          holderName: getInput(fieldIds.holderName).value,
+        },
       };
 
       // Mock Validation
-      let isAuthorized = this.isCreditCardAllowed(requestData.paymentMethod.cardNumber);
-      const resultCode = isAuthorized ? PaymentOutcome.AUTHORIZED : PaymentOutcome.REJECTED;
+      let isAuthorized = this.isCreditCardAllowed(
+        requestData.paymentMethod.cardNumber,
+      );
+      const resultCode = isAuthorized
+        ? PaymentOutcome.AUTHORIZED
+        : PaymentOutcome.REJECTED;
 
       const request: PaymentRequestSchemaDTO = {
         paymentMethod: {
           type: this.paymentMethod,
+          ...(storePaymentDetails ? { storePaymentMethod: true } : {}), // In here we pass the consent the user has given to tokenise the payment method
         },
         paymentOutcome: resultCode,
       };
-      const response = await fetch(this.processorUrl + '/payments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Session-Id': this.sessionId },
+      const response = await fetch(this.processorUrl + "/payments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Session-Id": this.sessionId,
+        },
         body: JSON.stringify(request),
       });
       const data = await response.json();
       const isSuccess = resultCode === PaymentOutcome.AUTHORIZED;
 
-      this.onComplete && this.onComplete({ isSuccess, paymentReference: data.paymentReference });
-    } catch(e) {
-      this.onError('Some error occurred. Please try again.');
+      this.onComplete &&
+        this.onComplete({ isSuccess, paymentReference: data.paymentReference });
+    } catch (e) {
+      this.onError("Some error occurred. Please try again.");
     }
   }
 
   private _getTemplate() {
-    const payButton = this.showPayButton ? `<button class="${buttonStyles.button} ${buttonStyles.fullWidth} ${styles.submitButton}" id="creditCardForm-paymentButton">Pay</button>` : '';
+    const payButton = this.showPayButton
+      ? `<button class="${buttonStyles.button} ${buttonStyles.fullWidth} ${styles.submitButton}" id="creditCardForm-paymentButton">Pay</button>`
+      : "";
     return `
     <div class="${styles.wrapper}">
       <form class="${styles.paymentForm}">
@@ -135,7 +169,7 @@ export class Card extends BaseComponent {
         ${payButton}
       </form>
       </div>
-    `
+    `;
   }
 
   async showValidation() {
@@ -161,7 +195,11 @@ export class Card extends BaseComponent {
   }
 
   private isCreditCardAllowed(cardNumber: string) {
-    const allowedCreditCards = ['4111111111111111', '5555555555554444', '341925950237632'];
+    const allowedCreditCards = [
+      "4111111111111111",
+      "5555555555554444",
+      "341925950237632",
+    ];
     return allowedCreditCards.includes(cardNumber);
   }
 }

@@ -326,8 +326,26 @@ export class MockPaymentService extends AbstractPaymentService {
       paymentId: ctPayment.id,
     });
 
-    // Before the call is made to the PSP to create the payment the request payload should be enhanced with stored-payment-methods data.
+    // Fetch the required data and then validate it before making the request to the PSP.
     await this.handleStoredPaymentMethod(request, ctCart);
+
+    // Perform request to PSP and process result:
+    if (request.data.paymentOutcome === PaymentOutcome.AUTHORIZED) {
+      // Depending on the PSP integration the creation of the CT stored payment method could happen in one of two ways:
+      // 1. sync based on the response from the PSP when the payment is created and authorized.
+      // 2. async via a webhook/notification from the PSP after the payment is created and authorized.
+
+      // In this example it will be directly created as described in option 1.
+      if (ctCart.customerId) {
+        await this.ctPaymentMethodService.save({
+          customerId: ctCart.customerId,
+          method: request.data.paymentMethod.type,
+          paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
+          interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
+          token: randomUUID(), // This value should always come from the PSP after they have authorized the payment
+        });
+      }
+    }
 
     const pspReference = randomUUID().toString();
 
@@ -374,11 +392,6 @@ export class MockPaymentService extends AbstractPaymentService {
       return {};
     }
 
-    // The cart needs to have a customerId set
-    if (!ctCart.customerId) {
-      return {};
-    }
-
     // The payment method must be allowed to be tokenised
     if (!getStoredPaymentMethodsConfig().config.allowedPaymentMethods.includes(request.data.paymentMethod.type)) {
       return {};
@@ -395,37 +408,36 @@ export class MockPaymentService extends AbstractPaymentService {
     const storedPaymentMethodId = request.data.paymentMethod.storedPaymentMethodId;
     const payWithExistingStoredPaymentMethod = storedPaymentMethodId !== undefined;
 
-    if (storePaymentMethodFirstTime && payWithExistingStoredPaymentMethod) {
-      log.warn(
-        'It was indicated that the user wants to both tokenise and pay with an existing spm. This scenario should not happen and is most likely a implementation error.',
-      );
-
+    if (!storePaymentMethodFirstTime && !payWithExistingStoredPaymentMethod) {
+      // User does not want to do anything related to stored-payment-methods.
       return {};
+    }
+
+    if (storePaymentMethodFirstTime && payWithExistingStoredPaymentMethod) {
+      // This scenario should never happen. If the enabler indicates it wants to pay and tokenise at the same time there is most likely an implementation error.
+      return {};
+    }
+
+    // The cart needs to have a customerId set if the incoming request indicated that it wants to either pay or tokenise
+    if (!ctCart.customerId) {
+      throw new ErrorRequiredField('customerId', {
+        privateMessage: 'The customerId is not set on the cart yet the customer wants to tokenize the payment',
+        privateFields: {
+          cart: {
+            id: ctCart.id,
+            typeId: 'cart',
+          },
+        },
+      });
     }
 
     if (storePaymentMethodFirstTime) {
       // The user has indicated that it wants to tokenise the payment. Forward this intent to the PSP.
-
-      // Depending on the PSP integration the creation of the CT stored payment method could happen in one of two ways:
-      // 1. sync based on the response from the PSP when the payment is created
-      // 2. async via a webhook/notification from the PSP after the payment is created
-
-      const mimickedTokenValueFromThePsp = randomUUID(); // This value should always come from the PSP after they have Authorization the payment
-
-      // In this example it will be directly created as in option 1.
-      await this.ctPaymentMethodService.save({
-        customerId: ctCart.customerId,
-        method: request.data.paymentMethod.type,
-        paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
-        interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
-        token: mimickedTokenValueFromThePsp,
-      });
-    }
-
-    if (payWithExistingStoredPaymentMethod) {
+      return { storePaymentMethod: storePaymentMethodFirstTime };
+    } else if (payWithExistingStoredPaymentMethod) {
       // The user has selected a existing stored-payment-method to pay with from the enabler/UI.
 
-      // It's important to verify if the given payment-method id from the enabler request actually belongs to the `customerId` that is set on the `card`.
+      // It's important to verify if the given payment-method id from the enabler request actually belongs to the `customerId` that is set on the `cart`.
       // This can be achieved by fetching the payment-method from CT using the payment-methods service from the connect-payments-sdk.
 
       const paymentMethod = await this.ctPaymentMethodService.get({
@@ -435,8 +447,8 @@ export class MockPaymentService extends AbstractPaymentService {
         id: storedPaymentMethodId,
       });
 
-      // Due note that it could be that the PSP integration can only work by sending the actual token value from the enabler components.
-      // In order to retrieve/verify that the token is both known and belongs to the `customerId` that is set on the `card` one of the two following approaches can be used:
+      // Due note that it could be that the PSP integration works by sending the actual token value from the enabler components to the `/payments` API in the processor.
+      // In this case one of the two following approaches can be chosen to achieve the same validation:
       // const paymentMethod = await this.ctPaymentMethodService.getByTokenValue({
       //   customerId: ctCart.customerId,
       //   paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,

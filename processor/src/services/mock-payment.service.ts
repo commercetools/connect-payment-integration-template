@@ -327,24 +327,26 @@ export class MockPaymentService extends AbstractPaymentService {
     });
 
     // Fetch the required data and then validate it before making the request to the PSP.
-    await this.handleStoredPaymentMethod(request, ctCart);
+    const storedPaymentMethodDataOptions = await this.handleStoredPaymentMethod(request, ctCart);
 
-    // Perform request to PSP and process result:
-    if (request.data.paymentOutcome === PaymentOutcome.AUTHORIZED) {
-      // Depending on the PSP integration the creation of the CT stored payment method could happen in one of two ways:
-      // 1. sync based on the response from the PSP when the payment is created and authorized.
-      // 2. async via a webhook/notification from the PSP after the payment is created and authorized.
+    // Perform request to PSP
 
+    // Depending on the PSP integration the creation of the CT stored payment method could happen in one of two ways:
+    // 1. sync based on the response from the PSP when the payment is created and authorized.
+    // 2. async via a webhook/notification from the PSP after the payment is created and authorized.
+    if (
+      request.data.paymentOutcome === PaymentOutcome.AUTHORIZED &&
+      ctCart.customerId &&
+      storedPaymentMethodDataOptions.storePaymentMethod
+    ) {
       // In this example it will be directly created as described in option 1.
-      if (ctCart.customerId) {
-        await this.ctPaymentMethodService.save({
-          customerId: ctCart.customerId,
-          method: request.data.paymentMethod.type,
-          paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
-          interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
-          token: randomUUID(), // This value should always come from the PSP after they have authorized the payment
-        });
-      }
+      await this.ctPaymentMethodService.save({
+        customerId: ctCart.customerId,
+        method: request.data.paymentMethod.type,
+        paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
+        interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
+        token: randomUUID(), // This value should always come from the PSP after they have authorized the payment
+      });
     }
 
     const pspReference = randomUUID().toString();
@@ -407,6 +409,13 @@ export class MockPaymentService extends AbstractPaymentService {
 
     const storedPaymentMethodId = request.data.paymentMethod.storedPaymentMethodId;
     const payWithExistingStoredPaymentMethod = storedPaymentMethodId !== undefined;
+
+    console.log(
+      request.data.paymentMethod.storePaymentMethod,
+      storePaymentMethodFirstTime,
+      request.data.paymentMethod.storedPaymentMethodId,
+      payWithExistingStoredPaymentMethod,
+    );
 
     if (!storePaymentMethodFirstTime && !payWithExistingStoredPaymentMethod) {
       // User does not want to do anything related to stored-payment-methods.

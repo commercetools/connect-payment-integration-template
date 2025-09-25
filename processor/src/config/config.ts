@@ -28,7 +28,7 @@ export const config = {
 
   // env variables related to stored payment methods feature
   storedPaymentMethodsEnabled: process.env.STORED_PAYMENT_METHODS_ENABLED || 'false',
-  storedPaymentMethodsPaymentInterface: process.env.STORED_PAYMENT_METHODS_PAYMENT_INTERFACE || 'psp-paymentInterface',
+  storedPaymentMethodsPaymentInterface: process.env.STORED_PAYMENT_METHODS_PAYMENT_INTERFACE || 'psp-template',
   storedPaymentMethodsInterfaceAccount: process.env.STORED_PAYMENT_METHODS_INTERFACE_ACCOUNT || undefined,
 };
 

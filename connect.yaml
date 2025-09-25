@@ -39,7 +39,7 @@ deployAs:
           description: If set to "true" then the stored payment methods feature is enabled. Default value is "false".
           required: false
         - key: STORED_PAYMENT_METHODS_PAYMENT_INTERFACE
-          description: The payment method payment interface value used in the commerceotools payment methods. Default value is "adyen".
+          description: The payment method payment interface value used in the commerceotools payment methods. Default value is "psp-template".
           required: false
         - key: STORED_PAYMENT_METHODS_INTERFACE_ACCOUNT
           description: The payment method interface account value used in the commerceotools payment methods.

@@ -12,7 +12,7 @@
     "serve": "npm run build && serve public -l 3000 --cors"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "serve": "14.2.5"
   },
   "devDependencies": {
     "@types/node": "24.1.0",
@@ -21,7 +21,7 @@
     "ts-jest": "^29.4.0",
     "ts-node": "^10.9.2",
     "typescript": "5.8.3",
-    "vite": "7.0.6",
+    "vite": "7.1.5",
     "vite-plugin-css-injected-by-js": "3.5.2"
   },
   "overrides": {

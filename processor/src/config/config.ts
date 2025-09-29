@@ -24,6 +24,12 @@ export const config = {
   // supportedUIElements: convertStringCommaSeparatedValuesToArray(process.env.SUPPORTED_UI_ELEMENTS),
   // enableStoreDetails: process.env.ENABLE_STORE_DETAILS === 'true' ? true : false,
   // sellerReturnUrl: process.env.SELLER_RETURN_URL || ''
+  //
+
+  // env variables related to stored payment methods feature
+  storedPaymentMethodsEnabled: process.env.STORED_PAYMENT_METHODS_ENABLED || 'false',
+  storedPaymentMethodsPaymentInterface: process.env.STORED_PAYMENT_METHODS_PAYMENT_INTERFACE || 'psp-template',
+  storedPaymentMethodsInterfaceAccount: process.env.STORED_PAYMENT_METHODS_INTERFACE_ACCOUNT || undefined,
 };
 
 export const getConfig = () => {

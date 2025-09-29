@@ -107,6 +107,15 @@ deployAs:
           description: JWT Issuer for jwt validation (example - https://mc-api.europe-west1.gcp.commercetools.com)
           required: true
           default: https://mc-api.europe-west1.gcp.commercetools.com
+        - key: STORED_PAYMENT_METHODS_ENABLED
+          description: If set to "true" then the stored payment methods feature is enabled. Default value is "false".
+          required: false
+        - key: STORED_PAYMENT_METHODS_PAYMENT_INTERFACE
+          description: The payment method payment interface value used in the commerceotools payment methods. Default value is "psp-template".
+          required: false
+        - key: STORED_PAYMENT_METHODS_INTERFACE_ACCOUNT
+          description: The payment method interface account value used in the commerceotools payment methods.
+          required: false
       securedConfiguration:
         - key: CTP_CLIENT_SECRET
           description: commercetools client secret
@@ -123,6 +132,34 @@ Here you can see the details about various variables in configuration
 - `CTP_SESSION_URL`: The URL for session creation in commercetools platform. Connectors relies on the session created to be able to share information between enabler and processor. The default value is `https://session.europe-west1.gcp.commercetools.com`.
 - `CTP_JWKS_URL`: The URL which provides JSON Web Key Set. Default value is `https://mc-api.europe-west1.gcp.commercetools.com/.well-known/jwks.json`
 - `CTP_JWT_ISSUER`: The issuer inside JSON Web Token which is required in JWT validation process. Default value is `https://mc-api.europe-west1.gcp.commercetools.com`
+- `STORED_PAYMENT_METHODS_ENABLED`: Indicates if the stored payment methods feature is enabled or not. Must be a string value of "true" or "false". Default it's "false".
+- `STORED_PAYMENT_METHODS_PAYMENT_INTERFACE`: A string value which is used to set the corresponding "paymentInterface" value on the CT payment-methods. If this value gets changed then previously created payment-methods won't be retrieved and would need to be manually migrated over.
+- `STORED_PAYMENT_METHODS_INTERFACE_ACCOUNT`: A string value which is used to set the corresponding "interfaceAccount" value on the CT payment-methods. If this value gets changed then previously created payment-methods won't be retrieved and would need to be manually migrated over.
+
+## Feature
+
+### stored payment methods
+
+The feature stored payment methods allows the payment details to be tokenised to the next time the customers goes through Checkout they won't have to re-enter the payment details.
+
+Currently supported payment-methods for storing:
+
+- `card`
+
+#### Setting up stored payment methods
+
+1. update the env configuration
+   1. set `STORED_PAYMENT_METHODS_ENABLED` to `true`. By default it is not enabled.
+   2. set `STORED_PAYMENT_METHODS_PAYMENT_INTERFACE` to any string value.
+   3. optionally set `STORED_PAYMENT_METHODS_INTERFACE_ACCOUNT` to any string value.
+2. create a new CT API client which the additional scope of `manage_payment_methods` and update the corresponding env values. The connector health check will fail if the feature is enabled but the configured API client is missing this scope.
+3. ensure that before Checkout is instantiated the `cart.customerId` is set to the correct customer.
+
+#### CT payment-methods and tokens
+
+When a payment method is tokenized for the first time the psp template connector will create a new CT payment-method. The payment-method is attached to the `cart.customerId` as well as the `paymentInterface` and `interfaceAccount` are set based on the previously configured env values.
+
+The next time the same customer goes through Checkout (either using drop-ins or web-components) they will see the stored payment method as a option to pay with.
 
 ## Development
 
@@ -161,6 +198,6 @@ This project includes sample code for four types of payment methods:
 - Purchase Order
 - Custom Test Method
 
-All of them contain example code only and should not be used in production, but rather as a guide for developing your own payment methods. Some of them, such as "card," "invoice," or "purchase-order," are standard types supported by Checkout. This means that their name, logo, and default description will automatically appear in the checkout component and can later be customized in the Merchant Center. 
+All of them contain example code only and should not be used in production, but rather as a guide for developing your own payment methods. Some of them, such as "card," "invoice," or "purchase-order," are standard types supported by Checkout. This means that their name, logo, and default description will automatically appear in the checkout component and can later be customized in the Merchant Center.
 
-The "customtestmethod" is not a standard type, and to be used, it requires this information to be configured in the Merchant Center. 
+The "customtestmethod" is not a standard type, and to be used, it requires this information to be configured in the Merchant Center.

@@ -410,13 +410,6 @@ export class MockPaymentService extends AbstractPaymentService {
     const storedPaymentMethodId = request.data.paymentMethod.storedPaymentMethodId;
     const payWithExistingStoredPaymentMethod = storedPaymentMethodId !== undefined;
 
-    console.log(
-      request.data.paymentMethod.storePaymentMethod,
-      storePaymentMethodFirstTime,
-      request.data.paymentMethod.storedPaymentMethodId,
-      payWithExistingStoredPaymentMethod,
-    );
-
     if (!storePaymentMethodFirstTime && !payWithExistingStoredPaymentMethod) {
       // User does not want to do anything related to stored-payment-methods.
       return {};

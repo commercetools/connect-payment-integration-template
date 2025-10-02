@@ -29,6 +29,7 @@ export const mockGetCartResult = () => {
     shippingInfo: shippingInfo,
     createdAt: '2024-01-01T00:00:00Z',
     lastModifiedAt: '2024-01-01T00:00:00Z',
+    priceRoundingMode: 'HalfEven',
   };
   return mockGetCartResult;
 };

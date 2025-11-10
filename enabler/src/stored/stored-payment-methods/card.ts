@@ -25,7 +25,6 @@ import {
   PaymentRequestSchemaDTO,
 } from "../../dtos/mock-payment.dto";
 
-let cvvFieldIdCounter = 0;
 export class StoredCardBuilder extends MockBaseStoredComponentBuilder {
   constructor(baseOptions: BaseOptions) {
     super(PaymentMethod.card, baseOptions);
@@ -67,7 +66,7 @@ export class StoredCardComponent extends DefaultMockStoredComponent {
   }
 
   init({ id }: { id: string }): void {
-    this.cvvFieldId = `creditCardForm-cvv-${++cvvFieldIdCounter}`; // Generate a unique ID for the CVV field to avoid conflicts with other cvv fields
+    this.cvvFieldId = `creditCardForm-cvv-${crypto.randomUUID()}`; // Generate a unique ID for the CVV field to avoid conflicts with other cvv fields
     const cocoStoredPaymentMethod =
       this.storedPaymentMethodsConfig.storedPaymentMethods.find((spm) => {
         return spm.id === id;

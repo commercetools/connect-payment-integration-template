@@ -26,6 +26,7 @@ import {
   PaymentRequestSchemaDTO,
 } from "../../dtos/mock-payment.dto";
 
+let cvvFieldIdCounter = 0;
 export class StoredCardBuilder extends MockBaseStoredComponentBuilder {
   constructor(baseOptions: BaseOptions) {
     super(PaymentMethod.card, baseOptions);
@@ -52,6 +53,7 @@ export class StoredCardBuilder extends MockBaseStoredComponentBuilder {
 
 export class StoredCardComponent extends DefaultMockStoredComponent {
   private showPayButton: boolean;
+  private cvvFieldId: string;
 
   constructor(opts: {
     paymentMethod: PaymentMethod;
@@ -66,6 +68,7 @@ export class StoredCardComponent extends DefaultMockStoredComponent {
   }
 
   init({ id }: { id: string }): void {
+    this.cvvFieldId = `creditCardForm-cvv-${++cvvFieldIdCounter}`; // Generate a unique ID for the CVV field to avoid conflicts with other cvv fields
     const cocoStoredPaymentMethod =
       this.storedPaymentMethodsConfig.storedPaymentMethods.find((spm) => {
         return spm.id === id;
@@ -81,11 +84,11 @@ export class StoredCardComponent extends DefaultMockStoredComponent {
   }
 
   async showValidation() {
-    validateAllFieldsStored();
+    validateAllFieldsStored(this.cvvFieldId);
   }
 
   async isValid() {
-    return validateAllFieldsStored();
+    return validateAllFieldsStored(this.cvvFieldId);
   }
 
   async submit(): Promise<void> {
@@ -102,7 +105,7 @@ export class StoredCardComponent extends DefaultMockStoredComponent {
       const requestData = {
         paymentMethod: {
           type: this.paymentMethod,
-          cvc: getInput(fieldIds.cvv).value,
+          cvc: getInput(this.cvvFieldId).value,
         },
       };
 
@@ -163,7 +166,7 @@ export class StoredCardComponent extends DefaultMockStoredComponent {
     ) {
       const brand = this.usedCocoStoredPaymentMethod.displayOptions.brand
         .key as string;
-      addFormFieldsEventListenersForStoredCardComponent(brand);
+      addFormFieldsEventListenersForStoredCardComponent(brand, this.cvvFieldId);
     }
 
     return;
@@ -180,11 +183,11 @@ export class StoredCardComponent extends DefaultMockStoredComponent {
            <p class="${inputFieldStyles.helperText}">* Required fields for payment by credit card <p>
          </div>
          <div class="${inputFieldStyles.inputContainer}">
-           <label class="${inputFieldStyles.inputLabel}" for="creditCardForm-cvv">
+           <label class="${inputFieldStyles.inputLabel}" for="${this.cvvFieldId}">
              CVC/CVV <span aria-hidden="true"> *</span>
            </label>
-           <input class="${inputFieldStyles.inputField}" type="text" id="creditCardForm-cvv" name="cvv" value="" aria-describedby="cvvInput-ally">
-           <span class="${styles.hidden} ${inputFieldStyles.errorField}" id="cvvInput-ally" role="alert" aria-live="assertive" tabindex="0">Invalid CVV</span>
+           <input class="${inputFieldStyles.inputField}" type="text" id="${this.cvvFieldId}" name="cvv" value="" aria-describedby="${this.cvvFieldId}Input-ally">
+           <span class="${styles.hidden} ${inputFieldStyles.errorField}" id="${this.cvvFieldId}Input-ally" role="alert" aria-live="assertive" tabindex="0">Invalid CVV</span>
          </div>
          ${payButton}
        </form>

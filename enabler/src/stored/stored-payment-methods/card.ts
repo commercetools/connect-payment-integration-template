@@ -17,7 +17,6 @@ import inputFieldStyles from "../../style/inputField.module.scss";
 import styles from "../../style/style.module.scss";
 import {
   addFormFieldsEventListenersForStoredCardComponent,
-  fieldIds,
   getInput,
   validateAllFieldsStored,
 } from "../../components/payment-methods/card/utils";

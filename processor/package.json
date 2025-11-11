@@ -1,6 +1,6 @@
 {
   "name": "payment-integration-template",
-  "version": "4.6.2",
+  "version": "4.7.0",
   "description": "Payment provider integration template",
   "main": "dist/server.js",
   "scripts": {

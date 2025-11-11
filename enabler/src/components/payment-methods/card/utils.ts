@@ -227,8 +227,9 @@ export const addFormFieldsEventListeners = () => {
   addHolderNameEventListeners();
 };
 
-const addCvvStoredEventListeners = (brand: string) => {
-  const cvv = getInput(fieldIds.cvv);
+const addCvvStoredEventListeners = (brand: string, cvvFieldId: string) => {
+  const fieldToUse = cvvFieldId || fieldIds.cvv;
+  const cvv = getInput(fieldToUse);
   cvv.addEventListener("input", () => {
     if (isNaN(Number(cvv.value))) {
       cvv.value = cvv.value.slice(0, -1);
@@ -241,21 +242,23 @@ const addCvvStoredEventListeners = (brand: string) => {
       cvv.value = cvv.value.slice(0, 3);
     }
   });
-  handleFieldValidation(fieldIds.cvv);
+  handleFieldValidation(fieldToUse);
 };
 
 export const addFormFieldsEventListenersForStoredCardComponent = (
   brand: string,
+  cvvFieldId?: string
 ) => {
-  addCvvStoredEventListeners(brand);
+  addCvvStoredEventListeners(brand, cvvFieldId);
 };
 
-export const validateAllFieldsStored = () => {
+export const validateAllFieldsStored = (cvvFieldId?: string) => {
   let isValid = true;
+  const fieldToValidate = cvvFieldId || fieldIds.cvv;
 
-  if (!isFieldValid(fieldIds.cvv)) {
+  if (!isFieldValid(fieldToValidate)) {
     isValid = false;
-    showErrorIfInvalid(fieldIds.cvv);
+    showErrorIfInvalid(fieldToValidate);
   }
 
   return isValid;

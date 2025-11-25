@@ -60,23 +60,23 @@ const handleFieldValidation = (field: string) => {
 
 const isFieldValid = (field: string) => {
   const input = getInput(field);
-  switch (field) {
-    case "creditCardForm-cardNumber":
-      const cardNumber = getInput(fieldIds.cardNumber);
-      const brand = getCardBrand(cardNumber.value);
-      if (brand === "amex") {
-        return input.value.replace(/\s/g, "").length === 15;
-      } else {
-        return input.value.replace(/\s/g, "").length === 16;
-      }
-    case "creditCardForm-expiryDate":
-      return input.value.length === 5;
-    case "creditCardForm-cvv":
-      return input.value.length === 3 || input.value.length === 4;
-    case "creditCardForm-holderNameLabel":
-      return input.value.length > 0;
-    default:
-      return false;
+
+  if (field === "creditCardForm-cardNumber") {
+    const cardNumber = getInput(fieldIds.cardNumber);
+    const brand = getCardBrand(cardNumber.value);
+    if (brand === "amex") {
+      return input.value.replace(/\s/g, "").length === 15;
+    } else {
+      return input.value.replace(/\s/g, "").length === 16;
+    }
+  } else if (field === "creditCardForm-expiryDate") {
+    return input.value.length === 5;
+  } else if (field.startsWith("creditCardForm-cvv")) {
+    return input.value.length === 3 || input.value.length === 4;
+  } else if (field === "creditCardForm-holderNameLabel") {
+    return input.value.length > 0;
+  } else {
+    return false;
   }
 };
 
@@ -228,8 +228,7 @@ export const addFormFieldsEventListeners = () => {
 };
 
 const addCvvStoredEventListeners = (brand: string, cvvFieldId: string) => {
-  const fieldToUse = cvvFieldId || fieldIds.cvv;
-  const cvv = getInput(fieldToUse);
+  const cvv = getInput(cvvFieldId);
   cvv.addEventListener("input", () => {
     if (isNaN(Number(cvv.value))) {
       cvv.value = cvv.value.slice(0, -1);
@@ -242,23 +241,22 @@ const addCvvStoredEventListeners = (brand: string, cvvFieldId: string) => {
       cvv.value = cvv.value.slice(0, 3);
     }
   });
-  handleFieldValidation(fieldToUse);
+  handleFieldValidation(cvvFieldId);
 };
 
 export const addFormFieldsEventListenersForStoredCardComponent = (
   brand: string,
-  cvvFieldId?: string
+  cvvFieldId: string,
 ) => {
   addCvvStoredEventListeners(brand, cvvFieldId);
 };
 
-export const validateAllFieldsStored = (cvvFieldId?: string) => {
+export const validateAllFieldsStored = (cvvFieldId: string) => {
   let isValid = true;
-  const fieldToValidate = cvvFieldId || fieldIds.cvv;
 
-  if (!isFieldValid(fieldToValidate)) {
+  if (!isFieldValid(cvvFieldId)) {
     isValid = false;
-    showErrorIfInvalid(fieldToValidate);
+    showErrorIfInvalid(cvvFieldId);
   }
 
   return isValid;

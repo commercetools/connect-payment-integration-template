@@ -59,6 +59,16 @@ export interface PaymentEnabler {
   ) => Promise<StoredComponentBuilder | never>;
 
   /**
+   * Creates an express payment builder of the specified type.
+   * @param type - The type of the express payment builder.
+   * @returns A promise that resolves to the express payment builder.
+   * @throws {Error} If the express payment builder cannot be created.
+   */
+  createExpressBuilder: (
+    type: string
+  ) => Promise<PaymentExpressBuilder | never>;
+
+  /**
    * Indicates if the stored payment methods is enabled. The actual value should not be determined in the enabled but instead must come from the processor.
    * @returns A promise that resolves to a boolean value
    */
@@ -389,4 +399,73 @@ export interface PaymentDropinBuilder {
    * @returns The built drop-in component.
    */
   build(config: DropinOptions): DropinComponent;
+}
+
+export interface ExpressComponent {
+  mount(selector: string): void;
+}
+
+export type ExpressAddressData = {
+  country: string;
+  firstName?: string;
+  lastName?: string;
+  streetName?: string;
+  streetNumber?: string;
+  additionalStreetInfo?: string;
+  region?: string;
+  postalCode?: string;
+  city?: string;
+  phone?: string;
+  email?: string;
+};
+
+type OnclickResponse = {
+  sessionId: string;
+};
+
+export type OnComplete = (opts: {
+  isSuccess: boolean;
+  paymentReference: string;
+  method: {
+    type: string;
+  };
+}) => void;
+
+export type CTAmount = {
+  centAmount: number;
+  currencyCode: string;
+  fractionDigits: number;
+};
+
+// ExpressShippingOptionData can be structured to meet the type contract of the PSP implemented.
+export type ExpressShippingOptionData = {
+  id: string;
+  name: string;
+  description?: string;
+  isSelected?: boolean;
+  amount: CTAmount;
+};
+
+export type ExpressOptions = {
+  allowedCountries?: string[];
+  onPayButtonClick: () => Promise<OnclickResponse>;
+  onShippingAddressSelected: (opts: {
+    address: ExpressAddressData;
+  }) => Promise<void>;
+  getShippingMethods: (opts: {
+    address: ExpressAddressData;
+  }) => Promise<ExpressShippingOptionData[]>;
+  onShippingMethodSelected: (opts: {
+    shippingMethod: { id: string };
+  }) => Promise<void>;
+  onPaymentSubmit: (opts: {
+    shippingAddress: ExpressAddressData;
+    billingAddress: ExpressAddressData;
+  }) => Promise<void>;
+  onComplete?: OnComplete;
+  initialAmount: CTAmount;
+};
+
+export interface PaymentExpressBuilder {
+  build(config: ExpressOptions): ExpressComponent;
 }

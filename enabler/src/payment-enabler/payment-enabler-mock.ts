@@ -9,12 +9,14 @@ import {
   PaymentComponentBuilder,
   PaymentDropinBuilder,
   PaymentEnabler,
+  PaymentExpressBuilder,
   PaymentResult,
   StoredComponentBuilder,
 } from "./payment-enabler";
 import { DropinEmbeddedBuilder } from "../dropin/dropin-embedded";
 import { CustomTestMethodBuilder } from "../components/payment-methods/custom-test-method/custom-test-method";
 import { StoredCardBuilder } from "../stored/stored-payment-methods/card";
+import { SampleExpressBuilder } from "../express/sample";
 
 declare global {
   interface ImportMeta {
@@ -200,6 +202,24 @@ export class MockPaymentEnabler implements PaymentEnabler {
         `Component type not supported: ${type}. Supported types: ${Object.keys(
           supportedMethods,
         ).join(", ")}`,
+      );
+    }
+
+    return new supportedMethods[type](baseOptions);
+  }
+
+  async createExpressBuilder(type: string): Promise<PaymentExpressBuilder | never> {
+    const { baseOptions } = await this.setupData;
+
+    const supportedMethods = {
+      sample: SampleExpressBuilder,
+    };
+
+    if (!Object.keys(supportedMethods).includes(type)) {
+      throw new Error(
+        `Express checkout type not supported: ${type}. Supported types: ${Object.keys(
+          supportedMethods
+        ).join(", ")}`
       );
     }
 

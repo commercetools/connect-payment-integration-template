@@ -6,11 +6,7 @@ import {
   OnComplete,
 } from "../payment-enabler/payment-enabler";
 
-export type ShippingMethodCost = {
-  [key: string]: string;
-};
-
-export abstract class DefaultAdyenExpressComponent implements ExpressComponent {
+export abstract class DefaultExpressComponent implements ExpressComponent {
   protected processorUrl: string;
   protected sessionId: string;
   protected countryCode: string;
@@ -40,7 +36,7 @@ export abstract class DefaultAdyenExpressComponent implements ExpressComponent {
 
   abstract init(): void;
 
-  abstract mount(selector: string): Promise<void>;
+  abstract mount(selector: string): void;
 
   async setShippingAddress(opts: {
     address: ExpressAddressData;

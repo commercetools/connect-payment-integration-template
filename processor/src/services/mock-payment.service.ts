@@ -166,6 +166,11 @@ export class MockPaymentService extends AbstractPaymentService {
           type: PaymentMethodType.PURCHASE_ORDER,
         },
       ],
+      express: [
+        {
+          type: 'sample',
+        },
+      ],
     };
   }
 

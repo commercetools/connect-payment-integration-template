@@ -32,14 +32,18 @@ export type StoredPaymentMethodsConfig = {
 export type BaseOptions = {
   sdk: FakeSdk;
   processorUrl: string;
+  countryCode?: string;
+  currencyCode?: string;
   sessionId: string;
   environment: string;
+  paymentMethodConfig?: { [key: string]: string };
   locale?: string;
   onComplete: (result: PaymentResult) => void;
   onError: (error: any, context?: { paymentReference?: string }) => void;
   storedPaymentMethodsConfig: StoredPaymentMethodsConfig;
   getStorePaymentDetails: () => boolean;
   setStorePaymentDetails: (enabled: boolean) => void;
+  setSessionId?: (sessionId: string) => void;
 };
 
 export class MockPaymentEnabler implements PaymentEnabler {

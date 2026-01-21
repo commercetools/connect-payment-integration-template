@@ -9,13 +9,14 @@ export async function createLaunchpadPurchaseOrderNumberCustomType(): Promise<vo
     .types()
     .get({
       queryArgs: {
-        where: `key="${launchpadPurchaseOrderCustomType.key}"`,
+        where: `key="${launchpadPurchaseOrderCustomType.key}"`, //TODO: needs to be configured in connect.yaml
       },
     })
     .execute();
 
   if (getRes.body.results.length) {
     log.info('Launchpad purchase order number custom type already exists. Skipping creation.');
+    //TODO: check if the correct field definitions and resourceTypeIds exist, if not create them
     return;
   }
 
@@ -23,7 +24,7 @@ export async function createLaunchpadPurchaseOrderNumberCustomType(): Promise<vo
     .types()
     .post({
       body: {
-        key: launchpadPurchaseOrderCustomType.key,
+        key: launchpadPurchaseOrderCustomType.key, //TODO: needs to be configured in connect.yaml
         name: { en: 'Additional fields to store purchase order information' },
         resourceTypeIds: ['payment'],
         fieldDefinitions: [

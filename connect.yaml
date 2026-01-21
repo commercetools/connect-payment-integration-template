@@ -15,6 +15,9 @@ deployAs:
         - key: CTP_CLIENT_ID
           description: commercetools client ID with manage_payments, manage_orders, view_sessions, view_api_clients, manage_checkout_payment_intents, introspect_oauth_tokens, manage_types and view_types scopes
           required: true
+        - key: TYPE_DEFINITION_KEY
+          required: true
+          default: payment-launchpad-purchase-order
         - key: CTP_AUTH_URL
           description: commercetools Auth URL
           required: true

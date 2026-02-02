@@ -12,6 +12,7 @@
     "serve": "npm run build && serve public -l 3000 --cors"
   },
   "dependencies": {
+    "@commercetools-backend/loggers": "^25.1.0",
     "serve": "14.2.5"
   },
   "devDependencies": {
@@ -25,6 +26,7 @@
     "vite-plugin-css-injected-by-js": "3.5.2"
   },
   "overrides": {
-    "path-to-regexp": "3.3.0"
+    "path-to-regexp": "3.3.0",
+    "lodash": "^4.17.23"
   }
 }

@@ -36,37 +36,44 @@ export const updateRequestContext = (ctx: Partial<ContextData>) => {
 
 export const getCtSessionIdFromContext = (): string => {
   const contextData = getRequestContext() as ContextData;
-  return paymentSdk.getCtSessionIdFromContext(contextData) as string;
+  // SessionAuthentication stores sessionId as credentials
+  return contextData.authentication?.getCredentials() as string;
 };
 
 export const getCartIdFromContext = (): string => {
   const contextData = getRequestContext() as ContextData;
-  return paymentSdk.getCartIdFromContext(contextData) as string;
+  const principal = contextData.authentication?.getPrincipal() as any;
+  return principal?.cartId as string;
 };
 
 export const getAllowedPaymentMethodsFromContext = (): string[] => {
   const contextData = getRequestContext() as ContextData;
-  return paymentSdk.getAllowedPaymentMethodsFromContext(contextData) as string[];
+  const principal = contextData.authentication?.getPrincipal() as any;
+  return (principal?.allowedPaymentMethods as string[]) || [];
 };
 
 export const getPaymentInterfaceFromContext = (): string | undefined => {
   const contextData = getRequestContext() as ContextData;
-  return paymentSdk.getPaymentInterfaceFromContext(contextData);
+  const principal = contextData.authentication?.getPrincipal() as any;
+  return principal?.paymentInterface;
 };
 
 export const getProcessorUrlFromContext = (): string => {
   const contextData = getRequestContext() as ContextData;
-  return paymentSdk.getProcessorUrlFromContext(contextData) as string;
+  const principal = contextData.authentication?.getPrincipal() as any;
+  return principal?.processorUrl as string;
 };
 
 export const getMerchantReturnUrlFromContext = (): string | undefined => {
   const contextData = getRequestContext() as ContextData;
-  return paymentSdk.getMerchantReturnUrlFromContext(contextData);
+  const principal = contextData.authentication?.getPrincipal() as any;
+  return principal?.merchantReturnUrl;
 };
 
 export const getFutureOrderNumberFromContext = (): string | undefined => {
   const contextData = getRequestContext() as ContextData;
-  return paymentSdk.getFutureOrderNumberFromContext(contextData);
+  const principal = contextData.authentication?.getPrincipal() as any;
+  return principal?.futureOrderNumber;
 };
 
 export const requestContextPlugin = fp(async (fastify: FastifyInstance) => {

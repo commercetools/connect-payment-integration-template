@@ -39,7 +39,6 @@ describe('mock-payment.service', () => {
   const opts: MockPaymentServiceOptions = {
     ctCartService: paymentSDK.ctCartService,
     ctPaymentService: paymentSDK.ctPaymentService,
-    ctPaymentMethodService: paymentSDK.ctPaymentMethodService,
   };
   const paymentService: AbstractPaymentService = new MockPaymentService(opts);
   const mockPaymentService: MockPaymentService = new MockPaymentService(opts);
@@ -78,8 +77,9 @@ describe('mock-payment.service', () => {
       const result: HealthCheckResult = {
         name: 'CoCo Permissions',
         status: 'DOWN',
-        message: 'CoCo Permissions are not available',
-        details: {},
+        details: {
+          message: 'CoCo Permissions are not available',
+        },
       };
       return result;
     };
@@ -93,8 +93,7 @@ describe('mock-payment.service', () => {
     expect(result?.status).toStrictEqual('Partially Available');
     expect(result?.checks[0]?.name).toStrictEqual('CoCo Permissions');
     expect(result?.checks[0]?.status).toStrictEqual('DOWN');
-    expect(result?.checks[0]?.details).toStrictEqual({});
-    expect(result?.checks[0]?.message).toBeDefined();
+    expect(result?.checks[0]?.details).toStrictEqual({ message: 'CoCo Permissions are not available' });
     expect(result?.checks[1]?.name).toStrictEqual('Mock Payment API');
     expect(result?.checks[1]?.status).toStrictEqual('UP');
     expect(result?.checks[1]?.details).toBeDefined();

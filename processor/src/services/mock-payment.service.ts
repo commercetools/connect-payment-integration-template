@@ -33,10 +33,31 @@ import { TransactionDraftDTO, TransactionResponseDTO } from '../dtos/operations/
 import { getStoredPaymentMethodsConfig } from '../config/stored-payment-methods.config';
 import { StoredPaymentMethod, StoredPaymentMethodsResponse } from '../dtos/stored-payment-methods.dto';
 import { log } from '../libs/logger';
+import { CustomPaymentMethodService, PaymentMethod } from './ct-payment-method.service';
 
 export class MockPaymentService extends AbstractPaymentService {
+  private ctPaymentMethodService: CustomPaymentMethodService;
+
   constructor(opts: MockPaymentServiceOptions) {
-    super(opts.ctCartService, opts.ctPaymentService, opts.ctPaymentMethodService);
+    super(opts.ctCartService, opts.ctPaymentService);
+    this.ctPaymentMethodService = new CustomPaymentMethodService({
+      ctAPI: paymentSDK.ctAPI,
+    });
+  }
+
+  /**
+   * Helper method to check if payment has a transaction in a specific state
+   */
+  private hasTransactionInState(opts: {
+    payment: { transactions?: { type: string; state: string }[] };
+    transactionType: string;
+    states: string[];
+  }): boolean {
+    return (
+      opts.payment.transactions?.some(
+        (t) => t.type === opts.transactionType && opts.states.includes(t.state),
+      ) || false
+    );
   }
 
   /**
@@ -100,7 +121,6 @@ export class MockPaymentService extends AbstractPaymentService {
 
     const handler = await statusHandler({
       timeout: getConfig().healthCheckTimeout,
-      log: appLogger,
       checks: [
         healthCheckCommercetoolsPermissions({
           requiredPermissions,
@@ -250,17 +270,17 @@ export class MockPaymentService extends AbstractPaymentService {
    * @returns Promise with outcome containing operation status and PSP reference
    */
   public async reversePayment(request: ReversePaymentRequest): Promise<PaymentProviderModificationResponse> {
-    const hasCharge = this.ctPaymentService.hasTransactionInState({
+    const hasCharge = this.hasTransactionInState({
       payment: request.payment,
       transactionType: 'Charge',
       states: ['Success'],
     });
-    const hasRefund = this.ctPaymentService.hasTransactionInState({
+    const hasRefund = this.hasTransactionInState({
       payment: request.payment,
       transactionType: 'Refund',
       states: ['Success', 'Pending'],
     });
-    const hasCancelAuthorization = this.ctPaymentService.hasTransactionInState({
+    const hasCancelAuthorization = this.hasTransactionInState({
       payment: request.payment,
       transactionType: 'CancelAuthorization',
       states: ['Success', 'Pending'],
@@ -276,7 +296,7 @@ export class MockPaymentService extends AbstractPaymentService {
       });
     }
 
-    const hasAuthorization = this.ctPaymentService.hasTransactionInState({
+    const hasAuthorization = this.hasTransactionInState({
       payment: request.payment,
       transactionType: 'Authorization',
       states: ['Success'],
@@ -448,10 +468,8 @@ export class MockPaymentService extends AbstractPaymentService {
       // This can be achieved by fetching the payment-method from CT using the payment-methods service from the connect-payments-sdk.
 
       const paymentMethod = await this.ctPaymentMethodService.get({
-        customerId: ctCart.customerId,
-        paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
-        interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
         id: storedPaymentMethodId,
+        customerId: ctCart.customerId,
       });
 
       // Due note that it could be that the PSP integration works by sending the actual token value from the enabler components to the `/payments` API in the processor.
@@ -524,11 +542,11 @@ export class MockPaymentService extends AbstractPaymentService {
 
     // Map over the payment methods and include displayable friendly data for Checkout to use.
     return {
-      storedPaymentMethods: storedPaymentMethods.results.map((spm) => {
+      storedPaymentMethods: storedPaymentMethods.results.map((spm: PaymentMethod) => {
         const res: StoredPaymentMethod = {
           id: spm.id,
           createdAt: spm.createdAt,
-          isDefault: spm.default,
+          isDefault: spm.default || false,
           token: spm.token?.value || '',
           type: spm.method || '',
           // The displayOptions is optional but will be used for displaying this data in the UI. Must be enhanced from with data from the PSP since that is not (yet) stored on the payment-methods in CT.
@@ -559,10 +577,8 @@ export class MockPaymentService extends AbstractPaymentService {
    */
   async deleteStoredPaymentMethod(id: string, customerId: string): Promise<void> {
     const paymentMethod = await this.ctPaymentMethodService.get({
-      customerId: customerId,
-      paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
-      interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
       id,
+      customerId: customerId,
     });
 
     try {

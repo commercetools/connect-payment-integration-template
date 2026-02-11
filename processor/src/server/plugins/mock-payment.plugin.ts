@@ -7,7 +7,6 @@ export default async function (server: FastifyInstance) {
   const mockPaymentService = new MockPaymentService({
     ctCartService: paymentSDK.ctCartService,
     ctPaymentService: paymentSDK.ctPaymentService,
-    ctPaymentMethodService: paymentSDK.ctPaymentMethodService,
   });
 
   await server.register(paymentRoutes, {

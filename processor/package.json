@@ -20,8 +20,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@commercetools-backend/loggers": "24.11.0",
-    "@commercetools/connect-payments-sdk": "0.25.1",
+    "@commercetools-backend/loggers": "^25.1.0",
+    "@commercetools/connect-payments-sdk": "^0.4.4",
     "@fastify/autoload": "6.3.1",
     "@fastify/cors": "11.1.0",
     "@fastify/formbody": "8.0.2",
@@ -31,7 +31,7 @@
     "@fastify/type-provider-typebox": "6.1.0",
     "@sinclair/typebox": "0.33.22",
     "dotenv": "17.2.3",
-    "fastify": "5.6.2",
+    "fastify": "^5.7.4",
     "fastify-plugin": "5.1.0"
   },
   "devDependencies": {
@@ -59,6 +59,7 @@
     "typescript": "5.9.3"
   },
   "overrides": {
-    "path-to-regexp": "3.3.0"
+    "path-to-regexp": "3.3.0",
+    "lodash": "^4.17.23"
   }
 }

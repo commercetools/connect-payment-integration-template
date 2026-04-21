@@ -1,4 +1,4 @@
-import { describe, test, expect, afterEach, jest, beforeEach } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { ConfigResponse, ModifyPayment, StatusResponse } from '../src/services/types/operation.type';
 import { paymentSDK } from '../src/payment-sdk';
 import { DefaultPaymentService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment.service';
@@ -31,7 +31,6 @@ function setupMockConfig(keysAndValues: Record<string, string>) {
     mockConfig[key] = keysAndValues[key];
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   jest.spyOn(Config, 'getConfig').mockReturnValue(mockConfig as any);
 }
 

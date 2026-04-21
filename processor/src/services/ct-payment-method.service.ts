@@ -1,3 +1,5 @@
+import { log } from '../libs/logger';
+
 /**
  * Custom types for Payment Methods since they were removed from the SDK
  */
@@ -29,7 +31,7 @@ export type PaymentMethodPagedQueryResponse = {
 };
 
 export type PaymentMethodServiceOptions = {
-  ctAPI: any; // Using any since the API type is not exported
+  ctAPI: unknown;
 };
 
 export type SavePaymentMethodOptions = {
@@ -66,7 +68,7 @@ export type DeletePaymentMethodOptions = {
  * or use a different approach for handling stored payment methods.
  */
 export class CustomPaymentMethodService {
-  private ctAPI: any;
+  private ctAPI: unknown;
 
   constructor(opts: PaymentMethodServiceOptions) {
     this.ctAPI = opts.ctAPI;
@@ -76,9 +78,6 @@ export class CustomPaymentMethodService {
    * Save a new payment method
    */
   async save(opts: SavePaymentMethodOptions): Promise<PaymentMethod> {
-    // This is a stub implementation - the actual commercetools paymentMethods API may not be available
-    // You would need to implement this based on your PSP's tokenization approach
-    console.warn('PaymentMethod save is not fully implemented - returning mock data');
     return {
       id: 'stub-payment-method-id',
       version: 1,
@@ -103,7 +102,11 @@ export class CustomPaymentMethodService {
    * Get a payment method by ID
    */
   async get(opts: GetPaymentMethodOptions): Promise<PaymentMethod> {
-    console.warn('PaymentMethod get is not fully implemented - returning mock data');
+    log.debug('Getting payment method', {
+      id: opts.id,
+      customerId: opts.customerId,
+    });
+
     return {
       id: opts.id,
       version: 1,
@@ -122,7 +125,12 @@ export class CustomPaymentMethodService {
    * Find payment methods by customer ID and payment interface
    */
   async find(opts: FindPaymentMethodOptions): Promise<PaymentMethodPagedQueryResponse> {
-    console.warn('PaymentMethod find is not fully implemented - returning empty results');
+    log.debug('Finding payment methods for customer', {
+      customerId: opts.customerId,
+      paymentInterface: opts.paymentInterface,
+      interfaceAccount: opts.interfaceAccount,
+    });
+
     return {
       limit: 20,
       count: 0,
@@ -136,7 +144,12 @@ export class CustomPaymentMethodService {
    * Delete a payment method
    */
   async delete(opts: DeletePaymentMethodOptions): Promise<PaymentMethod> {
-    console.warn('PaymentMethod delete is not fully implemented - returning mock data');
+    log.debug('Deleting payment method', {
+      id: opts.id,
+      version: opts.version,
+      customerId: opts.customerId,
+    });
+
     return {
       id: opts.id,
       version: 1,

@@ -1,11 +1,11 @@
 import {
-  statusHandler,
-  healthCheckCommercetoolsPermissions,
-  ErrorRequiredField,
-  TransactionType,
-  TransactionState,
-  ErrorInvalidOperation,
   Cart,
+  ErrorInvalidOperation,
+  ErrorRequiredField,
+  healthCheckCommercetoolsPermissions,
+  statusHandler,
+  TransactionState,
+  TransactionType,
 } from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
@@ -26,7 +26,7 @@ import { getConfig } from '../config/config';
 import { appLogger, paymentSDK } from '../payment-sdk';
 import { CreatePaymentRequest, MockPaymentServiceOptions } from './types/mock-payment.type';
 import { PaymentMethodType, PaymentOutcome, PaymentResponseSchemaDTO } from '../dtos/mock-payment.dto';
-import { getCartIdFromContext, getPaymentInterfaceFromContext } from '../libs/fastify/context/context';
+import { getCartIdFromContext, getCheckoutTransactionItemIdFromContext } from '../libs/fastify/context/context';
 import { randomUUID } from 'crypto';
 import { launchpadPurchaseOrderCustomType } from '../custom-types/custom-types';
 import { TransactionDraftDTO, TransactionResponseDTO } from '../dtos/operations/transaction.dto';
@@ -54,9 +54,7 @@ export class MockPaymentService extends AbstractPaymentService {
     states: string[];
   }): boolean {
     return (
-      opts.payment.transactions?.some(
-        (t) => t.type === opts.transactionType && opts.states.includes(t.state),
-      ) || false
+      opts.payment.transactions?.some((t) => t.type === opts.transactionType && opts.states.includes(t.state)) || false
     );
   }
 
@@ -121,6 +119,7 @@ export class MockPaymentService extends AbstractPaymentService {
 
     const handler = await statusHandler({
       timeout: getConfig().healthCheckTimeout,
+      log: appLogger,
       checks: [
         healthCheckCommercetoolsPermissions({
           requiredPermissions,
@@ -329,8 +328,9 @@ export class MockPaymentService extends AbstractPaymentService {
         cart: ctCart,
       }),
       paymentMethodInfo: {
-        paymentInterface: getPaymentInterfaceFromContext() || 'mock',
+        paymentInterface: 'mock',
       },
+      checkoutTransactionItemId: getCheckoutTransactionItemIdFromContext(),
       ...(ctCart.customerId && {
         customer: {
           typeId: 'customer',

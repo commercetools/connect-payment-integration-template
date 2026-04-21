@@ -182,6 +182,11 @@ export type EnablerOptions = {
   locale?: string;
 
   /**
+   * The country code for the payment.
+   */
+  countryCode?: string;
+
+  /**
    * A callback function that is called when an action is required during the payment process.
    * @returns A promise that resolves when the action is completed.
    */

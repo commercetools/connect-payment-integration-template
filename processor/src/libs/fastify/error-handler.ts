@@ -111,7 +111,6 @@ const transformValidationErrors = (errors: FastifySchemaValidationError[], req: 
 
 const getKeys = (path: string) => path.replace(/^\//, '').split('/');
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const getPropertyFromPath = (path: string, obj: any): any => {
   const keys = getKeys(path);
   let value = obj;

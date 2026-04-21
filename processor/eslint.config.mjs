@@ -31,7 +31,7 @@ export default [
       prettier,
       'unused-imports': unusedImports,
     },
-    files: ['*.ts'],
+    files: ['**/*.ts'],
     languageOptions: {
       globals: {
         ...globals.node,

@@ -1,4 +1,4 @@
-import { describe, test, expect } from '@jest/globals';
+import { describe, expect, test } from '@jest/globals';
 
 describe('sample-test-suite', () => {
   // Please customize test cases below

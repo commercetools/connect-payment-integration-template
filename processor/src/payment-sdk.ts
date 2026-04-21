@@ -1,4 +1,4 @@
-import { RequestContextData, setupPaymentSDK, Logger } from '@commercetools/connect-payments-sdk';
+import { Logger, RequestContextData, setupPaymentSDK } from '@commercetools/connect-payments-sdk';
 import { config } from './config/config';
 import { getRequestContext, updateRequestContext } from './libs/fastify/context/context';
 import { log } from './libs/logger/index';
@@ -27,6 +27,7 @@ export const paymentSDK = setupPaymentSDK({
   clientSecret: config.clientSecret,
   projectKey: config.projectKey,
   sessionUrl: config.sessionUrl,
+  checkoutUrl: config.checkoutUrl,
   jwksUrl: config.jwksUrl,
   jwtIssuer: config.jwtIssuer,
   getContextFn: (): RequestContextData => {

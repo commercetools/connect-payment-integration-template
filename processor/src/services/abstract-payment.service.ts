@@ -1,5 +1,6 @@
 import {
   CommercetoolsCartService,
+  CommercetoolsPaymentMethodService,
   CommercetoolsPaymentService,
   ErrorInvalidOperation,
 } from '@commercetools/connect-payments-sdk';
@@ -20,10 +21,16 @@ import { TransactionDraftDTO, TransactionResponseDTO } from '../dtos/operations/
 export abstract class AbstractPaymentService {
   protected ctCartService: CommercetoolsCartService;
   protected ctPaymentService: CommercetoolsPaymentService;
+  protected ctPaymentMethodService: CommercetoolsPaymentMethodService;
 
-  protected constructor(ctCartService: CommercetoolsCartService, ctPaymentService: CommercetoolsPaymentService) {
+  protected constructor(
+    ctCartService: CommercetoolsCartService,
+    ctPaymentService: CommercetoolsPaymentService,
+    ctPaymentMethodService: CommercetoolsPaymentMethodService,
+  ) {
     this.ctCartService = ctCartService;
     this.ctPaymentService = ctPaymentService;
+    this.ctPaymentMethodService = ctPaymentMethodService;
   }
 
   /**

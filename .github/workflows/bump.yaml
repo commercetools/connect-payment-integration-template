@@ -41,7 +41,7 @@ jobs:
           git commit -m 'chore: bump version'
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "chore: bump version"
@@ -49,3 +49,4 @@ jobs:
           title: "Bump version"
           body: "This PR bumps the version. This is executed by a GitHub Action `bump.yaml`."
           labels: "version bump"
+          sign-commits: true

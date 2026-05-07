@@ -9,13 +9,51 @@ export async function createLaunchpadPurchaseOrderNumberCustomType(): Promise<vo
     .types()
     .get({
       queryArgs: {
-        where: `key="${launchpadPurchaseOrderCustomType.key}"`,
+        where: `key="${launchpadPurchaseOrderCustomType.key}"`, // TODO: needs to be configured in connect.yaml
       },
     })
     .execute();
 
+  const requiredFields = [
+    {
+      type: { name: 'String' as const },
+      name: launchpadPurchaseOrderCustomType.purchaseOrderNumber,
+      label: { en: 'Purchase Order Number' },
+      required: true,
+    },
+    {
+      type: { name: 'String' as const },
+      name: launchpadPurchaseOrderCustomType.invoiceMemo,
+      label: { en: 'Invoice Memo' },
+      required: false,
+    },
+  ];
+
   if (getRes.body.results.length) {
-    log.info('Launchpad purchase order number custom type already exists. Skipping creation.');
+    const existingType = getRes.body.results[0];
+    const existingFieldNames = existingType.fieldDefinitions.map((f) => f.name);
+    const missingFields = requiredFields.filter((field) => !existingFieldNames.includes(field.name));
+
+    if (!missingFields.length) {
+      log.info('Launchpad purchase order number custom type already exists with all required fields. Skipping.');
+      return;
+    }
+
+    await apiClient
+      .types()
+      .withKey({ key: launchpadPurchaseOrderCustomType.key })
+      .post({
+        body: {
+          version: existingType.version,
+          actions: missingFields.map((field) => ({
+            action: 'addFieldDefinition' as const,
+            fieldDefinition: field,
+          })),
+        },
+      })
+      .execute();
+
+    log.info('Launchpad purchase order number custom type updated with missing fields.');
     return;
   }
 
@@ -26,28 +64,7 @@ export async function createLaunchpadPurchaseOrderNumberCustomType(): Promise<vo
         key: launchpadPurchaseOrderCustomType.key,
         name: { en: 'Additional fields to store purchase order information' },
         resourceTypeIds: ['payment'],
-        fieldDefinitions: [
-          {
-            type: {
-              name: 'String',
-            },
-            name: launchpadPurchaseOrderCustomType.purchaseOrderNumber,
-            label: {
-              en: 'Purchase Order Number',
-            },
-            required: true,
-          },
-          {
-            type: {
-              name: 'String',
-            },
-            name: launchpadPurchaseOrderCustomType.invoiceMemo,
-            label: {
-              en: 'Invoce Memo',
-            },
-            required: false,
-          },
-        ],
+        fieldDefinitions: requiredFields,
       },
     })
     .execute();

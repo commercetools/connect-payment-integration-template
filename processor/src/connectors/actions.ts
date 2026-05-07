@@ -9,7 +9,7 @@ export async function createLaunchpadPurchaseOrderNumberCustomType(): Promise<vo
     .types()
     .get({
       queryArgs: {
-        where: `key="${launchpadPurchaseOrderCustomType.key}"`, // TODO: needs to be configured in connect.yaml
+        where: `key="${launchpadPurchaseOrderCustomType.key}"`,
       },
     })
     .execute();

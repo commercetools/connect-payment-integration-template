@@ -10,6 +10,9 @@ on:
       - latest
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     name: Preview Connector

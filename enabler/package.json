@@ -12,19 +12,19 @@
     "serve": "npm run build && serve public -l 3000 --cors"
   },
   "dependencies": {
-    "@commercetools-backend/loggers": "27.6.3",
+    "@commercetools-backend/loggers": "27.8.0",
     "serve": "14.2.6"
   },
   "devDependencies": {
     "@jest/globals": "30.4.1",
     "@types/node": "25.9.1",
     "jest": "30.4.2",
-    "sass": "1.101.0",
-    "ts-jest": "29.4.11",
+    "sass": "1.101.6",
+    "ts-jest": "29.4.12",
     "ts-node": "10.9.2",
     "typescript": "5.9.3",
-    "vite": "8.0.16",
-    "vite-plugin-css-injected-by-js": "5.0.1"
+    "vite": "8.1.5",
+    "vite-plugin-css-injected-by-js": "5.0.2"
   },
   "overrides": {
     "path-to-regexp": "3.3.0",

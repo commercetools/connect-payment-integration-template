@@ -19,6 +19,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "npm": ">=11.0.0"
+  },
   "dependencies": {
     "@commercetools-backend/loggers": "27.8.0",
     "@commercetools/connect-payments-sdk": "1.1.0",

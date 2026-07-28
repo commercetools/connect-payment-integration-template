@@ -38,6 +38,7 @@ describe('mock-payment.service', () => {
   const opts: MockPaymentServiceOptions = {
     ctCartService: paymentSDK.ctCartService,
     ctPaymentService: paymentSDK.ctPaymentService,
+    ctPaymentMethodService: paymentSDK.ctPaymentMethodService,
   };
   const paymentService: AbstractPaymentService = new MockPaymentService(opts);
   const mockPaymentService: MockPaymentService = new MockPaymentService(opts);

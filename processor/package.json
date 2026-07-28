@@ -66,6 +66,9 @@
     "brace-expansion": "1.1.14",
     "diff": "9.0.0",
     "flatted": "3.4.2",
-    "minimatch": "3.1.5"
+    "minimatch": "3.1.5",
+    "@istanbuljs/load-nyc-config": {
+      "js-yaml": "3.15.0"
+    }
   }
 }

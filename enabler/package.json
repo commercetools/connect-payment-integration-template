@@ -11,9 +11,6 @@
     "preview": "vite preview",
     "serve": "npm run build && serve public -l 3000 --cors"
   },
-  "engines": {
-    "npm": ">=11.0.0"
-  },
   "dependencies": {
     "@commercetools-backend/loggers": "27.8.0",
     "serve": "14.2.6"

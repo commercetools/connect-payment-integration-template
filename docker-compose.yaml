@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   jwt-server:
-    image: node:alpine
+    image: node:24-alpine
     restart: always
     command: 
       - npx
@@ -14,7 +14,7 @@ services:
       - 9002:9000
 
   enabler:
-    image: node:20
+    image: node:24
     volumes:
       - ./enabler:/home/node/app
     restart: always
@@ -30,7 +30,7 @@ services:
       - 3000:3000
   
   processor:
-    image: node:20
+    image: node:24
     volumes:
       - ./processor:/home/node/app
     working_dir: /home/node/app

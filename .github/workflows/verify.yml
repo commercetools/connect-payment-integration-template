@@ -1,0 +1,55 @@
+name: Verify
+
+# Builds, tests and lints both applications. Mark "Verify (processor)" and
+# "Verify (enabler)" as required status checks on main so that Dependabot
+# auto-merge (see dependabot-auto-merge.yml) actually has something to wait for -
+# ci.yml only runs `commercetools connect validate` and never compiles the code.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify (${{ matrix.app }})
+    runs-on: ubuntu-latest
+    strategy:
+      # Always report both applications, rather than cancelling on first failure.
+      fail-fast: false
+      matrix:
+        app:
+          - processor
+          - enabler
+    defaults:
+      run:
+        working-directory: ${{ matrix.app }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: ${{ matrix.app }}/package-lock.json
+
+      # npm ci (not npm install) so a lockfile that is out of sync with
+      # package.json fails the build instead of being silently repaired.
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Test
+        run: npm test
+
+      # enabler has no lint script.
+      - name: Lint
+        if: matrix.app == 'processor'
+        run: npm run lint

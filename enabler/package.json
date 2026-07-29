@@ -12,14 +12,14 @@
     "serve": "npm run build && serve public -l 3000 --cors"
   },
   "dependencies": {
-    "@commercetools-backend/loggers": "27.8.0",
+    "@commercetools-backend/loggers": "27.9.0",
     "serve": "14.2.6"
   },
   "devDependencies": {
     "@jest/globals": "30.4.1",
-    "@types/node": "26.1.1",
+    "@types/node": "26.1.2",
     "jest": "30.4.2",
-    "sass": "1.101.6",
+    "sass": "1.102.0",
     "ts-jest": "29.4.12",
     "ts-node": "10.9.2",
     "typescript": "5.9.3",

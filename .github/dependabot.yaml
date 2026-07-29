@@ -2,25 +2,49 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/processor"
+    # Patch and minor are deliberately separate groups: patch-only PRs are
+    # auto-merged (see .github/workflows/dependabot-auto-merge.yml), and for a
+    # grouped PR Dependabot reports the *highest* bump in the group - so mixing
+    # minor in would block every patch from ever auto-merging.
     groups:
-      dependencies:
+      patch-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+      minor-dependencies:
         patterns:
           - "*"
         update-types:
           - "minor"
-          - "patch"
+    ignore:
+      # Keep @types/node on the same major as the Node runtime (24.x, see .nvmrc).
+      # The groups above only cover minor/patch, so majors still arrive as their
+      # own PRs - that is how @types/node previously drifted to 26.x.
+      - dependency-name: "@types/node"
+        update-types:
+          - "version-update:semver-major"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     open-pull-requests-limit: 10
   - package-ecosystem: "npm"
     directory: "/enabler"
     groups:
-      dependencies:
+      patch-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+      minor-dependencies:
         patterns:
           - "*"
         update-types:
           - "minor"
-          - "patch"
+    ignore:
+      # Keep @types/node on the same major as the Node runtime (24.x, see .nvmrc).
+      - dependency-name: "@types/node"
+        update-types:
+          - "version-update:semver-major"
     schedule:
-      interval: "daily"
+      interval: "weekly"
     open-pull-requests-limit: 10

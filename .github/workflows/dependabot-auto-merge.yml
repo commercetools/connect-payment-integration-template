@@ -1,0 +1,36 @@
+name: Dependabot auto-merge
+
+# Enables GitHub's auto-merge on Dependabot PRs that only contain patch bumps.
+# Auto-merge still waits for every required status check and branch protection
+# rule, so this does not merge anything a human could not have merged - it only
+# removes the manual click. Anything minor or major is left for review.
+#
+# Requires "Allow auto-merge" to be enabled in the repository settings.
+on: pull_request_target
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    name: Auto-merge patch updates
+    runs-on: ubuntu-latest
+    # The repository guard stops this from running in forks.
+    if: github.event.pull_request.user.login == 'dependabot[bot]' && github.repository == 'commercetools/connect-payment-integration-template'
+    steps:
+      # Note: deliberately no actions/checkout. This workflow runs on
+      # pull_request_target with a write token, so it must never execute code
+      # from the pull request branch.
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v3
+
+      # For grouped updates, update-type is the highest bump in the group, so a
+      # group containing any minor bump will not match here.
+      - name: Enable auto-merge for patch-only updates
+        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
+        run: gh pr merge --auto --squash "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

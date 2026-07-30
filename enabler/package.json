@@ -27,7 +27,7 @@
     "ts-jest": "29.4.12",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",
-    "vite": "8.1.5",
+    "vite": "8.2.0",
     "vite-plugin-css-injected-by-js": "5.0.2"
   },
   "overrides": {

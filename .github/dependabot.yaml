@@ -24,6 +24,12 @@ updates:
       - dependency-name: "@types/node"
         update-types:
           - "version-update:semver-major"
+      # ts-jest 29.4.12 (latest) peer-requires typescript ">=4.3 <7", and its
+      # transpiler hardcodes require("typescript"), which TS 7's native compiler
+      # cannot satisfy - the test suites fail to run. 6.x is fine, so only pin
+      # out 7+; drop this once ts-jest ships TypeScript 7 support.
+      - dependency-name: "typescript"
+        versions: [">=7"]
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
@@ -45,6 +51,12 @@ updates:
       - dependency-name: "@types/node"
         update-types:
           - "version-update:semver-major"
+      # ts-jest 29.4.12 (latest) peer-requires typescript ">=4.3 <7", and its
+      # transpiler hardcodes require("typescript"), which TS 7's native compiler
+      # cannot satisfy - the test suites fail to run. 6.x is fine, so only pin
+      # out 7+; drop this once ts-jest ships TypeScript 7 support.
+      - dependency-name: "typescript"
+        versions: [">=7"]
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10

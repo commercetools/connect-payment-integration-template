@@ -2,10 +2,9 @@ version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/processor"
-    # Patch and minor are deliberately separate groups: patch-only PRs are
-    # auto-merged (see .github/workflows/dependabot-auto-merge.yml), and for a
-    # grouped PR Dependabot reports the *highest* bump in the group - so mixing
-    # minor in would block every patch from ever auto-merging.
+    # Patch and minor are deliberately separate groups: for a grouped PR
+    # Dependabot reports the *highest* bump in the group, so mixing minor in
+    # would leave low-risk patch bumps waiting on a minor-bump review.
     groups:
       patch-dependencies:
         patterns:
@@ -57,6 +56,32 @@ updates:
       # out 7+; drop this once ts-jest ships TypeScript 7 support.
       - dependency-name: "typescript"
         versions: [">=7"]
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+  - package-ecosystem: "github-actions"
+    # Actions are declared in .github/workflows, but Dependabot expects the
+    # repository root here - "/.github/workflows" silently matches nothing.
+    directory: "/"
+    # The workflows pin actions to a commit SHA with a trailing "# vX.Y.Z"
+    # comment. Dependabot reads that comment to work out the semver bump and
+    # rewrites both the SHA and the comment, so pinning does not opt out of
+    # updates - it is what makes them reviewable.
+    #
+    # Same patch/minor split as the npm entries above, and for the same reason:
+    # a grouped PR reports the highest bump in the group, so mixing minor in
+    # would leave low-risk patch bumps waiting on a minor-bump review.
+    groups:
+      patch-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "patch"
+      minor-dependencies:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10

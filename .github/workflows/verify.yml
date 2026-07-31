@@ -1,9 +1,9 @@
 name: Verify
 
 # Builds, tests and lints both applications. Mark "Verify (processor)" and
-# "Verify (enabler)" as required status checks on main so that Dependabot
-# auto-merge (see dependabot-auto-merge.yml) actually has something to wait for -
-# ci.yml only runs `commercetools connect validate` and never compiles the code.
+# "Verify (enabler)" as required status checks on main - ci.yml only runs
+# `commercetools connect validate` and never compiles the code, so without these
+# a pull request can go green without anything having been built.
 on:
   push:
     branches:
@@ -29,10 +29,10 @@ jobs:
         working-directory: ${{ matrix.app }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Use Node.js from .nvmrc
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
           cache: npm

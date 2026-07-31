@@ -13,16 +13,42 @@ on:
           - major
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read # writes (checkout + PR) use the App token below, not GITHUB_TOKEN
+  id-token: write # required for Workload Identity Federation to GCP Secret Manager
 
 jobs:
   bump-version:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
+        with:
+          project_id: ctp-production-eu
+          workload_identity_provider: projects/884107378518/locations/global/workloadIdentityPools/production/providers/github
+
+      - name: Fetch GitHub App private key from Secret Manager
+        id: gcp-secrets
+        uses: google-github-actions/get-secretmanager-secrets@bc9c54b29fdffb8a47776820a7d26e77b379d262 # v3.0.0
+        with:
+          secrets: |-
+            app-private-key:projects/ctp-production-eu/secrets/checkout-anywhere-checkout-automator-github-app-private-key
+
+      - name: Generate a token
+        id: generate-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ secrets.CHECKOUT_AUTOMATOR_GITHUB_APP_CLIENT_ID }}
+          private-key: ${{ steps.gcp-secrets.outputs['app-private-key'] }}
+          permission-contents: write
+          permission-pull-requests: write
+
       - name: Checkout
         uses: actions/checkout@v7
+        with:
+          token: ${{ steps.generate-token.outputs.token }}
+          # peter-evans pushes via its own token input, so don't persist the App token.
+          persist-credentials: false
 
       - name: Use Node.js 24.x
         uses: actions/setup-node@v7
@@ -47,7 +73,7 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v8
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ steps.generate-token.outputs.token }}
           commit-message: "chore: bump version"
           branch: "bump-version-branch"
           title: "Bump version"

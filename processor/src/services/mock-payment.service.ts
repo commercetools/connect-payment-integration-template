@@ -1,11 +1,11 @@
 import {
   Cart,
+  ErrorInvalidField,
   ErrorInvalidOperation,
   ErrorRequiredField,
   healthCheckCommercetoolsPermissions,
   statusHandler,
   TransactionState,
-  TransactionType,
 } from '@commercetools/connect-payments-sdk';
 import {
   CancelPaymentRequest,
@@ -90,7 +90,6 @@ export class MockPaymentService extends AbstractPaymentService {
       'view_api_clients',
       'manage_orders',
       'introspect_oauth_tokens',
-      'manage_checkout_payment_intents',
       'manage_types',
     ];
 
@@ -592,25 +591,85 @@ export class MockPaymentService extends AbstractPaymentService {
   }
 
   public async handleTransaction(transactionDraft: TransactionDraftDTO): Promise<TransactionResponseDTO> {
-    const TRANSACTION_AUTHORIZATION_TYPE: TransactionType = 'Authorization';
-    const TRANSACTION_STATE_SUCCESS: TransactionState = 'Success';
-    const TRANSACTION_STATE_FAILURE: TransactionState = 'Failure';
+    if (transactionDraft.type === 'Recurring') {
+      return await this.handleTransactionRecurringType(transactionDraft);
+    }
 
-    const maxCentAmountIfSuccess = 10000;
+    throw new ErrorInvalidField('type', transactionDraft.type || 'not-provided', 'Recurring');
+  }
+
+  private async handleTransactionRecurringType(transactionDraft: TransactionDraftDTO): Promise<TransactionResponseDTO> {
+    if (!getStoredPaymentMethodsConfig().enabled) {
+      throw new ErrorInvalidOperation(
+        'The stored-payment-methods feature is disabled and thus cannot request a transaction using stored-payment-methods',
+      );
+    }
 
     const ctCart = await this.ctCartService.getCart({ id: transactionDraft.cartId });
 
-    let amountPlanned = transactionDraft.amount;
-    if (!amountPlanned) {
-      amountPlanned = await this.ctCartService.getPaymentAmount({ cart: ctCart });
+    if (!ctCart.customerId) {
+      throw new ErrorRequiredField('customerId', {
+        privateMessage: 'customerId is not set on the cart',
+        privateFields: {
+          cart: {
+            id: ctCart.id,
+          },
+          checkoutTransactionItemId: transactionDraft.checkoutTransactionItemId,
+        },
+      });
     }
 
-    const isBelowSuccessStateThreshold = amountPlanned.centAmount < maxCentAmountIfSuccess;
+    const cartAmount = await this.ctCartService.getPaymentAmount({ cart: ctCart });
+
+    if (transactionDraft.amount.currencyCode !== cartAmount.currencyCode) {
+      throw new ErrorInvalidField('amount.currencyCode', transactionDraft.amount.currencyCode, cartAmount.currencyCode);
+    }
+
+    if (transactionDraft.amount.centAmount > cartAmount.centAmount) {
+      throw new ErrorInvalidField(
+        'amount.centAmount',
+        String(transactionDraft.amount.centAmount),
+        `<= ${cartAmount.centAmount}`,
+      );
+    }
+
+    const paymentMethod = await this.ctPaymentMethodService.get({
+      id: transactionDraft.paymentMethodId,
+      customerId: ctCart.customerId,
+      paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
+      interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
+    });
+
+    if (!paymentMethod.token) {
+      throw new ErrorRequiredField('token', {
+        privateMessage: 'The "token" value is not set on the payment-method',
+        privateFields: {
+          cart: {
+            id: ctCart.id,
+          },
+          checkoutTransactionItemId: transactionDraft.checkoutTransactionItemId,
+          paymentMethod: {
+            id: paymentMethod.id,
+          },
+        },
+      });
+    }
+
+    const amountPlanned = transactionDraft.amount;
 
     const newlyCreatedPayment = await this.ctPaymentService.createPayment({
       amountPlanned,
+      checkoutTransactionItemId: transactionDraft.checkoutTransactionItemId,
       paymentMethodInfo: {
-        paymentInterface: transactionDraft.paymentInterface,
+        paymentInterface: 'mock',
+        token: {
+          value: paymentMethod.token.value,
+        },
+        ...(paymentMethod.method && { method: paymentMethod.method }),
+      },
+      customer: {
+        typeId: 'customer',
+        id: ctCart.customerId,
       },
     });
 
@@ -622,28 +681,28 @@ export class MockPaymentService extends AbstractPaymentService {
       paymentId: newlyCreatedPayment.id,
     });
 
-    const transactionState: TransactionState = isBelowSuccessStateThreshold
-      ? TRANSACTION_STATE_SUCCESS
-      : TRANSACTION_STATE_FAILURE;
+    const isAuthorized = this.simulatePspAuthorization(amountPlanned);
+    const transactionState: TransactionState = isAuthorized ? 'Success' : 'Failure';
 
     const pspReference = randomUUID().toString();
 
-    await this.ctPaymentService.updatePayment({
+    const updatedPayment = await this.ctPaymentService.updatePayment({
       id: newlyCreatedPayment.id,
       pspReference: pspReference,
       transaction: {
         amount: amountPlanned,
-        type: TRANSACTION_AUTHORIZATION_TYPE,
+        type: 'Authorization',
         state: transactionState,
         interactionId: pspReference,
       },
     });
 
-    if (isBelowSuccessStateThreshold) {
+    if (isAuthorized) {
       return {
         transactionStatus: {
           errors: [],
-          state: 'Pending',
+          state: 'Completed',
+          paymentId: updatedPayment.id,
         },
       };
     } else {
@@ -656,9 +715,19 @@ export class MockPaymentService extends AbstractPaymentService {
             },
           ],
           state: 'Failed',
+          paymentId: updatedPayment.id,
         },
       };
     }
+  }
+
+  /**
+   * Stands in for the actual request/response with the PSP. This mock decides the outcome
+   * deterministically from the charged amount, same as the rest of this mock service.
+   */
+  private simulatePspAuthorization(amount: { centAmount: number; currencyCode: string }): boolean {
+    const maxCentAmountIfSuccess = 10000;
+    return amount.centAmount < maxCentAmountIfSuccess;
   }
 
   private convertPaymentResultCode(resultCode: PaymentOutcome): string {

@@ -85,7 +85,7 @@ deployAs:
           description: commercetools project key
           required: true
         - key: CTP_CLIENT_ID
-          description: commercetools client ID with manage_payments, manage_orders, view_sessions, view_api_clients, manage_checkout_payment_intents & introspect_oauth_tokens scopes
+          description: commercetools client ID with manage_payments, manage_orders, view_sessions, view_api_clients & introspect_oauth_tokens scopes
           required: true
         - key: CTP_AUTH_URL
           description: commercetools Auth URL
@@ -129,7 +129,7 @@ deployAs:
 Here you can see the details about various variables in configuration
 
 - `CTP_PROJECT_KEY`: The key of commercetools composable commerce project.
-- `CTP_CLIENT_ID`: The client ID of your commercetools composable commerce user account. It is used in commercetools client to communicate with commercetools composable commerce via SDK. Expected scopes are: `manage_payments` `manage_orders` `view_sessions` `view_api_clients` `manage_checkout_payment_intents` `introspect_oauth_tokens` `manage_types` `view_types`.
+- `CTP_CLIENT_ID`: The client ID of your commercetools composable commerce user account. It is used in commercetools client to communicate with commercetools composable commerce via SDK. Expected scopes are: `manage_payments` `manage_orders` `view_sessions` `view_api_clients` `introspect_oauth_tokens` `manage_types` `view_types`.
 - `CTP_CLIENT_SECRET`: The client secret of commercetools composable commerce user account. It is used in commercetools client to communicate with commercetools composable commerce via SDK.
 - `CTP_AUTH_URL`: The URL for authentication in commercetools platform. It is used to generate OAuth 2.0 token which is required in every API call to commercetools composable commerce. The default value is `https://auth.europe-west1.gcp.commercetools.com`. For details, please refer to documentation [here](https://docs.commercetools.com/tutorials/api-tutorial#authentication).
 - `CTP_API_URL`: The URL for commercetools composable commerce API. Default value is `https://api.europe-west1.gcp.commercetools.com`.
@@ -164,6 +164,21 @@ Currently supported payment-methods for storing:
 When a payment method is tokenized for the first time the psp template connector will create a new CT payment-method. The payment-method is attached to the `cart.customerId` as well as the `paymentInterface` and `interfaceAccount` are set based on the previously configured env values.
 
 The next time the same customer goes through Checkout (either using drop-ins or web-components) they will see the stored payment method as a option to pay with.
+
+### Server-to-server recurring payments
+
+Once a payment method has been tokenized (see [stored payment methods](#stored-payment-methods) above), a backend system - for example the system responsible for commercetools recurring orders - can charge that stored payment method directly, server-to-server. This is a different flow from the client-to-server flows described above: there is no shopper session and no redirect involved, since the shopper is not present when the charge happens.
+
+#### Endpoint
+
+`POST /operations/transactions`
+
+For the full request/response contract, see [Create transaction](./processor/README.md#create-transaction) in the processor documentation.
+
+#### Requirements
+
+- The stored payment methods feature must be enabled (see [Setting up stored payment methods](#setting-up-stored-payment-methods)) - a token to charge must already exist.
+- The caller must present an OAuth2 token with the `manage_project` and `manage_checkout_transactions` scopes.
 
 ## Development
 

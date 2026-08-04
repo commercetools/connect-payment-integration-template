@@ -702,8 +702,8 @@ export class MockPaymentService extends AbstractPaymentService {
         transactionStatus: {
           errors: [],
           state: 'Completed',
-          paymentId: updatedPayment.id,
         },
+        paymentId: updatedPayment.id,
       };
     } else {
       return {
@@ -715,8 +715,8 @@ export class MockPaymentService extends AbstractPaymentService {
             },
           ],
           state: 'Failed',
-          paymentId: updatedPayment.id,
         },
+        paymentId: updatedPayment.id,
       };
     }
   }

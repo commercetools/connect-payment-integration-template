@@ -153,15 +153,15 @@ Private endpoint used for server-to-server payment processing, for example to ch
 
 - transactionStatus
   - state: Result of the transaction. It can be `Pending`, `Failed` or `Completed`. `Pending` means the PSP accepted the charge but has not confirmed it yet - typical of payment methods that are settled asynchronously and may still be confirmed at a later point. This mock decides the outcome synchronously and never returns `Pending`; a real PSP integration built from this template is likely to.
-  - paymentId: Id of the commercetools Payment resource created for this charge, when available.
   - errors: List of errors, present when the payment was rejected.
+- paymentId: Id of the commercetools Payment resource created for this charge, when available.
 
 ```
 {
     transactionStatus: {
         state: "Pending|Failed|Completed",
-        paymentId: "<paymentId>",
         errors: [{ code: "PaymentRejected", message: "<message>" }]
-    }
+    },
+    paymentId: "<paymentId>"
 }
 ```

@@ -437,8 +437,8 @@ describe('mock-payment.service', () => {
           transactionStatus: {
             errors: [],
             state: 'Completed',
-            paymentId: mockUpdatePaymentResult.id,
           },
+          paymentId: mockUpdatePaymentResult.id,
         });
       });
 
@@ -486,8 +486,8 @@ describe('mock-payment.service', () => {
               },
             ],
             state: 'Failed',
-            paymentId: mockUpdatePaymentResult.id,
           },
+          paymentId: mockUpdatePaymentResult.id,
         });
       });
     });

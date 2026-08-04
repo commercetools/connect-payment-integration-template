@@ -35,7 +35,6 @@ export const TransactionStatusState = Type.Union([
 export const TransactionResponse = Type.Object({
   transactionStatus: Type.Object({
     state: TransactionStatusState,
-    paymentId: Type.Optional(Type.String()),
     errors: Type.Array(
       Type.Object({
         code: Type.Literal('PaymentRejected'),
@@ -43,6 +42,7 @@ export const TransactionResponse = Type.Object({
       }),
     ),
   }),
+  paymentId: Type.Optional(Type.String()),
 });
 
 export type TransactionDraftDTO = Static<typeof TransactionDraft>;

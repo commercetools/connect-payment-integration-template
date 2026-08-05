@@ -17,9 +17,17 @@ import { MockPaymentService } from '../src/services/mock-payment.service';
 import * as FastifyContext from '../src/libs/fastify/context/context';
 import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
 
-import { HealthCheckResult } from '@commercetools/connect-payments-sdk';
+import {
+  ErrorInvalidField,
+  ErrorInvalidOperation,
+  ErrorRequiredField,
+  HealthCheckResult,
+  PaymentMethod,
+} from '@commercetools/connect-payments-sdk';
+import { DefaultPaymentMethodService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment-method.service';
 import { PaymentMethodType, PaymentOutcome } from '../src/dtos/mock-payment.dto';
 import { TransactionDraftDTO } from '../src/dtos/operations/transaction.dto';
+import * as StoredPaymentMethodsConfig from '../src/config/stored-payment-methods.config';
 
 interface FlexibleConfig {
   [key: string]: string; // Adjust the type according to your config values
@@ -253,65 +261,292 @@ describe('mock-payment.service', () => {
   });
 
   describe('handleTransaction', () => {
-    test('should create the payment in CoCo and return it with a success state', async () => {
-      const createPaymentOpts: TransactionDraftDTO = {
-        cartId: 'dd4b7669-698c-4175-8e4c-bed178abfed3',
-        paymentInterface: '42251cfc-0660-4ab3-80f6-c32829aa7a8b',
-        amount: {
-          centAmount: 1000,
-          currencyCode: 'EUR',
-        },
-      };
+    const customerId = '0e2a18f3-9f3b-4cef-83ab-6d892c95a0a8';
+    const paymentMethodId = '997ff5fb-838b-4978-bf47-37a7de565820';
 
-      jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
-      jest
-        .spyOn(DefaultPaymentService.prototype, 'createPayment')
-        .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
-      jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
-      jest
-        .spyOn(DefaultPaymentService.prototype, 'updatePayment')
-        .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
+    const transactionDraft: TransactionDraftDTO = {
+      cartId: 'dd4b7669-698c-4175-8e4c-bed178abfed3',
+      checkoutTransactionItemId: '42251cfc-0660-4ab3-80f6-c32829aa7a8b',
+      amount: {
+        centAmount: 1000,
+        currencyCode: 'EUR',
+      },
+      paymentMethodId,
+      idempotencyKey: 'idempotency-key-value',
+      type: 'Recurring',
+    };
 
-      const resultPromise = mockPaymentService.handleTransaction(createPaymentOpts);
-      expect(resultPromise).resolves.toStrictEqual({
-        transactionStatus: {
-          errors: [],
-          state: 'Pending',
-        },
-      });
+    const mockStoredPaymentMethod: PaymentMethod = {
+      id: paymentMethodId,
+      createdAt: '',
+      lastModifiedAt: '',
+      paymentMethodStatus: 'Active',
+      version: 1,
+      default: false,
+      token: {
+        value: 'mock-token-value',
+      },
+      method: 'card',
+    };
+
+    test('it should throw an ErrorInvalidField if the provided "type" value is unsupported', async () => {
+      const invalidTransactionDraft: TransactionDraftDTO = {
+        ...transactionDraft,
+        type: 'UnknownType',
+      } as unknown as TransactionDraftDTO;
+
+      expect(mockPaymentService.handleTransaction(invalidTransactionDraft)).rejects.toThrow(
+        new ErrorInvalidField('type', 'UnknownType', 'Recurring'),
+      );
     });
 
-    test('should create the payment in CoCo and return it with a failed state', async () => {
-      const createPaymentOpts: TransactionDraftDTO = {
-        cartId: 'dd4b7669-698c-4175-8e4c-bed178abfed3',
-        paymentInterface: '42251cfc-0660-4ab3-80f6-c32829aa7a8b',
-        amount: {
-          centAmount: 10000,
-          currencyCode: 'EUR',
-        },
-      };
+    test('it should throw an ErrorInvalidField if the "type" value is not provided', async () => {
+      const invalidTransactionDraft: TransactionDraftDTO = {
+        ...transactionDraft,
+        type: undefined,
+      } as unknown as TransactionDraftDTO;
 
-      jest.spyOn(DefaultCartService.prototype, 'getCart').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
-      jest
-        .spyOn(DefaultPaymentService.prototype, 'createPayment')
-        .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
-      jest.spyOn(DefaultCartService.prototype, 'addPayment').mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
-      jest
-        .spyOn(DefaultPaymentService.prototype, 'updatePayment')
-        .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
+      expect(mockPaymentService.handleTransaction(invalidTransactionDraft)).rejects.toThrow(
+        new ErrorInvalidField('type', 'not-provided', 'Recurring'),
+      );
+    });
 
-      const resultPromise = mockPaymentService.handleTransaction(createPaymentOpts);
+    describe('Recurring', () => {
+      test('it should throw an ErrorInvalidOperation if the stored-payment-methods feature is not enabled', async () => {
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: false,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
 
-      expect(resultPromise).resolves.toStrictEqual({
-        transactionStatus: {
-          errors: [
-            {
-              code: 'PaymentRejected',
-              message: `Payment '${mockGetPaymentResult.id}' has been rejected.`,
-            },
-          ],
-          state: 'Failed',
-        },
+        expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(ErrorInvalidOperation);
+      });
+
+      test('it should throw an ErrorRequiredField if the provided cart does not have a customerId set', async () => {
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: true,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
+        jest
+          .spyOn(DefaultCartService.prototype, 'getCart')
+          .mockResolvedValue({ ...mockGetCartResult(), customerId: undefined });
+
+        expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(
+          new ErrorRequiredField('customerId'),
+        );
+      });
+
+      test('it should throw an ErrorInvalidField if the draft amount currency does not match the cart amount currency', async () => {
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: true,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
+        jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
+        jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
+          centAmount: transactionDraft.amount!.centAmount,
+          currencyCode: 'USD',
+          fractionDigits: 2,
+        });
+
+        expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(
+          new ErrorInvalidField('amount.currencyCode', transactionDraft.amount!.currencyCode, 'USD'),
+        );
+      });
+
+      test('it should throw an ErrorInvalidField if the draft amount is greater than the cart amount', async () => {
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: true,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
+        jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
+        jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
+          centAmount: transactionDraft.amount!.centAmount - 1,
+          currencyCode: transactionDraft.amount!.currencyCode,
+          fractionDigits: 2,
+        });
+
+        expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(
+          new ErrorInvalidField(
+            'amount.centAmount',
+            String(transactionDraft.amount!.centAmount),
+            `<= ${transactionDraft.amount!.centAmount - 1}`,
+          ),
+        );
+      });
+
+      test('it should fall back to the cart amount, skipping currency/amount validation, when the draft does not have an amount set', async () => {
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: true,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
+
+        const cartAmount = { centAmount: 999, currencyCode: 'USD', fractionDigits: 2 };
+
+        jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
+        jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue(cartAmount);
+        jest.spyOn(DefaultPaymentMethodService.prototype, 'get').mockResolvedValue(mockStoredPaymentMethod);
+        jest
+          .spyOn(DefaultPaymentService.prototype, 'createPayment')
+          .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
+        jest
+          .spyOn(DefaultCartService.prototype, 'addPayment')
+          .mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
+        jest
+          .spyOn(DefaultPaymentService.prototype, 'updatePayment')
+          .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
+
+        const transactionDraftWithoutAmount: TransactionDraftDTO = { ...transactionDraft, amount: undefined };
+
+        await mockPaymentService.handleTransaction(transactionDraftWithoutAmount);
+
+        expect(DefaultPaymentService.prototype.createPayment).toHaveBeenCalledWith(
+          expect.objectContaining({ amountPlanned: cartAmount }),
+        );
+      });
+
+      test('it should throw an ErrorRequiredField if the draft does not have a paymentMethodId set', async () => {
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: true,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
+        jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
+        jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
+          centAmount: transactionDraft.amount!.centAmount,
+          currencyCode: transactionDraft.amount!.currencyCode,
+          fractionDigits: 2,
+        });
+
+        const transactionDraftWithoutPaymentMethodId: TransactionDraftDTO = {
+          ...transactionDraft,
+          paymentMethodId: undefined,
+        };
+
+        expect(mockPaymentService.handleTransaction(transactionDraftWithoutPaymentMethodId)).rejects.toThrow(
+          new ErrorRequiredField('paymentMethodId'),
+        );
+      });
+
+      test('it should throw an ErrorRequiredField if the paymentMethod referenced does not have a token value set', async () => {
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: true,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
+        jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
+        jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
+          centAmount: transactionDraft.amount!.centAmount,
+          currencyCode: transactionDraft.amount!.currencyCode,
+          fractionDigits: 2,
+        });
+        jest.spyOn(DefaultPaymentMethodService.prototype, 'get').mockResolvedValue({
+          ...mockStoredPaymentMethod,
+          token: undefined,
+        });
+
+        expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(new ErrorRequiredField('token'));
+      });
+
+      test('should create the payment in CoCo and return it with a Completed state', async () => {
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: true,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
+        jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
+        jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
+          centAmount: transactionDraft.amount!.centAmount,
+          currencyCode: transactionDraft.amount!.currencyCode,
+          fractionDigits: 2,
+        });
+        jest.spyOn(DefaultPaymentMethodService.prototype, 'get').mockResolvedValue(mockStoredPaymentMethod);
+        jest
+          .spyOn(DefaultPaymentService.prototype, 'createPayment')
+          .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
+        jest
+          .spyOn(DefaultCartService.prototype, 'addPayment')
+          .mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
+        jest
+          .spyOn(DefaultPaymentService.prototype, 'updatePayment')
+          .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
+
+        const resultPromise = mockPaymentService.handleTransaction(transactionDraft);
+        expect(resultPromise).resolves.toStrictEqual({
+          transactionStatus: {
+            errors: [],
+            state: 'Completed',
+          },
+          paymentId: mockUpdatePaymentResult.id,
+        });
+      });
+
+      test('should create the payment in CoCo and return it with a Failed state', async () => {
+        const failingTransactionDraft: TransactionDraftDTO = {
+          ...transactionDraft,
+          amount: {
+            centAmount: 10000,
+            currencyCode: 'EUR',
+          },
+        };
+
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: true,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
+        jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
+        jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
+          centAmount: failingTransactionDraft.amount!.centAmount,
+          currencyCode: failingTransactionDraft.amount!.currencyCode,
+          fractionDigits: 2,
+        });
+        jest.spyOn(DefaultPaymentMethodService.prototype, 'get').mockResolvedValue(mockStoredPaymentMethod);
+        jest
+          .spyOn(DefaultPaymentService.prototype, 'createPayment')
+          .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
+        jest
+          .spyOn(DefaultCartService.prototype, 'addPayment')
+          .mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
+        jest
+          .spyOn(DefaultPaymentService.prototype, 'updatePayment')
+          .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
+
+        const resultPromise = mockPaymentService.handleTransaction(failingTransactionDraft);
+
+        expect(resultPromise).resolves.toStrictEqual({
+          transactionStatus: {
+            errors: [
+              {
+                code: 'PaymentRejected',
+                message: `Payment '${mockGetPaymentResult.id}' has been rejected.`,
+              },
+            ],
+            state: 'Failed',
+          },
+          paymentId: mockUpdatePaymentResult.id,
+        });
       });
     });
   });

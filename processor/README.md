@@ -55,7 +55,6 @@ Setup correct environment variables: check `processor/src/config/config.ts` for 
 Make sure commercetools client credential have at least the following permissions:
 
 * `manage_payments`
-* `manage_checkout_payment_intents`
 * `view_sessions`
 * `introspect_oauth_tokens`
 
@@ -128,3 +127,45 @@ Token can be found in response
 ```
 
 Use the token to authenticate requests protected by JWT: `Authorization: Bearer <token>`. 
+
+## APIs
+
+### Create transaction
+
+Private endpoint used for server-to-server payment processing, for example to charge a recurring order's billing cycle using a previously stored payment method. Unlike the other endpoints, it is not called from Checkout front-end but from a backend system. It is protected by `manage_project` and `manage_checkout_transactions` access rights of composable commerce OAuth2 token.
+
+#### Endpoint
+
+`POST /operations/transactions`
+
+#### Request Parameters
+
+- cartId: Id of the cart to charge.
+- checkoutTransactionItemId: Id of the checkout payment-transaction item this request is processing. The commercetools Payment created for this charge is linked to this value.
+- paymentInterface (optional): Deprecated, do not use.
+- amount (optional)
+  - centAmount: Amount in the smallest indivisible unit of a currency. For example, 5 EUR is specified as 500 while 5 JPY is specified as 5. It must match the currency and not exceed the outstanding amount of the cart, otherwise the request is rejected.
+  - currencyCode: Currency code compliant to [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)
+
+  When omitted, the cart's outstanding amount is charged instead, and no currency/amount validation against the cart is performed.
+- paymentMethodId: Id of the previously stored payment method to charge. Required to process the charge.
+- idempotencyKey (optional): Key used to make repeated requests for the same charge attempt idempotent. In a real PSP integration this would be forwarded to the PSP's own idempotency mechanism - this mock does not call a real PSP, so the value is accepted but unused.
+- futureOrderNumber (optional): Accepted but unused by this mock.
+- type: Type of transaction to process. Currently only `Recurring` is supported.
+
+#### Response Parameters
+
+- transactionStatus
+  - state: Result of the transaction. It can be `Pending`, `Failed` or `Completed`. `Pending` means the PSP accepted the charge but has not confirmed it yet - typical of payment methods that are settled asynchronously and may still be confirmed at a later point. This mock decides the outcome synchronously and never returns `Pending`; a real PSP integration built from this template is likely to.
+  - errors: List of errors, present when the payment was rejected.
+- paymentId: Id of the commercetools Payment resource created for this charge, when available.
+
+```
+{
+    transactionStatus: {
+        state: "Pending|Failed|Completed",
+        errors: [{ code: "PaymentRejected", message: "<message>" }]
+    },
+    paymentId: "<paymentId>"
+}
+```

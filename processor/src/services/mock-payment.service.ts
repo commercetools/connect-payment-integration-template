@@ -621,16 +621,34 @@ export class MockPaymentService extends AbstractPaymentService {
 
     const cartAmount = await this.ctCartService.getPaymentAmount({ cart: ctCart });
 
-    if (transactionDraft.amount.currencyCode !== cartAmount.currencyCode) {
-      throw new ErrorInvalidField('amount.currencyCode', transactionDraft.amount.currencyCode, cartAmount.currencyCode);
+    if (transactionDraft.amount) {
+      if (transactionDraft.amount.currencyCode !== cartAmount.currencyCode) {
+        throw new ErrorInvalidField(
+          'amount.currencyCode',
+          transactionDraft.amount.currencyCode,
+          cartAmount.currencyCode,
+        );
+      }
+
+      if (transactionDraft.amount.centAmount > cartAmount.centAmount) {
+        throw new ErrorInvalidField(
+          'amount.centAmount',
+          String(transactionDraft.amount.centAmount),
+          `<= ${cartAmount.centAmount}`,
+        );
+      }
     }
 
-    if (transactionDraft.amount.centAmount > cartAmount.centAmount) {
-      throw new ErrorInvalidField(
-        'amount.centAmount',
-        String(transactionDraft.amount.centAmount),
-        `<= ${cartAmount.centAmount}`,
-      );
+    if (!transactionDraft.paymentMethodId) {
+      throw new ErrorRequiredField('paymentMethodId', {
+        privateMessage: 'paymentMethodId is not set on the transaction draft',
+        privateFields: {
+          cart: {
+            id: ctCart.id,
+          },
+          checkoutTransactionItemId: transactionDraft.checkoutTransactionItemId,
+        },
+      });
     }
 
     const paymentMethod = await this.ctPaymentMethodService.get({
@@ -655,7 +673,7 @@ export class MockPaymentService extends AbstractPaymentService {
       });
     }
 
-    const amountPlanned = transactionDraft.amount;
+    const amountPlanned = transactionDraft.amount ?? cartAmount;
 
     const newlyCreatedPayment = await this.ctPaymentService.createPayment({
       amountPlanned,

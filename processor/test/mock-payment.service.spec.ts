@@ -351,13 +351,13 @@ describe('mock-payment.service', () => {
         });
         jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
         jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
-          centAmount: transactionDraft.amount.centAmount,
+          centAmount: transactionDraft.amount!.centAmount,
           currencyCode: 'USD',
           fractionDigits: 2,
         });
 
         expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(
-          new ErrorInvalidField('amount.currencyCode', transactionDraft.amount.currencyCode, 'USD'),
+          new ErrorInvalidField('amount.currencyCode', transactionDraft.amount!.currencyCode, 'USD'),
         );
       });
 
@@ -371,17 +371,75 @@ describe('mock-payment.service', () => {
         });
         jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
         jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
-          centAmount: transactionDraft.amount.centAmount - 1,
-          currencyCode: transactionDraft.amount.currencyCode,
+          centAmount: transactionDraft.amount!.centAmount - 1,
+          currencyCode: transactionDraft.amount!.currencyCode,
           fractionDigits: 2,
         });
 
         expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(
           new ErrorInvalidField(
             'amount.centAmount',
-            String(transactionDraft.amount.centAmount),
-            `<= ${transactionDraft.amount.centAmount - 1}`,
+            String(transactionDraft.amount!.centAmount),
+            `<= ${transactionDraft.amount!.centAmount - 1}`,
           ),
+        );
+      });
+
+      test('it should fall back to the cart amount, skipping currency/amount validation, when the draft does not have an amount set', async () => {
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: true,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
+
+        const cartAmount = { centAmount: 999, currencyCode: 'USD', fractionDigits: 2 };
+
+        jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
+        jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue(cartAmount);
+        jest.spyOn(DefaultPaymentMethodService.prototype, 'get').mockResolvedValue(mockStoredPaymentMethod);
+        jest
+          .spyOn(DefaultPaymentService.prototype, 'createPayment')
+          .mockReturnValueOnce(Promise.resolve(mockGetPaymentResult));
+        jest
+          .spyOn(DefaultCartService.prototype, 'addPayment')
+          .mockReturnValueOnce(Promise.resolve(mockGetCartResult()));
+        jest
+          .spyOn(DefaultPaymentService.prototype, 'updatePayment')
+          .mockReturnValue(Promise.resolve(mockUpdatePaymentResult));
+
+        const transactionDraftWithoutAmount: TransactionDraftDTO = { ...transactionDraft, amount: undefined };
+
+        await mockPaymentService.handleTransaction(transactionDraftWithoutAmount);
+
+        expect(DefaultPaymentService.prototype.createPayment).toHaveBeenCalledWith(
+          expect.objectContaining({ amountPlanned: cartAmount }),
+        );
+      });
+
+      test('it should throw an ErrorRequiredField if the draft does not have a paymentMethodId set', async () => {
+        jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+          enabled: true,
+          config: {
+            paymentInterface: 'psp-template',
+            allowedPaymentMethods: [PaymentMethodType.CARD],
+          },
+        });
+        jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
+        jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
+          centAmount: transactionDraft.amount!.centAmount,
+          currencyCode: transactionDraft.amount!.currencyCode,
+          fractionDigits: 2,
+        });
+
+        const transactionDraftWithoutPaymentMethodId: TransactionDraftDTO = {
+          ...transactionDraft,
+          paymentMethodId: undefined,
+        };
+
+        expect(mockPaymentService.handleTransaction(transactionDraftWithoutPaymentMethodId)).rejects.toThrow(
+          new ErrorRequiredField('paymentMethodId'),
         );
       });
 
@@ -395,8 +453,8 @@ describe('mock-payment.service', () => {
         });
         jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
         jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
-          centAmount: transactionDraft.amount.centAmount,
-          currencyCode: transactionDraft.amount.currencyCode,
+          centAmount: transactionDraft.amount!.centAmount,
+          currencyCode: transactionDraft.amount!.currencyCode,
           fractionDigits: 2,
         });
         jest.spyOn(DefaultPaymentMethodService.prototype, 'get').mockResolvedValue({
@@ -417,8 +475,8 @@ describe('mock-payment.service', () => {
         });
         jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
         jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
-          centAmount: transactionDraft.amount.centAmount,
-          currencyCode: transactionDraft.amount.currencyCode,
+          centAmount: transactionDraft.amount!.centAmount,
+          currencyCode: transactionDraft.amount!.currencyCode,
           fractionDigits: 2,
         });
         jest.spyOn(DefaultPaymentMethodService.prototype, 'get').mockResolvedValue(mockStoredPaymentMethod);
@@ -460,8 +518,8 @@ describe('mock-payment.service', () => {
         });
         jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
         jest.spyOn(DefaultCartService.prototype, 'getPaymentAmount').mockResolvedValue({
-          centAmount: failingTransactionDraft.amount.centAmount,
-          currencyCode: failingTransactionDraft.amount.currencyCode,
+          centAmount: failingTransactionDraft.amount!.centAmount,
+          currencyCode: failingTransactionDraft.amount!.currencyCode,
           fractionDigits: 2,
         });
         jest.spyOn(DefaultPaymentMethodService.prototype, 'get').mockResolvedValue(mockStoredPaymentMethod);

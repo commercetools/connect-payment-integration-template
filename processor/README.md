@@ -142,11 +142,15 @@ Private endpoint used for server-to-server payment processing, for example to ch
 
 - cartId: Id of the cart to charge.
 - checkoutTransactionItemId: Id of the checkout payment-transaction item this request is processing. The commercetools Payment created for this charge is linked to this value.
-- amount
+- paymentInterface (optional): Deprecated, do not use.
+- amount (optional)
   - centAmount: Amount in the smallest indivisible unit of a currency. For example, 5 EUR is specified as 500 while 5 JPY is specified as 5. It must match the currency and not exceed the outstanding amount of the cart, otherwise the request is rejected.
   - currencyCode: Currency code compliant to [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)
-- paymentMethodId: Id of the previously stored payment method to charge.
-- idempotencyKey: Key used to make repeated requests for the same charge attempt idempotent. In a real PSP integration this would be forwarded to the PSP's own idempotency mechanism - this mock does not call a real PSP, so the value is accepted but unused.
+
+  When omitted, the cart's outstanding amount is charged instead, and no currency/amount validation against the cart is performed.
+- paymentMethodId: Id of the previously stored payment method to charge. Required to process the charge.
+- idempotencyKey (optional): Key used to make repeated requests for the same charge attempt idempotent. In a real PSP integration this would be forwarded to the PSP's own idempotency mechanism - this mock does not call a real PSP, so the value is accepted but unused.
+- futureOrderNumber (optional): Accepted but unused by this mock.
 - type: Type of transaction to process. Currently only `Recurring` is supported.
 
 #### Response Parameters

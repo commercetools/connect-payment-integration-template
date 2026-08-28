@@ -28,7 +28,7 @@
     "@commercetools/connect-payments-sdk": "1.2.1",
     "@fastify/autoload": "6.5.0",
     "@fastify/cors": "11.3.0",
-    "@fastify/formbody": "8.0.2",
+    "@fastify/formbody": "9.0.0",
     "@fastify/http-proxy": "11.6.1",
     "@fastify/request-context": "7.0.0",
     "@fastify/static": "10.1.3",

@@ -23,7 +23,7 @@
     "@jest/globals": "30.4.1",
     "@types/node": "24.13.3",
     "jest": "30.4.2",
-    "sass": "1.102.0",
+    "sass": "1.103.1",
     "ts-jest": "29.4.12",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",

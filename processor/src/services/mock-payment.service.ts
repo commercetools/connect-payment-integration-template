@@ -1,5 +1,6 @@
 import {
   Cart,
+  ErrorInternalConstraintViolated,
   ErrorInvalidField,
   ErrorInvalidOperation,
   ErrorRequiredField,
@@ -36,7 +37,7 @@ import { log } from '../libs/logger';
 
 export class MockPaymentService extends AbstractPaymentService {
   constructor(opts: MockPaymentServiceOptions) {
-    super(opts.ctCartService, opts.ctPaymentService, opts.ctPaymentMethodService);
+    super(opts.ctCartService, opts.ctPaymentService, opts.ctPaymentMethodService, opts.ctRecurringPaymentJobService);
   }
 
   /**
@@ -95,6 +96,9 @@ export class MockPaymentService extends AbstractPaymentService {
 
     if (getStoredPaymentMethodsConfig().enabled) {
       requiredPermissions.push('manage_payment_methods');
+      // Required so a recurring payment job can be created when a stored payment method is used
+      // to pay for a recurring cart
+      requiredPermissions.push('manage_recurring_payment_jobs');
     }
 
     const handler = await statusHandler({
@@ -336,6 +340,10 @@ export class MockPaymentService extends AbstractPaymentService {
 
     // Perform request to PSP
 
+    // The payment method involved in this payment, whichever way it was resolved: freshly
+    // tokenized just below, or an already-existing one from handleStoredPaymentMethod() above.
+    let paymentMethodId = storedPaymentMethodDataOptions?.paymentMethodId;
+
     // Depending on the PSP integration the creation of the CT stored payment method could happen in one of two ways:
     // 1. sync based on the response from the PSP when the payment is created and authorized.
     // 2. async via a webhook/notification from the PSP after the payment is created and authorized.
@@ -345,13 +353,15 @@ export class MockPaymentService extends AbstractPaymentService {
       storedPaymentMethodDataOptions.storePaymentMethod
     ) {
       // In this example it will be directly created as described in option 1.
-      await this.ctPaymentMethodService.save({
+      const savedPaymentMethod = await this.ctPaymentMethodService.save({
         customerId: ctCart.customerId,
         method: request.data.paymentMethod.type,
         paymentInterface: getStoredPaymentMethodsConfig().config.paymentInterface,
         interfaceAccount: getStoredPaymentMethodsConfig().config.interfaceAccount,
         token: randomUUID(), // This value should always come from the PSP after they have authorized the payment
       });
+
+      paymentMethodId = savedPaymentMethod.id;
     }
 
     const pspReference = randomUUID().toString();
@@ -380,6 +390,13 @@ export class MockPaymentService extends AbstractPaymentService {
       }),
     });
 
+    if (request.data.paymentOutcome === PaymentOutcome.AUTHORIZED && paymentMethodId) {
+      // The cart is recurring and this payment used a stored payment method (freshly tokenized
+      // or already existing) — link them so commercetools Checkout can charge it for the cart's
+      // future occurrences.
+      await this.createRecurringPaymentJobIfApplicable(updatedPayment.id, paymentMethodId);
+    }
+
     return {
       paymentReference: updatedPayment.id,
     };
@@ -393,7 +410,7 @@ export class MockPaymentService extends AbstractPaymentService {
   async handleStoredPaymentMethod(
     request: CreatePaymentRequest,
     ctCart: Cart,
-  ): Promise<{ storePaymentMethod?: boolean; token?: string }> {
+  ): Promise<{ storePaymentMethod?: boolean; token?: string; paymentMethodId?: string }> {
     // Feature itself must be enabled on connector level by the merchant
     if (!getStoredPaymentMethodsConfig().enabled) {
       return {};
@@ -427,8 +444,7 @@ export class MockPaymentService extends AbstractPaymentService {
 
     // The cart needs to have a customerId set if the incoming request indicated that it wants to either pay or tokenise
     if (!ctCart.customerId) {
-      throw new ErrorRequiredField('customerId', {
-        privateMessage: 'The customerId is not set on the cart yet the customer wants to tokenize the payment',
+      throw new ErrorInternalConstraintViolated('The cart does not have a customerId set.', {
         privateFields: {
           cart: {
             id: ctCart.id,
@@ -477,10 +493,35 @@ export class MockPaymentService extends AbstractPaymentService {
       // }
 
       // Send the "paymentMethod.token.value" attribute to the PSP in order to pay with an tokenised payment method
-      return { token: paymentMethod.token?.value };
+      return { token: paymentMethod.token?.value, paymentMethodId: paymentMethod.id };
     }
 
     return {};
+  }
+
+  /**
+   * Links a payment to a stored payment method so commercetools Checkout can charge it for a
+   * recurring cart's future occurrences.
+   *
+   * `createRecurringPaymentJobIfApplicable` never throws and always resolves - to the created job,
+   * or to `null` when the cart isn't configured for recurring payments, or if the request to
+   * Checkout failed. It already logs which of those two happened via the same logger this
+   * processor uses, so there's nothing more to log here for the `null` case.
+   */
+  private async createRecurringPaymentJobIfApplicable(paymentId: string, paymentMethodId: string): Promise<void> {
+    const paymentMethod = { id: paymentMethodId, typeId: 'payment-method' };
+
+    const recurringPaymentJob = await this.ctRecurringPaymentJobService.createRecurringPaymentJobIfApplicable({
+      originPayment: { id: paymentId, typeId: 'payment' },
+      paymentMethod,
+    });
+
+    if (recurringPaymentJob) {
+      log.info('Created recurring payment job for stored payment method', {
+        recurringPaymentJobId: recurringPaymentJob.id,
+        paymentMethod,
+      });
+    }
   }
 
   /**
@@ -494,8 +535,7 @@ export class MockPaymentService extends AbstractPaymentService {
     const customerId = ctCart.customerId;
 
     if (!customerId) {
-      throw new ErrorRequiredField('customerId', {
-        privateMessage: 'customerId is not set on the cart',
+      throw new ErrorInternalConstraintViolated('The cart does not have a customerId set.', {
         privateFields: {
           cart: {
             id: ctCart.id,
@@ -608,8 +648,7 @@ export class MockPaymentService extends AbstractPaymentService {
     const ctCart = await this.ctCartService.getCart({ id: transactionDraft.cartId });
 
     if (!ctCart.customerId) {
-      throw new ErrorRequiredField('customerId', {
-        privateMessage: 'customerId is not set on the cart',
+      throw new ErrorInternalConstraintViolated('The cart does not have a customerId set.', {
         privateFields: {
           cart: {
             id: ctCart.id,
@@ -659,8 +698,7 @@ export class MockPaymentService extends AbstractPaymentService {
     });
 
     if (!paymentMethod.token) {
-      throw new ErrorRequiredField('token', {
-        privateMessage: 'The "token" value is not set on the payment-method',
+      throw new ErrorInternalConstraintViolated('The referenced payment method does not have a token set.', {
         privateFields: {
           cart: {
             id: ctCart.id,

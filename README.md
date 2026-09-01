@@ -156,7 +156,7 @@ Currently supported payment-methods for storing:
    1. set `STORED_PAYMENT_METHODS_ENABLED` to `true`. By default it is not enabled.
    2. set `STORED_PAYMENT_METHODS_PAYMENT_INTERFACE` to any string value.
    3. optionally set `STORED_PAYMENT_METHODS_INTERFACE_ACCOUNT` to any string value.
-2. create a new CT API client which the additional scope of `manage_payment_methods` and update the corresponding env values. The connector health check will fail if the feature is enabled but the configured API client is missing this scope.
+2. create a new CT API client which the additional scopes of `manage_payment_methods` and `manage_recurring_payment_jobs`, and update the corresponding env values. The connector health check will fail if the feature is enabled but the configured API client is missing either scope.
 3. ensure that before Checkout is instantiated the `cart.customerId` is set to the correct customer.
 
 #### CT payment-methods and tokens
@@ -164,6 +164,8 @@ Currently supported payment-methods for storing:
 When a payment method is tokenized for the first time the psp template connector will create a new CT payment-method. The payment-method is attached to the `cart.customerId` as well as the `paymentInterface` and `interfaceAccount` are set based on the previously configured env values.
 
 The next time the same customer goes through Checkout (either using drop-ins or web-components) they will see the stored payment method as a option to pay with.
+
+If the cart being checked out is a recurring cart (has line items or custom line items with `recurrenceInfo` set), the connector also links the payment method involved - freshly tokenized or an already-stored one - to the payment via a commercetools recurring payment job, so commercetools Checkout can charge it for the cart's future occurrences.
 
 ### Server-to-server recurring payments
 

@@ -5,6 +5,7 @@ const paymentService = new MockPaymentService({
   ctCartService: paymentSDK.ctCartService,
   ctPaymentService: paymentSDK.ctPaymentService,
   ctPaymentMethodService: paymentSDK.ctPaymentMethodService,
+  ctRecurringPaymentJobService: paymentSDK.ctRecurringPaymentJobService,
 });
 
 export const app = {

@@ -214,6 +214,16 @@
         containerExternal.innerHTML = "";
         containerInternal.innerHTML = "";
 
+        const storeContainer = document.getElementById(
+          "storePaymentMethod-container"
+        );
+        const storeCheckbox = document.getElementById("storePaymentMethod");
+        const canStorePaymentMethod =
+          method.category === "component" &&
+          allowedStoredPaymentMethods.includes(method.type);
+        storeContainer.classList.toggle("d-none", !canStorePaymentMethod);
+        storeCheckbox.checked = false;
+
         const builder = method.builder;
         const component = method.component;
         if (builder.componentHasSubmit) {

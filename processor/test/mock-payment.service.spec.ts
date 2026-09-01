@@ -18,6 +18,7 @@ import * as FastifyContext from '../src/libs/fastify/context/context';
 import * as StatusHandler from '@commercetools/connect-payments-sdk/dist/api/handlers/status.handler';
 
 import {
+  ErrorInternalConstraintViolated,
   ErrorInvalidField,
   ErrorInvalidOperation,
   ErrorRequiredField,
@@ -25,6 +26,7 @@ import {
   PaymentMethod,
 } from '@commercetools/connect-payments-sdk';
 import { DefaultPaymentMethodService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-payment-method.service';
+import { DefaultRecurringPaymentJobService } from '@commercetools/connect-payments-sdk/dist/commercetools/services/ct-recurring-payment-job.service';
 import { PaymentMethodType, PaymentOutcome } from '../src/dtos/mock-payment.dto';
 import { TransactionDraftDTO } from '../src/dtos/operations/transaction.dto';
 import * as StoredPaymentMethodsConfig from '../src/config/stored-payment-methods.config';
@@ -47,6 +49,7 @@ describe('mock-payment.service', () => {
     ctCartService: paymentSDK.ctCartService,
     ctPaymentService: paymentSDK.ctPaymentService,
     ctPaymentMethodService: paymentSDK.ctPaymentMethodService,
+    ctRecurringPaymentJobService: paymentSDK.ctRecurringPaymentJobService,
   };
   const paymentService: AbstractPaymentService = new MockPaymentService(opts);
   const mockPaymentService: MockPaymentService = new MockPaymentService(opts);
@@ -260,6 +263,145 @@ describe('mock-payment.service', () => {
     await expect(resultPromise).rejects.toThrow('A value is required for field poNumber.');
   });
 
+  describe('createPayment - recurring payment job', () => {
+    const customerId = '12303506-396c-4163-9193-11115c10fc2e';
+
+    beforeEach(() => {
+      jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
+        enabled: true,
+        config: {
+          paymentInterface: 'psp-template',
+          allowedPaymentMethods: [PaymentMethodType.CARD],
+        },
+      });
+      jest.spyOn(DefaultCartService.prototype, 'getCart').mockResolvedValue({ ...mockGetCartResult(), customerId });
+      jest.spyOn(DefaultPaymentService.prototype, 'createPayment').mockResolvedValue(mockGetPaymentResult);
+      jest.spyOn(DefaultCartService.prototype, 'addPayment').mockResolvedValue(mockGetCartResult());
+      jest.spyOn(DefaultPaymentService.prototype, 'updatePayment').mockResolvedValue(mockUpdatePaymentResult);
+    });
+
+    test('creates a recurring payment job after tokenizing a payment method for the first time', async () => {
+      const createPaymentOpts: CreatePaymentRequest = {
+        data: {
+          paymentMethod: {
+            type: PaymentMethodType.CARD,
+            storePaymentMethod: true,
+          },
+          paymentOutcome: PaymentOutcome.AUTHORIZED,
+        },
+      };
+
+      const savedPaymentMethod = {
+        id: 'd85435f2-2628-457f-8b8e-1a567da30a8d',
+        customer: { id: customerId, typeId: 'customer' },
+        token: { value: 'new-token-value' },
+        method: 'card',
+        createdAt: '',
+        lastModifiedAt: '',
+        default: false,
+        paymentMethodStatus: 'Active',
+        version: 1,
+      } as PaymentMethod;
+      jest.spyOn(DefaultPaymentMethodService.prototype, 'save').mockResolvedValue(savedPaymentMethod);
+
+      const createRecurringPaymentJobSpy = jest
+        .spyOn(DefaultRecurringPaymentJobService.prototype, 'createRecurringPaymentJobIfApplicable')
+        .mockResolvedValue({
+          id: 'recurring-payment-job-id',
+          version: 1,
+          createdAt: '',
+          lastModifiedAt: '',
+          status: { state: 'Initial' },
+        });
+
+      const result = await mockPaymentService.createPayment(createPaymentOpts);
+
+      expect(result?.paymentReference).toStrictEqual('123456');
+      expect(createRecurringPaymentJobSpy).toHaveBeenCalledWith({
+        originPayment: { id: '123456', typeId: 'payment' },
+        paymentMethod: { id: savedPaymentMethod.id, typeId: 'payment-method' },
+      });
+    });
+
+    test('creates a recurring payment job after paying with an already-stored payment method', async () => {
+      const storedPaymentMethodId = '997ff5fb-838b-4978-bf47-37a7de565820';
+      const createPaymentOpts: CreatePaymentRequest = {
+        data: {
+          paymentMethod: {
+            type: PaymentMethodType.CARD,
+            storedPaymentMethodId,
+          },
+          paymentOutcome: PaymentOutcome.AUTHORIZED,
+        },
+      };
+
+      const existingPaymentMethod = {
+        id: storedPaymentMethodId,
+        customer: { id: customerId, typeId: 'customer' },
+        token: { value: 'existing-token-value' },
+        method: 'card',
+        createdAt: '',
+        lastModifiedAt: '',
+        default: false,
+        paymentMethodStatus: 'Active',
+        version: 1,
+      } as PaymentMethod;
+      jest.spyOn(DefaultPaymentMethodService.prototype, 'get').mockResolvedValue(existingPaymentMethod);
+
+      const createRecurringPaymentJobSpy = jest
+        .spyOn(DefaultRecurringPaymentJobService.prototype, 'createRecurringPaymentJobIfApplicable')
+        .mockResolvedValue({
+          id: 'recurring-payment-job-id',
+          version: 1,
+          createdAt: '',
+          lastModifiedAt: '',
+          status: { state: 'Initial' },
+        });
+
+      const result = await mockPaymentService.createPayment(createPaymentOpts);
+
+      expect(result?.paymentReference).toStrictEqual('123456');
+      expect(createRecurringPaymentJobSpy).toHaveBeenCalledWith({
+        originPayment: { id: '123456', typeId: 'payment' },
+        paymentMethod: { id: storedPaymentMethodId, typeId: 'payment-method' },
+      });
+    });
+
+    test('does not fail the payment when no recurring payment job is applicable', async () => {
+      const createPaymentOpts: CreatePaymentRequest = {
+        data: {
+          paymentMethod: {
+            type: PaymentMethodType.CARD,
+            storePaymentMethod: true,
+          },
+          paymentOutcome: PaymentOutcome.AUTHORIZED,
+        },
+      };
+
+      jest.spyOn(DefaultPaymentMethodService.prototype, 'save').mockResolvedValue({
+        id: 'd85435f2-2628-457f-8b8e-1a567da30a8d',
+        customer: { id: customerId, typeId: 'customer' },
+        token: { value: 'new-token-value' },
+        method: 'card',
+        createdAt: '',
+        lastModifiedAt: '',
+        default: false,
+        paymentMethodStatus: 'Active',
+        version: 1,
+      } as PaymentMethod);
+
+      // createRecurringPaymentJobIfApplicable never throws - it resolves to null both when the
+      // cart isn't recurring and when the request to Checkout failed.
+      jest
+        .spyOn(DefaultRecurringPaymentJobService.prototype, 'createRecurringPaymentJobIfApplicable')
+        .mockResolvedValue(null);
+
+      const result = await mockPaymentService.createPayment(createPaymentOpts);
+
+      expect(result?.paymentReference).toStrictEqual('123456');
+    });
+  });
+
   describe('handleTransaction', () => {
     const customerId = '0e2a18f3-9f3b-4cef-83ab-6d892c95a0a8';
     const paymentMethodId = '997ff5fb-838b-4978-bf47-37a7de565820';
@@ -324,7 +466,7 @@ describe('mock-payment.service', () => {
         expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(ErrorInvalidOperation);
       });
 
-      test('it should throw an ErrorRequiredField if the provided cart does not have a customerId set', async () => {
+      test('it should throw an ErrorInternalConstraintViolated if the provided cart does not have a customerId set', async () => {
         jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
           enabled: true,
           config: {
@@ -337,7 +479,7 @@ describe('mock-payment.service', () => {
           .mockResolvedValue({ ...mockGetCartResult(), customerId: undefined });
 
         expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(
-          new ErrorRequiredField('customerId'),
+          new ErrorInternalConstraintViolated('The cart does not have a customerId set.'),
         );
       });
 
@@ -443,7 +585,7 @@ describe('mock-payment.service', () => {
         );
       });
 
-      test('it should throw an ErrorRequiredField if the paymentMethod referenced does not have a token value set', async () => {
+      test('it should throw an ErrorInternalConstraintViolated if the paymentMethod referenced does not have a token value set', async () => {
         jest.spyOn(StoredPaymentMethodsConfig, 'getStoredPaymentMethodsConfig').mockReturnValue({
           enabled: true,
           config: {
@@ -462,7 +604,9 @@ describe('mock-payment.service', () => {
           token: undefined,
         });
 
-        expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(new ErrorRequiredField('token'));
+        expect(mockPaymentService.handleTransaction(transactionDraft)).rejects.toThrow(
+          new ErrorInternalConstraintViolated('The referenced payment method does not have a token set.'),
+        );
       });
 
       test('should create the payment in CoCo and return it with a Completed state', async () => {

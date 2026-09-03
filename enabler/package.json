@@ -20,9 +20,9 @@
     "serve": "14.2.6"
   },
   "devDependencies": {
-    "@jest/globals": "30.4.1",
+    "@jest/globals": "30.5.0",
     "@types/node": "24.13.3",
-    "jest": "30.4.2",
+    "jest": "30.5.0",
     "sass": "1.103.1",
     "ts-jest": "29.4.12",
     "ts-node": "10.9.2",

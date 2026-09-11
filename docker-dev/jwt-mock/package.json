@@ -1,0 +1,12 @@
+{
+  "name": "jwt-mock",
+  "private": true,
+  "version": "1.0.0",
+  "type": "commonjs",
+  "main": "jwt-mock.js",
+  "dependencies": {
+    "cors": "2.8.5",
+    "express": "4.19.2",
+    "jose": "5.9.6"
+  }
+}

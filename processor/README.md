@@ -103,7 +103,7 @@ In order to make easy running the application locally, following commands help t
 
 ####Set environment variable to point to the jwksUrl
 ```
-export CTP_JWKS_URL="http://localhost:9000/jwt/.well-known/jwks.json"
+export CTP_JWKS_URL="http://localhost:9002/jwt/.well-known/jwks.json"
 ```
 ####Run the jwt server
 ```
@@ -113,7 +113,7 @@ docker compose up -d
 ####Obtain JWT
 ```
 # Request token
-curl --location 'http://localhost:9000/jwt/token' \
+curl --location 'http://localhost:9002/jwt/token' \
 --header 'Content-Type: application/json' \
 --data '{
     "iss": "https://mc-api.europe-west1.gcp.commercetools.com",

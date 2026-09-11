@@ -2,16 +2,10 @@ version: "3.8"
 
 services:
   jwt-server:
-    image: node:24-alpine
+    build: ./docker-dev/jwt-mock
     restart: always
-    command: 
-      - npx
-      - --package
-      - jwt-mock-server
-      - -y
-      - start
     ports:
-      - 9002:9000
+      - 9002:9002
 
   enabler:
     image: node:24
@@ -39,7 +33,7 @@ services:
     env_file:
       - ./processor/.env
     environment:
-      - CTP_JWKS_URL=http://jwt-server:9000/jwt/.well-known/jwks.json
+      - CTP_JWKS_URL=http://jwt-server:9002/jwt/.well-known/jwks.json
       - CTP_JWT_ISSUER=https://issuer.com
     command: /bin/sh -c 'npm install && npm run watch'
     ports:

@@ -6,7 +6,7 @@
   "main": "jwt-mock.js",
   "dependencies": {
     "cors": "2.8.5",
-    "express": "4.19.2",
+    "express": "4.22.0",
     "jose": "5.9.6"
   }
 }

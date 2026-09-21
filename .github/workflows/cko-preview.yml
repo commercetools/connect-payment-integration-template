@@ -15,9 +15,27 @@ permissions:
 
 jobs:
   publish:
-    name: Preview Connector
+    name: Preview Connector (${{ matrix.region }})
     runs-on: ubuntu-latest
     if: github.ref_type == 'tag'
+    strategy:
+      # One region failing should not hide the outcome of the other.
+      fail-fast: false
+      matrix:
+        include:
+          - region: europe-west1.gcp
+            auth_host: auth.europe-west1.gcp.commercetools.com
+            connect_host: connect.europe-west1.gcp.commercetools.com
+            client_id_secret: CKO_CLIENT_ID
+            client_secret_secret: CKO_CLIENT_SECRET
+            connector_key_secret: CKO_CONNECTOR_KEY
+          # AWS draft connectors AWS STG
+          - region: eu-central-1.aws
+            auth_host: auth.eu-central-1.aws.escemo.com
+            connect_host: connect-stage.eu-central-1.aws.commercetools.com
+            client_id_secret: CKO_AWS_CLIENT_ID
+            client_secret_secret: CKO_AWS_CLIENT_SECRET
+            connector_key_secret: CKO_AWS_CONNECTOR_KEY
     steps:
       - name: Checkout Repo
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -29,20 +47,26 @@ jobs:
 
       - name: Make previewable
         env:
-          CLIENT_ID: ${{ secrets.CKO_CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CKO_CLIENT_SECRET }}
-          CONNECTOR_KEY: ${{ secrets.CKO_CONNECTOR_KEY }}
+          CLIENT_ID: ${{ secrets[matrix.client_id_secret] }}
+          CLIENT_SECRET: ${{ secrets[matrix.client_secret_secret] }}
+          CONNECTOR_KEY: ${{ secrets[matrix.connector_key_secret] }}
+          REGION: ${{ matrix.region }}
+          AUTH_HOST: ${{ matrix.auth_host }}
+          CONNECT_HOST: ${{ matrix.connect_host }}
         run: |
           TIMEOUT=600 # 10 minutes
           START_TIME=$(date +%s)
+
+          AUTH_URL="https://$AUTH_HOST/oauth/token?grant_type=client_credentials"
+          DRAFT_URL="https://$CONNECT_HOST/connectors/drafts/key=$CONNECTOR_KEY"
           
-          echo "Updating connector to tag $GITHUB_REF_NAME"
+          echo "Updating connector to tag $GITHUB_REF_NAME in region $REGION"
         
           echo "********************************"
           echo Authenticating with commercetools
           echo "********************************"
 
-          OAUTH_RESPONSE=$(curl --silent --show-error --location --request POST 'https://auth.europe-west1.gcp.commercetools.com/oauth/token?grant_type=client_credentials' -u $CLIENT_ID:$CLIENT_SECRET)
+          OAUTH_RESPONSE=$(curl --silent --show-error --location --request POST "$AUTH_URL" -u $CLIENT_ID:$CLIENT_SECRET)
             
           ACCESS_TOKEN=$(echo $OAUTH_RESPONSE | jq -r '.access_token')
           echo Access token retrieved
@@ -51,7 +75,7 @@ jobs:
           echo Updating connector
           echo "********************************"
           
-          CONNECTOR_DETAILS=$(curl --silent --show-error --location "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+          CONNECTOR_DETAILS=$(curl --silent --show-error --location "$DRAFT_URL" \
               --header 'Content-Type: application/json' \
               --header "Authorization: Bearer $ACCESS_TOKEN")
           
@@ -60,14 +84,14 @@ jobs:
 
           echo "Updating connector version: $VERSION isPreviewable: $IS_PREVIWABLE"
           
-          CONNECTOR_DETAILS=$(curl --fail-with-body --silent --location POST "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+          CONNECTOR_DETAILS=$(curl --fail-with-body --silent --location POST "$DRAFT_URL" \
               --header 'Content-Type: application/json' \
               --header "Authorization: Bearer $ACCESS_TOKEN" \
               --data-raw "{\"version\": $VERSION, \"actions\": [{\"action\": \"setRepository\",\"url\": \"git@github.com:$GITHUB_REPOSITORY.git\",\"tag\": \"$GITHUB_REF_NAME\"}]}")
 
           VERSION=$(echo $CONNECTOR_DETAILS | jq -r '.version')
 
-          CONNECTOR_DETAILS=$(curl --fail-with-body --silent --location POST "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+          CONNECTOR_DETAILS=$(curl --fail-with-body --silent --location POST "$DRAFT_URL" \
               --header 'Content-Type: application/json' \
               --header "Authorization: Bearer $ACCESS_TOKEN" \
               --data-raw "{\"version\": $VERSION, \"actions\": [{\"action\": \"updatePreviewable\"}]}")
@@ -84,7 +108,7 @@ jobs:
             fi
             
             # Execute the curl request and capture the response
-            RESPONSE=$(curl --silent --show-error --location "https://connect.europe-west1.gcp.commercetools.com/connectors/drafts/key=$CONNECTOR_KEY" \
+            RESPONSE=$(curl --silent --show-error --location "$DRAFT_URL" \
               --header 'Content-Type: application/json' \
               --header "Authorization: Bearer $ACCESS_TOKEN")
             

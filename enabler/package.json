@@ -16,14 +16,14 @@
     "npm": ">=11.0.0"
   },
   "dependencies": {
-    "@commercetools-backend/loggers": "27.10.0",
+    "@commercetools-backend/loggers": "27.11.4",
     "serve": "14.2.6"
   },
   "devDependencies": {
     "@jest/globals": "30.5.2",
-    "@types/node": "24.13.6",
+    "@types/node": "24.19.0",
     "jest": "30.5.2",
-    "sass": "1.104.1",
+    "sass": "1.105.0",
     "ts-jest": "29.4.14",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",

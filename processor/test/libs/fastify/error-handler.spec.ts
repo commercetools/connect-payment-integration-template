@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, test } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import Fastify, { FastifyError, type FastifyInstance } from 'fastify';
 import { errorHandler } from '../../../src/libs/fastify/error-handler';
 import { ErrorAuthErrorResponse, Errorx, ErrorxAdditionalOpts } from '@commercetools/connect-payments-sdk';

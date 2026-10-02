@@ -1,5 +1,4 @@
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
-import jest from 'eslint-plugin-jest';
 import prettier from 'eslint-plugin-prettier';
 import unusedImports from 'eslint-plugin-unused-imports';
 import globals from 'globals';
@@ -27,7 +26,6 @@ export default [
   {
     plugins: {
       '@typescript-eslint': typescriptEslint,
-      jest,
       prettier,
       'unused-imports': unusedImports,
     },
@@ -35,7 +33,7 @@ export default [
     languageOptions: {
       globals: {
         ...globals.node,
-        ...globals.jest,
+        ...globals.vitest,
       },
 
       parser: tsParser,

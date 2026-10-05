@@ -5,8 +5,8 @@
   "type": "commonjs",
   "main": "jwt-mock.js",
   "dependencies": {
-    "cors": "2.8.5",
-    "express": "4.22.0",
-    "jose": "5.9.6"
+    "cors": "2.8.6",
+    "express": "5.2.1",
+    "jose": "6.2.12"
   }
 }

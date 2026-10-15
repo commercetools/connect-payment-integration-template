@@ -24,7 +24,7 @@
     "npm": ">=11.0.0"
   },
   "dependencies": {
-    "@commercetools-backend/loggers": "27.12.0",
+    "@commercetools-backend/loggers": "27.14.0",
     "@commercetools/connect-payments-sdk": "1.6.0",
     "@fastify/autoload": "6.5.0",
     "@fastify/cors": "11.3.0",
@@ -32,7 +32,7 @@
     "@fastify/http-proxy": "11.6.4",
     "@fastify/request-context": "7.0.0",
     "@fastify/static": "10.1.5",
-    "@fastify/type-provider-typebox": "6.1.0",
+    "@fastify/type-provider-typebox": "6.3.0",
     "@sinclair/typebox": "0.34.52",
     "dotenv": "18.0.5",
     "fastify": "5.12.5",

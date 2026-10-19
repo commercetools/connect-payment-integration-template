@@ -22,13 +22,13 @@
     "serve": "14.2.6"
   },
   "devDependencies": {
-    "@types/node": "24.19.1",
+    "@types/node": "24.19.2",
     "sass": "1.105.1",
     "ts-node": "10.9.2",
     "typescript": "7.0.2",
-    "vite": "8.3.2",
+    "vite": "8.3.4",
     "vite-plugin-css-injected-by-js": "5.0.2",
-    "vitest": "5.0.3"
+    "vitest": "5.0.4"
   },
   "overrides": {
     "@babel/core": "7.29.7",

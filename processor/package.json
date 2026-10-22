@@ -24,7 +24,7 @@
     "npm": ">=11.0.0"
   },
   "dependencies": {
-    "@commercetools-backend/loggers": "27.14.0",
+    "@commercetools-backend/loggers": "27.15.0",
     "@commercetools/connect-payments-sdk": "1.6.0",
     "@fastify/autoload": "6.5.1",
     "@fastify/cors": "11.3.1",

@@ -13,7 +13,7 @@
     "serve": "npm run build && serve public -l 3000 --cors"
   },
   "engines": {
-    "node": ">=24.0.0",
+    "node": ">=24.22.1",
     "npm": ">=11.0.0"
   },
   "dependencies": {

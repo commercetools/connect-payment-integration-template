@@ -24,7 +24,7 @@
     "npm": ">=11.0.0"
   },
   "dependencies": {
-    "@commercetools-backend/loggers": "27.14.0",
+    "@commercetools-backend/loggers": "27.15.0",
     "@commercetools/connect-payments-sdk": "1.6.0",
     "@fastify/autoload": "6.5.1",
     "@fastify/cors": "11.3.1",
@@ -42,8 +42,8 @@
     "@eslint/eslintrc": "3.3.7",
     "@eslint/js": "10.0.1",
     "@types/node": "24.19.2",
-    "@typescript-eslint/eslint-plugin": "8.71.2",
-    "@typescript-eslint/parser": "8.71.2",
+    "@typescript-eslint/eslint-plugin": "8.72.0",
+    "@typescript-eslint/parser": "8.72.0",
     "eslint": "10.13.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.7",

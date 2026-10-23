@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@commercetools-backend/loggers": "27.15.0",
-    "@commercetools/connect-payments-sdk": "1.6.0",
+    "@commercetools/connect-payments-sdk": "1.6.1",
     "@fastify/autoload": "6.5.1",
     "@fastify/cors": "11.3.1",
     "@fastify/formbody": "9.0.1",

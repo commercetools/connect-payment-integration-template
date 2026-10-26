@@ -365,6 +365,10 @@ export interface DropinComponent {
    * @param selector - The selector where the drop-in component will be mounted.
    */
   mount(selector: string): Promise<void>;
+  /**
+   * Removes and unmounts the drop-in component from the DOM.
+   */
+  remove(): Promise<void>;
 }
 
 /**

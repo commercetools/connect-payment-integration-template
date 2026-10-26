@@ -31,6 +31,10 @@ export class DropinComponents implements DropinComponent {
     this.dropinOptions.onDropinReady?.();
   }
 
+  async remove() {
+    // Write logic to unmount the drop-in component from the DOM
+  }
+
   async mount(selector: string) {
     document
       .querySelector(selector)

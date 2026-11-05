@@ -23,12 +23,12 @@
   },
   "devDependencies": {
     "@types/node": "24.19.2",
-    "sass": "1.106.1",
+    "sass": "1.107.1",
     "ts-node": "10.9.2",
     "typescript": "7.0.2",
     "vite": "8.3.5",
     "vite-plugin-css-injected-by-js": "5.0.2",
-    "vitest": "5.0.5"
+    "vitest": "5.1.0"
   },
   "overrides": {
     "@babel/core": "7.29.7",

@@ -28,7 +28,7 @@ export abstract class BaseComponent implements PaymentComponent {
   ) => void;
   protected getStorePaymentDetails?: () => boolean;
   protected setStorePaymentDetails?: (enabled: boolean) => void;
-  protected mountedNodes: ChildNode[] = [];
+  protected mountSelector?: string;
 
   constructor(
     paymentMethod: PaymentMethod,
@@ -55,20 +55,23 @@ export abstract class BaseComponent implements PaymentComponent {
   abstract mount(selector: string): Promise<void>;
 
   async remove(): Promise<void> {
-    this.mountedNodes.forEach((node) => node.remove());
-    this.mountedNodes = [];
+    if (!this.mountSelector) {
+      return;
+    }
+
+    document.querySelector(this.mountSelector)?.replaceChildren();
+    this.mountSelector = undefined;
   }
 
   /**
-   * Inserts the template at the start of the selector's container, producing the same DOM as
-   * insertAdjacentHTML("afterbegin", template), and keeps the inserted nodes so that remove()
-   * only deletes what this component mounted.
+   * Inserts the template at the start of the selector's container and remembers the selector,
+   * so that remove() can empty that container.
    */
   protected render(selector: string, template: string): void {
-    const fragment = document.createElement("template");
-    fragment.innerHTML = template;
-    this.mountedNodes = Array.from(fragment.content.childNodes);
-    document.querySelector(selector).prepend(fragment.content);
+    this.mountSelector = selector;
+    document
+      .querySelector(selector)
+      .insertAdjacentHTML("afterbegin", template);
   }
 
   showValidation?(): Promise<void>;

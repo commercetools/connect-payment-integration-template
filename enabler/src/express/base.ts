@@ -15,7 +15,7 @@ export abstract class DefaultExpressComponent implements ExpressComponent {
   protected availableShippingMethods: ExpressShippingOptionData[];
   protected paymentMethodConfig: { [key: string]: string };
   protected onComplete: OnComplete;
-  protected mountedNodes: ChildNode[] = [];
+  protected mountSelector?: string;
 
   constructor(opts: {
     expressOptions: ExpressOptions;
@@ -40,8 +40,12 @@ export abstract class DefaultExpressComponent implements ExpressComponent {
   abstract mount(selector: string): void;
 
   async remove(): Promise<void> {
-    this.mountedNodes.forEach((node) => node.remove());
-    this.mountedNodes = [];
+    if (!this.mountSelector) {
+      return;
+    }
+
+    document.querySelector(this.mountSelector)?.replaceChildren();
+    this.mountSelector = undefined;
   }
 
   async setShippingAddress(opts: {

@@ -68,9 +68,10 @@ export class SampleExpressComponent extends DefaultExpressComponent {
 
   // To be called when mounting the component
   mount(selector: string): void {
-    const root = document.createElement("div");
-    root.textContent = `Sample express component with sessionId: ${this.sessionId} mounted.`;
-    document.querySelector(selector).prepend(root);
-    this.rootElement = root;
+    const text = document.createTextNode(
+      `Sample express component with sessionId: ${this.sessionId} mounted.`,
+    );
+    document.querySelector(selector).prepend(text);
+    this.mountedNodes = [text];
   }
 }

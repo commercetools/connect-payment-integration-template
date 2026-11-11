@@ -68,8 +68,9 @@ export class SampleExpressComponent extends DefaultExpressComponent {
 
   // To be called when mounting the component
   mount(selector: string): void {
-    document
-      .querySelector(selector)
-      .insertAdjacentHTML("afterbegin", `Sample express component with sessionId: ${this.sessionId} mounted.`);
+    const root = document.createElement("div");
+    root.textContent = `Sample express component with sessionId: ${this.sessionId} mounted.`;
+    document.querySelector(selector).prepend(root);
+    this.rootElement = root;
   }
 }

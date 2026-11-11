@@ -31,9 +31,7 @@ export class CustomTestMethod extends BaseComponent {
   }
 
   async mount(selector: string) {
-    document
-      .querySelector(selector)
-      .insertAdjacentHTML("afterbegin", this._getTemplate());
+    this.render(selector, this._getTemplate());
 
     if (this.showPayButton) {
       document

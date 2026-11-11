@@ -15,6 +15,7 @@ export abstract class DefaultExpressComponent implements ExpressComponent {
   protected availableShippingMethods: ExpressShippingOptionData[];
   protected paymentMethodConfig: { [key: string]: string };
   protected onComplete: OnComplete;
+  protected rootElement?: HTMLElement;
 
   constructor(opts: {
     expressOptions: ExpressOptions;
@@ -37,6 +38,11 @@ export abstract class DefaultExpressComponent implements ExpressComponent {
   abstract init(): void;
 
   abstract mount(selector: string): void;
+
+  async remove(): Promise<void> {
+    this.rootElement?.remove();
+    this.rootElement = undefined;
+  }
 
   async setShippingAddress(opts: {
     address: ExpressAddressData;

@@ -24,17 +24,17 @@
     "npm": ">=11.0.0"
   },
   "dependencies": {
-    "@commercetools-backend/loggers": "27.16.0",
-    "@commercetools/connect-payments-sdk": "1.6.1",
+    "@commercetools-backend/loggers": "27.17.1",
+    "@commercetools/connect-payments-sdk": "1.7.0",
     "@fastify/autoload": "6.5.1",
-    "@fastify/cors": "11.4.0",
+    "@fastify/cors": "11.4.1",
     "@fastify/formbody": "9.0.1",
     "@fastify/http-proxy": "11.6.6",
     "@fastify/request-context": "7.0.5",
     "@fastify/static": "10.1.10",
     "@fastify/type-provider-typebox": "6.3.0",
     "@sinclair/typebox": "0.34.52",
-    "dotenv": "18.0.9",
+    "dotenv": "18.0.10",
     "fastify": "5.12.8",
     "fastify-plugin": "6.0.1"
   },
@@ -42,32 +42,33 @@
     "@eslint/eslintrc": "3.3.7",
     "@eslint/js": "10.0.1",
     "@types/node": "24.19.2",
-    "@typescript-eslint/eslint-plugin": "8.72.1",
-    "@typescript-eslint/parser": "8.72.1",
+    "@typescript-eslint/eslint-plugin": "8.72.2",
+    "@typescript-eslint/parser": "8.72.2",
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.7",
     "eslint-plugin-unused-imports": "4.4.1",
     "globals": "17.14.0",
-    "msw": "3.0.3",
+    "msw": "3.0.5",
     "node-fetch": "3.3.2",
     "nodemon": "3.1.14",
-    "prettier": "3.9.10",
+    "prettier": "3.10.0",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",
     "vitest": "5.1.0"
   },
   "overrides": {
-    "path-to-regexp": "3.3.0",
-    "lodash": "4.18.1",
-    "@typescript-eslint/utils": "8.58.2",
-    "@babel/core": "7.29.7",
-    "@babel/runtime": "7.26.10",
-    "@babel/runtime-corejs3": "7.26.10",
-    "brace-expansion": "5.0.12",
-    "diff": "9.0.0",
-    "flatted": "3.4.2",
-    "js-yaml@^3.13.1": "3.15.2",
-    "chokidar": "4.0.3"
+    "eslint": {
+      "minimatch": "11.0.8"
+    },
+    "@eslint/config-array": {
+      "minimatch": "11.0.8"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "11.0.8"
+    },
+    "nodemon": {
+      "minimatch": "11.0.8"
+    }
   }
 }

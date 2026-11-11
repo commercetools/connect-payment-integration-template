@@ -28,6 +28,7 @@ export abstract class BaseComponent implements PaymentComponent {
   ) => void;
   protected getStorePaymentDetails?: () => boolean;
   protected setStorePaymentDetails?: (enabled: boolean) => void;
+  protected rootElement?: HTMLElement;
 
   constructor(
     paymentMethod: PaymentMethod,
@@ -52,6 +53,22 @@ export abstract class BaseComponent implements PaymentComponent {
   }): Promise<void>;
 
   abstract mount(selector: string): Promise<void>;
+
+  async remove(): Promise<void> {
+    this.rootElement?.remove();
+    this.rootElement = undefined;
+  }
+
+  /**
+   * Renders the template inside a root element at the start of the selector's container,
+   * keeping a reference to it so that remove() only deletes what this component mounted.
+   */
+  protected render(selector: string, template: string): void {
+    const root = document.createElement("div");
+    root.innerHTML = template;
+    document.querySelector(selector).prepend(root);
+    this.rootElement = root;
+  }
 
   showValidation?(): Promise<void>;
   isValid?(): Promise<boolean>;

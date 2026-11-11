@@ -22,6 +22,7 @@ export class DropinEmbeddedBuilder implements PaymentDropinBuilder {
 
 export class DropinComponents implements DropinComponent {
   private dropinOptions: DropinOptions;
+  private rootElement?: HTMLElement;
 
   constructor(opts: { dropinOptions: DropinOptions }) {
     this.dropinOptions = opts.dropinOptions;
@@ -31,14 +32,16 @@ export class DropinComponents implements DropinComponent {
     this.dropinOptions.onDropinReady?.();
   }
 
-  async remove() {
-    // Write logic to unmount the drop-in component from the DOM
+  async remove(): Promise<void> {
+    this.rootElement?.remove();
+    this.rootElement = undefined;
   }
 
   async mount(selector: string) {
-    document
-      .querySelector(selector)
-      .insertAdjacentHTML("afterbegin", "Dropin Embedded");
+    const root = document.createElement("div");
+    root.textContent = "Dropin Embedded";
+    document.querySelector(selector).prepend(root);
+    this.rootElement = root;
   }
 
   async submit(): Promise<void> {

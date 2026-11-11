@@ -113,6 +113,12 @@ export interface PaymentComponent {
   mount(selector: string): Promise<void>;
 
   /**
+   * Removes the payment component from the DOM and releases its resources.
+   * Calling it on a component that is not mounted must be a no-op.
+   */
+  remove(): Promise<void>;
+
+  /**
    * Submits the payment.
    */
   submit({
@@ -365,8 +371,10 @@ export interface DropinComponent {
    * @param selector - The selector where the drop-in component will be mounted.
    */
   mount(selector: string): Promise<void>;
+
   /**
-   * Removes and unmounts the drop-in component from the DOM.
+   * Removes the drop-in component from the DOM and releases its resources.
+   * Calling it on a component that is not mounted must be a no-op.
    */
   remove(): Promise<void>;
 }
@@ -410,8 +418,21 @@ export interface PaymentDropinBuilder {
   build(config: DropinOptions): DropinComponent;
 }
 
+/**
+ * Represents the interface for an express checkout component.
+ */
 export interface ExpressComponent {
+  /**
+   * Mounts the express component to the specified selector.
+   * @param selector - The selector where the express component will be mounted.
+   */
   mount(selector: string): void;
+
+  /**
+   * Removes the express component from the DOM and releases its resources.
+   * Calling it on a component that is not mounted must be a no-op.
+   */
+  remove(): Promise<void>;
 }
 
 export type ExpressAddressData = {

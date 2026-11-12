@@ -28,6 +28,7 @@ export abstract class BaseComponent implements PaymentComponent {
   ) => void;
   protected getStorePaymentDetails?: () => boolean;
   protected setStorePaymentDetails?: (enabled: boolean) => void;
+  protected mountSelector?: string;
 
   constructor(
     paymentMethod: PaymentMethod,
@@ -52,6 +53,26 @@ export abstract class BaseComponent implements PaymentComponent {
   }): Promise<void>;
 
   abstract mount(selector: string): Promise<void>;
+
+  async destroy(): Promise<void> {
+    if (!this.mountSelector) {
+      return;
+    }
+
+    document.querySelector(this.mountSelector)?.replaceChildren();
+    this.mountSelector = undefined;
+  }
+
+  /**
+   * Inserts the template at the start of the selector's container and remembers the selector,
+   * so that destroy() can empty that container.
+   */
+  protected render(selector: string, template: string): void {
+    this.mountSelector = selector;
+    document
+      .querySelector(selector)
+      .insertAdjacentHTML("afterbegin", template);
+  }
 
   showValidation?(): Promise<void>;
   isValid?(): Promise<boolean>;

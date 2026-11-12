@@ -54,7 +54,7 @@ export abstract class BaseComponent implements PaymentComponent {
 
   abstract mount(selector: string): Promise<void>;
 
-  async remove(): Promise<void> {
+  async destroy(): Promise<void> {
     if (!this.mountSelector) {
       return;
     }
@@ -65,7 +65,7 @@ export abstract class BaseComponent implements PaymentComponent {
 
   /**
    * Inserts the template at the start of the selector's container and remembers the selector,
-   * so that remove() can empty that container.
+   * so that destroy() can empty that container.
    */
   protected render(selector: string, template: string): void {
     this.mountSelector = selector;

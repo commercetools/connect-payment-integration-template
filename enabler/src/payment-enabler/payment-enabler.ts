@@ -113,10 +113,10 @@ export interface PaymentComponent {
   mount(selector: string): Promise<void>;
 
   /**
-   * Removes the payment component from the DOM and releases its resources.
+   * Destroys the payment component from the DOM and releases its resources.
    * Calling it on a component that is not mounted must be a no-op.
    */
-  remove(): Promise<void>;
+  destroy(): Promise<void>;
 
   /**
    * Submits the payment.
@@ -373,10 +373,10 @@ export interface DropinComponent {
   mount(selector: string): Promise<void>;
 
   /**
-   * Removes the drop-in component from the DOM and releases its resources.
+   * Destroys the drop-in component from the DOM and releases its resources.
    * Calling it on a component that is not mounted must be a no-op.
    */
-  remove(): Promise<void>;
+  destroy(): Promise<void>;
 }
 
 /**
@@ -429,10 +429,10 @@ export interface ExpressComponent {
   mount(selector: string): void;
 
   /**
-   * Removes the express component from the DOM and releases its resources.
+   * Destroys the express component from the DOM and releases its resources.
    * Calling it on a component that is not mounted must be a no-op.
    */
-  remove(): Promise<void>;
+  destroy(): Promise<void>;
 }
 
 export type ExpressAddressData = {

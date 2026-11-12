@@ -32,7 +32,7 @@ export class DropinComponents implements DropinComponent {
     this.dropinOptions.onDropinReady?.();
   }
 
-  async remove(): Promise<void> {
+  async destroy(): Promise<void> {
     if (!this.mountSelector) {
       return;
     }

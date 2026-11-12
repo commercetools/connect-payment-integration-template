@@ -39,7 +39,7 @@ export abstract class DefaultExpressComponent implements ExpressComponent {
 
   abstract mount(selector: string): void;
 
-  async remove(): Promise<void> {
+  async destroy(): Promise<void> {
     if (!this.mountSelector) {
       return;
     }

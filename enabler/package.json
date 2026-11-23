@@ -19,7 +19,7 @@
   "dependencies": {
     "@commercetools-backend/loggers": "27.17.1",
     "@sinclair/typebox": "0.34.52",
-    "serve": "14.2.7"
+    "serve": "14.2.8"
   },
   "devDependencies": {
     "@types/node": "24.19.2",

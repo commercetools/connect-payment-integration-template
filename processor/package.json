@@ -29,9 +29,9 @@
     "@fastify/autoload": "6.6.0",
     "@fastify/cors": "11.4.3",
     "@fastify/formbody": "9.0.2",
-    "@fastify/http-proxy": "11.6.9",
+    "@fastify/http-proxy": "11.6.10",
     "@fastify/request-context": "7.0.5",
-    "@fastify/static": "10.1.11",
+    "@fastify/static": "10.1.12",
     "@fastify/type-provider-typebox": "6.3.0",
     "@sinclair/typebox": "0.34.52",
     "dotenv": "18.0.10",
@@ -49,13 +49,13 @@
     "eslint-plugin-prettier": "5.5.7",
     "eslint-plugin-unused-imports": "4.4.1",
     "globals": "17.14.0",
-    "msw": "3.0.6",
+    "msw": "3.0.7",
     "node-fetch": "3.3.2",
     "nodemon": "3.1.14",
     "prettier": "3.10.1",
     "ts-node": "10.9.2",
     "typescript": "6.0.3",
-    "vitest": "5.1.0"
+    "vitest": "5.1.1"
   },
   "overrides": {
     "eslint": {
